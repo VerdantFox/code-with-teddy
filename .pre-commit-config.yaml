@@ -37,18 +37,6 @@ repos:
     hooks:
       - id: blacken-docs
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v3.1.0"
-    hooks:
-      - id: prettier
-        args:
-          [
-            "--trailing-comma=es5",
-            "--tab-width=2",
-            "--no-semi",
-            "--plugin=prettier-plugin-jinja-template",
-          ]
-
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.6
     hooks:
@@ -75,6 +63,18 @@ repos:
           # stylelint: https://github.com/stylelint/stylelint/releases
           # stylelint-config-standard: https://github.com/stylelint/stylelint-config-standard/releases
           ["stylelint@15.11.0", "stylelint-config-standard@34.0.0"]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.1.0"
+    hooks:
+      - id: prettier
+        args:
+          [
+            "--trailing-comma=es5",
+            "--tab-width=2",
+            "--no-semi",
+            "--plugin=prettier-plugin-jinja-template",
+          ]
 
   # Mypy is fairly slow, so put towards the end
   - repo: https://github.com/pre-commit/mirrors-mypy

@@ -1,0 +1,5 @@
+<div class="flex flex-col gap-2">
+  {{ field.label }}
+  {{ field(class="rounded-lg focus-visible:ring-4 focus-visible:ring-teal-300") }}
+  {{ render_partial('shared/partials/forms/field_errors.html', errors=field.errors) }}
+</div>

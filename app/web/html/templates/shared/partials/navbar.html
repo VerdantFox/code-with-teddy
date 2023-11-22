@@ -1,0 +1,23 @@
+<header x-data="{navOpen: false}" class="sticky py-2 bg-teal-600 text-white">
+  <nav
+    class="section-container flex gap-6 text-lg justify-between items-center"
+    x-data="{navOpen: false}"
+  >
+    <div class="flex gap-6">
+      <a class="text-xl font-semibold" href="{{ url_for('html:home') }}"
+        >Todo App</a
+      >
+      <ul class="">
+        {% if current_user %}
+          <li>
+            <a href="{{ url_for('html:logout') }}">Log out</a>
+          </li>
+        {% else %}
+          <li>
+            <a href="{{ url_for('html:login_get') }}">Log in</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+</header>

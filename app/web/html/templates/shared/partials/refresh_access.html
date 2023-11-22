@@ -1,0 +1,9 @@
+{% if request.cookies.get("access_token") and not no_content %}
+  <div
+    hidden
+    hx-get="{{ url_for('html:refresh_access_token') }}"
+    hx-trigger="every 10m"
+    hx-target="this"
+    hx-swap="outerHTML"
+  ></div>
+{% endif %}

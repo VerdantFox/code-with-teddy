@@ -10,5 +10,6 @@
         "ignoreAtRules": ["extends", "tailwind"]
       }
     ]
-  }
+  },
+  "ignoreFiles": ["app/web/html/static/css/styles.css"]
 }

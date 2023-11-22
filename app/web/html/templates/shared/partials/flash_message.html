@@ -1,0 +1,48 @@
+{% if message %}
+  <div
+    class="flash-{{ message.category.value }} section-container w-full flex flex-wrap justify-between gap-8 rounded-md px-4 py-2 mb-6"
+    role="alert"
+    x-data="{ show: true }"
+    x-show="show"
+    {% if message.timeout %}
+      {% set timeout = message.timeout * 1000 %}
+      x-init="setTimeout(() => show = false, {{ timeout }})"
+    {% endif %}
+    x-transition:leave.duration.150ms
+  >
+    <span>{{ message.msg }}</span>
+    <button
+      type="button"
+      class="border-0"
+      data-dismiss="alert"
+      aria-label="Close"
+      @click="show = false"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 256 256"
+        class="w-4 h-4 stroke-current hover:stroke-teal-500 hover:scale-125 duration-300 border-0"
+      >
+        <rect width="256" height="256" fill="none" />
+        <line
+          x1="200"
+          y1="56"
+          x2="56"
+          y2="200"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="16"
+        />
+        <line
+          x1="200"
+          y1="200"
+          x2="56"
+          y2="56"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="16"
+        />
+      </svg>
+    </button>
+  </div>
+{% endif %}

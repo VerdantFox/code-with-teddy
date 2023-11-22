@@ -14,7 +14,8 @@ You can run (or not run) this script automatically as the last step of the
 import os
 from datetime import datetime, timedelta, timezone
 
-from app.datastore import Session, db_models
+from app.datastore import db_models
+from app.datastore.database import Session
 
 # DB connection constants
 DB_STRING_KEY = "DB_CONNECTION_STRING_SECRET"
@@ -37,42 +38,15 @@ class PopulateDB:
     def __init__(self, session: Session) -> None:
         """Initialize the class."""
         self.session = session
-        self.locations: list[db_models.Location] = []
+        self.users: list[db_models.User] = []
 
-    def _populate_locations(self) -> None:
-        """Populate the locations table."""
-        locations = [
-            db_models.Location(
-                latitude=40.0150,
-                longitude=-105.2705,
-                city="The Shire",
-                state="Eridor",
-                country="Middle Earth",
-                postal_code="80301",
-            ),
-            db_models.Location(
-                latitude=37.7749,
-                longitude=-122.4194,
-                city="EastFold",
-                state="Gondor",
-                country="Middle Earth",
-                postal_code="94107",
-            ),
-            db_models.Location(
-                latitude=26.6771,
-                longitude=-80.0370,
-                city="Mount Doom",
-                state="Mordor",
-                country="Middle Earth",
-                postal_code="33480",
-            ),
-        ]
-        for location in locations:
-            self.locations.append(self.session.put(location))
+    def _populate_users(self) -> None:
+        """Populate the users table."""
+        self.users = []
 
     def populate(self) -> None:
         """Populate the database with dummy data."""
-        self._populate_locations()
+        self._populate_users()
 
 
 def populate_database(db: Session) -> None:
