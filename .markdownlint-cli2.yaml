@@ -1,0 +1,6 @@
+# See https://github.com/DavidAnson/markdownlint-cli2/blob/main/test/markdownlint-cli2-yaml-example/.markdownlint-cli2.yaml
+# for an example.
+
+config:
+  line-length: false
+ignores: ["test_data/"]

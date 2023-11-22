@@ -1,0 +1,219 @@
+# pyproject.toml: unified Python project metadata and tool configuration file
+# See PEP-518: https://www.python.org/dev/peps/pep-0518/
+
+
+# --------------------------------------------------------------------------
+# Project setup
+# --------------------------------------------------------------------------
+# Project Metadata
+# Reference: https://www.python.org/dev/peps/pep-0621/
+[project]
+name = "code-with-teddy"
+version = "1.0"
+description = "Teddy's portfolio website."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Framework :: FastAPI",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+]
+maintainers = [
+    {name = "Theodore Williams", email = "theodore.f.williams@gmail.com"},
+]
+# Dependencies specified here should ideally not be pinned, unless
+# recommended by the package itself. This follows best practices
+# established by PyPA:
+#   https://packaging.python.org/discussions/install-requires-vs-requirements/
+dependencies = [
+    # Bcrypt: password hashing library
+    "bcrypt",
+    # Email-validator: email validation library for Pydantic
+    "email-validator",
+    # FastAPI: web framework
+    "fastapi",
+    # Itsdangerous: cryptographically signed tokens
+    "itsdangerous",
+    # Jinja-partials: Jinja2 template partials
+    "jinja-partials",
+    # Jinja2: templating engine
+    "jinja2",
+    # PsycoPG: PostgreSQL database adapter
+    "psycopg[binary]",
+    # Pydantic: data modeling, validation and settings management
+    "pydantic",
+    # SQLAlchemy: database toolkit
+    "SQLAlchemy",
+    # Uvicorn: ASGI server
+    "uvicorn",
+    # WTForms: web forms library
+    "WTForms",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Alembic: SQLAlchemy migration tool
+    "alembic",
+    # Docker: containerization tool
+    "docker",
+    # Mypy: static type checker
+    "mypy",
+    # Pip-tools: dependency management
+    "pip-tools",
+    # Pre-commit: git pre-commit hooks
+    "pre-commit",
+    # Pytest: testing framework
+    "pytest",
+    # Rich: pretty terminal output
+    "rich",
+    # Ruff: fast all-in-one linter, written in Rust
+    "ruff",
+    # Setuptools: build system
+    "setuptools",
+    # Typer: CLI toolkit
+    "typer",
+]
+
+[project.urls]
+source = "https://github.com/VerdantFox/code-with-teddy"
+issues = "https://github.com/VerdantFox/code-with-teddy/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# --------------------------------------------------------------------------
+# Tool configurations
+# --------------------------------------------------------------------------
+# Mypy
+# Reference: https://mypy.readthedocs.io/en/stable/config_file.html
+[tool.mypy]
+# Use the Pydantic plugin for better checking of Pydantic models.
+# References: https://pydantic-docs.helpmanual.io/mypy_plugin/
+# https://numpy.org/devdocs/reference/typing.html#mypy-plugin
+plugins = ["pydantic.mypy"]
+exclude = "venv|tmp"
+
+python_version = "3.11"
+
+# Type-checks the interior of functions without type annotations.
+check_untyped_defs = true
+# Require type annotations on all definitions.
+disallow_untyped_defs = true
+# Skip check against external imports that are missing type hints
+ignore_missing_imports = true
+# Require types to be marked as Optional if they support None.
+no_implicit_optional = true
+# Append an error code to each reported message.
+show_error_codes = true
+# Require types to overlap in order to allow equality comparisons.
+strict_equality = true
+# Report unnecessary "cast" calls.
+warn_redundant_casts = true
+# Report unnecessary "# type: ignore" directives.
+warn_unused_ignores = true
+
+# Pytest
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+filterwarnings = [
+    # Ignore warnings from all sources so that we can ignore warnings from
+    # external libraries that we can't control.
+    "ignore",
+    # Overwrite to error on warnings from our own code.
+    "error:::tests",
+    "error:::app",
+    "error:::scripts",
+]
+
+# Ruff
+[tool.ruff]
+line-length= 120
+target-version = "py310"
+# Rules to run
+select = [
+    "A",     # flake8-builtins
+    "ANN",   # flake8-annotations
+    "ASYNC", # flake8-async
+    "ARG",   # flake8-unused-arguments
+    "B",     # flake8-bugbear
+    "BLE",   # flake8-blind-except
+    "C4",    # flake8-comprehensions
+    "C90",   # mccabe (complexity)
+    "COM",   # flake8-commas
+    "D",     # pydocstyle
+    "DTZ",   # flake8-datetimez
+    "E",     # pycodestyle errors
+    "EM",    # flake8-errmsg
+    "ERA",   # eradicate
+    "EXE",   # flake8-executable
+    "F",     # pyflakes
+    "FBT",   # flake8-boolean-trap
+    "FLY",   # flynt
+    "FURB",  # Refurb
+    "G",     # flake8-logging-format
+    "I",     # isort
+    "ICN",   # flake8-import-conventions
+    "INP",   # flake8-no-pep420
+    "ISC",   # flake8-implicit-str-concat
+    "LOG",   # flake8-logging
+    "N",     # pep8-naming
+    "NPY",   # NumPy-specific rules
+    "PERF",  # Perflint
+    "PD",    # pandas-vet
+    "PGH",   # pygrep-hooks
+    "PIE",   # flake8-pie
+    "PL",    # pylint
+    "PLC",   # pylint-convention
+    "PLE",   # pylint-error
+    "PLR",   # pylint-refactor
+    "PLW",   # pylint-warning
+    "PT",    # flake8-pytest-style
+    "PTH",   # flake8-use-pathlib
+    "Q",     # flake8-quotes
+    "RET",   # flake8-return
+    "RSE",   # flake8-raise
+    "RUF",   # ruff-specific rules
+    "S",     # flake8-bandit
+    "SIM",   # flake8-simplify
+    "SLF",   # flake8-self
+    "T10",   # flake8-debugger
+    "T20",   # flake8-print
+    "TID",   # flake8-tidy-imports
+    "TRY",   # tryceratops
+    "UP",    # pyupgrade
+    "W",     # pycodestyle warnings
+    "YTT",   # flake8-2020
+]
+# Roles to ignore
+ignore = [
+    "A003",   # builtin-attribute-shadowing. Shadowing `id` in a model for instance.
+    "ANN101", # Missing type annotation for self in class method
+    "ANN102", # Missing type annotation for cls in classmethod
+    "ANN401",  # No dynamically typed expressions (like "Any")
+    "D105",   # Missing docstring in magic method
+    "D107",   # Missing docstring in __init__
+    "D203",   # 1 blank line required before class docstring (conflicts with D211 - No blank lines allowed before class docstring)
+    "D213",   # Multi-line docstring summary should start at the second line (conflicts with D212 - Multi-line docstring summary should start at the first line)
+]
+# Don't automatically fix these errors, but still report them
+unfixable = [
+    "ERA001",  # eradicate commented out code
+    "T20",     # flake8-print
+    "RUF100",  # unused-noqa
+]
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["S"]  # assert-used
+
+[tool.ruff.mccabe]
+max-complexity = 8
+
+[tool.ruff.isort.sections]
+"tests" = ["tests"]
+"scripts" = ["scripts"]
+
+[tool.ruff.isort]
+known-first-party = ["app"]

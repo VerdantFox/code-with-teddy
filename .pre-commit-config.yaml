@@ -1,0 +1,119 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+# To run against all files:
+#     pre-commit run --all-files
+# To install hooks:
+#     pre-commit install
+# To update hooks:
+#     pre-commit autoupdate
+default_language_version:
+  python: python3.11
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=600"]
+      - id: check-ast
+      - id: debug-statements
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: "v0.1.6"
+    hooks:
+      - id: ruff
+        args: ["--fix", "--show-fixes", "--exit-non-zero-on-fix"]
+      - id: ruff-format
+
+  - repo: https://github.com/asottile/blacken-docs
+    rev: 1.16.0
+    hooks:
+      - id: blacken-docs
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.1.0"
+    hooks:
+      - id: prettier
+        args:
+          [
+            "--trailing-comma=es5",
+            "--tab-width=2",
+            "--no-semi",
+            "--plugin=prettier-plugin-jinja-template",
+          ]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        # Seems to be broken on python 3.11
+        language_version: python3.10
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.11.0
+    hooks:
+      - id: markdownlint-cli2
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.1-beta
+    hooks:
+      - id: hadolint-docker
+
+  - repo: https://github.com/awebdeveloper/pre-commit-stylelint
+    rev: "4200758"
+    hooks:
+      - id: stylelint
+        additional_dependencies:
+          # Find releases here:
+          # stylelint: https://github.com/stylelint/stylelint/releases
+          # stylelint-config-standard: https://github.com/stylelint/stylelint-config-standard/releases
+          ["stylelint@15.11.0", "stylelint-config-standard@34.0.0"]
+
+  # Mypy is fairly slow, so put towards the end
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "v1.7.0"
+    hooks:
+      - id: mypy
+        # additional_dependencies:
+        #   - pydantic==1.10.8
+
+  # - repo: local
+  #   hooks:
+  #     - id: match-requirements
+  #       additional_dependencies:
+  #         - pyyaml==6.0
+  #         - toml==0.10.2
+  #         - rich==13.4.1
+  #       name: match-requirements
+  #       entry: python -m utils.abstracted.match-requirements
+  #       language: python
+  #       language_version: "3.10"
+  #       pass_filenames: false
+  #       files: ".pre-commit-config.yaml|requirements-prod.txt|requirements-dev.txt|pyproject.toml"
+  #     - id: ensure-prod-reqs
+
+  #       name: ensure-prod-reqs
+  #       # Have to run as "script" instead of "python" or subprocess takes 7X as long
+  #       # language: python
+  #       # language_version: "3.10"
+  #       # additional_dependencies:
+  #       #   - pipreqs==0.4.11
+  #       # entry: python -m utils.abstracted.ensure-prod-reqs
+  #       entry: ./utils/abstracted/ensure-prod-reqs.py
+  #       language: script
+  #       pass_filenames: false
+  #       files: "requirements-prod.txt|pyproject.toml|app/.*.py"
+  #     - id: jinja-ninja
+  #       additional_dependencies:
+  #         - jinjaninja==0.1.2
+  #       name: jinja-ninja
+  #       entry: jinja-ninja
+  #       language: python
+  #       types: [html]

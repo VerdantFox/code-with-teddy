@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Unit test / coverage reports
+.cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# Python virtual environment
+venv/
+
+# Environment variables
+.env
+
+# Static files to not track
+blog_uploaded/
+
+# Mypy
+.mypy_cache/
+
+# ruff
+.ruff_cache
+
+# Other
+certbot/
+**/logs/
