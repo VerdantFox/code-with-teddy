@@ -17,7 +17,7 @@ class WebAppError(BaseModel):
     status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-@router.get("", response_class=HTMLResponse)
+@router.get("", response_model=None)
 async def general_error(
     request: Request,
     status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,

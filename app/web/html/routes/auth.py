@@ -37,7 +37,7 @@ async def login_for_access_token(
 REFRESH_ACCESS_PARTIAL = "shared/partials/refresh_access.html"
 
 
-@router.get("/refresh-token-cookie")
+@router.get("/refresh-token-cookie", response_model=None)
 async def refresh_access_token(
     request: Request,
     access_token: OptionalCookieDependency = None,

@@ -3,7 +3,7 @@ from typing import Annotated
 
 import sqlalchemy
 from fastapi import APIRouter, Query, Request, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import Form, PasswordField, StringField, validators
 
@@ -35,7 +35,7 @@ class LoginForm(Form):
     )
 
 
-@router.get("/login", response_class=HTMLResponse)
+@router.get("/login", response_model=None)
 async def login_get(
     request: Request,
     username: Annotated[str | None, Query()] = None,
@@ -55,7 +55,7 @@ async def login_get(
     )
 
 
-@router.post("/login", response_class=HTMLResponse)
+@router.post("/login", response_model=None)
 async def login_post(
     request: Request,
     db: DBSession,
@@ -133,7 +133,7 @@ class RegisterUserForm(Form):
     )
 
 
-@router.get("/register", response_class=HTMLResponse)
+@router.get("/register", response_model=None)
 async def register_get(request: Request) -> _TemplateResponse:
     """Return the user registration page."""
     form_data = await request.form()
@@ -144,7 +144,7 @@ async def register_get(request: Request) -> _TemplateResponse:
     )
 
 
-@router.post("/register", response_class=HTMLResponse)
+@router.post("/register", response_model=None)
 async def register_post(
     request: Request,
     db: DBSession,
@@ -202,7 +202,7 @@ async def register_post(
     )
 
 
-@router.post("/logout", response_class=HTMLResponse)
+@router.post("/logout", response_model=None)
 async def logout(request: Request) -> RedirectResponse:
     """Log the user out and redirect to the home page."""
     response = RedirectResponse(
