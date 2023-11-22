@@ -1,13 +1,33 @@
+"""Run the app in development mode."""
 import time
+from typing import Annotated
 
+import typer
 from pynput.keyboard import Controller, Key
 
 keyboard = Controller()
+cli_app = typer.Typer(add_completion=False)
 
 
-def main() -> None:
+class Opts:
+    """Options for the typer function script."""
+
+    no_browser_sync_help = "Don't run browser-sync."
+    no_browser_sync = typer.Option(..., help="Don't run browser-sync.")
+
+
+@cli_app.command()
+def main(
+    *,
+    browser_sync: Annotated[
+        bool,
+        typer.Option(..., "--browser-sync/--no-browser-sync", "-b/-nb", help="Don't run browser-sync."),
+    ] = True,
+) -> None:
+    """Run the app in development mode."""
     run_tailwind()
-    run_browser_sync()
+    if browser_sync:
+        run_browser_sync()
     run_uvicorn()
 
 
@@ -52,6 +72,7 @@ def run_uvicorn() -> None:
 
 
 def run_browser_sync() -> None:
+    """Run browser-sync with hot reloading."""
     args = [
         "browser-sync",
         "http://localhost:8000",
@@ -64,4 +85,4 @@ def run_browser_sync() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    cli_app()

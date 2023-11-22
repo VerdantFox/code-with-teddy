@@ -7,7 +7,6 @@ Run with `python -m dev_tools.start_local_postgres --help`
 import contextlib
 import logging
 import os
-import subprocess
 import time
 from typing import Optional
 from urllib.parse import quote_plus
@@ -19,7 +18,8 @@ from docker.errors import NotFound
 from docker.models.containers import Container
 from pydantic import BaseModel
 
-from datastore import database, db_models
+from app.datastore import database, db_models
+from scripts.alembic import upgrade
 
 HEALTH_CHECK_TIMEOUT = 15
 
@@ -81,7 +81,9 @@ def teardown_container(*, db_vars: DBVars, docker_client: APIClient) -> None:
 
 
 def _create_postgres_container(
-    *, db_vars: DBVars, docker_client: APIClient
+    *,
+    db_vars: DBVars,
+    docker_client: APIClient,
 ) -> Container:
     """Create the postgres container."""
     environment = {
@@ -116,7 +118,7 @@ def _create_database() -> None:
 
 def _run_migrations(migration_version: str) -> None:
     """Run migrations to a specific version."""
-    subprocess.run(["flask", "db", "upgrade", migration_version], check=True)
+    upgrade(revision=migration_version)
 
 
 def _announce_vars(db_vars: DBVars) -> None:
@@ -128,17 +130,18 @@ def _announce_vars(db_vars: DBVars) -> None:
     logger.info("postgres password:       [yellow]%s[/yellow]", db_vars.password)
     logger.info("postgres database:       [yellow]%s[/yellow]", db_vars.database)
     logger.info(
-        "connection string:       [green]%s[/green]", db_vars.get_connection_string()
+        "connection string:       [green]%s[/green]",
+        db_vars.get_connection_string(),
     )
 
 
-def create_container_and_db(
+def create_container_and_db(  # noqa: PLR0913 too-many-args
     db_vars: DBVars,
     *,
     teardown: bool = True,
     create_db: bool = True,
     migration_version: str | None = None,
-    populate: bool = False,
+    populate: bool = False,  # noqa: ARG001 unused-function-arg
     silent: bool = False,
 ) -> Container:
     """Start the postgres container and populate the database."""
@@ -160,8 +163,8 @@ def create_container_and_db(
         logger.info("Creating database...")
         _create_database()
     # if populate:
-    #     logger.info("Populating database...")
-    #     populate_db.populate_database()
+    #     logger.info("Populating database...")  # noqa: ERA001
+    #     populate_db.populate_database()  # noqa: ERA001
     _announce_vars(db_vars)
     return container
 
@@ -175,14 +178,9 @@ class Opts:
     password = typer.Option(default, help="Postgres password.")
     database = typer.Option(default, help="Postgres database name.")
     port = typer.Option(5432, help="Postgres port.")
-    teardown_help = (
-        "Teardown an existing postgres container of the same name before creating a"
-        " new one."
-    )
+    teardown_help = "Teardown an existing postgres container of the same name before creating a new one."
     teardown = typer.Option(default=True, help=teardown_help)
-    create_db_help = (
-        "Create the database tables as specified by the SQLAlchemy models in db_models."
-    )
+    create_db_help = "Create the database tables as specified by the SQLAlchemy models in db_models."
     create_db = typer.Option(default=True, help=create_db_help)
     migration_help = (
         "Database migration version. If specified, the database "
@@ -198,7 +196,7 @@ cli_app = typer.Typer(add_completion=False)
 
 
 @cli_app.command()
-def typer_main(
+def typer_main(  # noqa: PLR0913 too-many-arguments
     *,
     container_name: str = Opts.container_name,
     username: str = Opts.username,
