@@ -1,22 +1,204 @@
-<header x-data="{navOpen: false}" class="sticky py-2 bg-teal-600 text-white">
-  <nav
-    class="section-container flex gap-6 text-lg justify-between items-center"
-    x-data="{navOpen: false}"
+{%
+  set nav_items = [
+  {
+  'name': 'About',
+  'url': "#",
+  },
+  {
+  'name': 'blog',
+  'url': "#",
+  },
+  {
+  'name': 'Projects',
+  'url': "#",
+  },
+  {
+  'name': 'Experience',
+  'url': "#",
+  },
+  {
+  'name': 'Skills',
+  'url': "#",
+  },
+  ]
+%}
+{%
+  set user_nav_items = [
+  {"name": "Your Profile", "url": "#"},
+  {"name": "Settings", "url": "#"},
+  {"name": "Sign out", "url": "#"},
+  ]
+%}
+{% if not active_nav_item %}
+  {% set active_nav_item = 0 %}
+{% endif %}
+<header
+  x-data="{navOpen: false, selectedNavItem: {{ active_nav_item }}, showNav: true, lastScroll: 9999999999, navAtTop: window.pageYOffset < 30}"
+  class="pointer-events-none z-40 w-full relative"
+  @scroll.window="let currentScroll = window.pageYOffset;
+                  if (Math.abs(currentScroll - lastScroll) < 2) return 
+                  showNav = (currentScroll  < lastScroll);
+                  navAtTop = currentScroll < 30;
+                  lastScroll = currentScroll;
+                  console.log(`did last scroll:${lastScroll} ${currentScroll}`)"
+  @resize.window="
+    let width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+    if (width > 768) {
+      navOpen = false
+    }
+  "
+>
+  <!-- Top navbar -->
+  <div
+    :class="{'top-0': showNav, '-top-24': !showNav}"
+    class="transition-all duration-300 px-6 py-6 w-full fixed"
+    x-show="!navOpen"
+    x-transition:enter.opacity.duration.200ms
+    x-transition:leave.opacity.duration.500ms
   >
-    <div class="flex gap-6">
-      <a class="text-xl font-semibold" href="{{ url_for('html:home') }}"
-        >Todo App</a
+    <div
+      class="mx-auto max-w-6xl relative flex justify-between items-center gap-4"
+    >
+      <!-- Home link image (left) -->
+      <div class="flex flex-1 g">
+        <a
+          aria-label="Home"
+          class="pointer-events-auto flex items-center justify-center gap-2 text-lg font-semibold"
+          href="{{ url_for('html:landing') }}"
+        >
+          <div
+            :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
+            class="h-12 w-12 rounded-full hover:bg-primary-white/90 dark:hover:bg-grayscale-700 p-1 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 backdrop-blur hvoer:dark:bg-grayscale-800/90 hover:dark:ring-white/10 flex items-center justify-center transition-all duration-300"
+          >
+            <img
+              alt=""
+              fetchpriority="high"
+              width="512"
+              height="512"
+              decoding="async"
+              data-nimg="1"
+              class="rounded-full bg-grayscale-100 object-cover dark:bg-grayscale-800 h-10 w-10 transition duration-500"
+              sizes="2.25rem"
+              src="{{ url_for('html:static', path='/images/landing/teddy_avatar.png') }}"
+            />
+          </div>
+        </a>
+      </div>
+
+      <!-- Nav links -- large screen (center) -->
+      <nav
+        aria-label="Main Navigation"
+        class="pointer-events-auto max-md:hidden flex flex-1"
       >
-      <ul class="">
-        {% if current_user %}
+        <ul
+          x-data="{hover: false}"
+          @mouseover="hover = true"
+          @mouseover.away="hover = false"
+          :class="navAtTop ? '' : 'bg-grayscale-50/90 dark:bg-grayscale-800/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:ring-white/10'"
+          class="flex rounded-full  px-3 text-md font-medium text-grayscale-800  backdrop-blur  dark:text-grayscale-200 hover:bg-grayscale-50/90 hover:dark:bg-grayscale-800/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hvoer:dark:ring-white/10 transition duration-200"
+        >
+          {% for nav_item in nav_items %}
+            <li>
+              <a
+                href="{{ nav_item.get('url') }}"
+                x-data="{
+                  id: {{ loop.index }},
+                  get selected() {
+                    return this.selectedNavItem === this.id
+                  },
+                  set selected(value) {
+                    this.selectedNavItem = this.id
+                  },
+                }"
+                @click="selected = !selected"
+                :class="selected ? 'text-primary-600 dark:text-primary-400' : ''"
+                class="relative block px-3 py-2 transition duration-300 hover:text-primary-600 dark:hover:text-primary-400"
+                >{{ nav_item.get("name") }}
+                <span
+                  :class="selected & (!navAtTop | hover) ? 'from-primary-600/0 via-primary-600/40 to-primary-600/0 dark:from-primary-400/0 dark:via-primary-400/40 dark:to-primary-400/0' : ''"
+                  class="absolute inset-x-1 -bottom-px h-px bg-gradient-to-r transition duration-300"
+                ></span
+              ></a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+
+      <!-- Mobile nav menu button (center-right) -->
+      <div class="max-md:flex max-md:flex-1 max-md:justify-end hidden">
+        <div class="pointer-events-auto">
+          <button
+            @click="navOpen = !navOpen"
+            :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
+            class="group flex items-center rounded-full  px-4 py-2 text-md font-medium text-grayscale-800  backdrop-blur  dark:text-grayscale-200 hover:ring-1 ring-grayscale-900/5  dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 duration-300 transition-all"
+            type="button"
+            aria-controls="mobile-menu"
+            :aria-expanded="navOpen"
+          >
+            Menu{{ render_partial('shared/partials/icons/caret-down.html', class="ml-3 h-3 w-3 fill-grayscale-500 group-hover:fill-grayscale-700 dark:group-hover:fill-grayscale-400") }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Dark Mode Button (right)-->
+      <div class="flex justify-end md:flex-1">
+        <div class="pointer-events-auto">
+          <button
+            type="button"
+            aria-label="Switch to dark theme"
+            @click="darkMode = !darkMode"
+            :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
+            class="group rounded-full  px-2 py-2 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
+          >
+            {{ render_partial('shared/partials/icons/sun.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300", xshow="!darkMode") }}
+            {{ render_partial('shared/partials/icons/moon-stars.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 dark:group-hover:fill-primary-400 transition-all duration-300", xshow="darkMode") }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile nav links (modal) -->
+  <nav
+    aria-label="Main navigation"
+    x-show="navOpen"
+    x-transition:enter.opacity.duration.200ms
+    @click.away="navOpen = false"
+    class="pointer-events-auto top-0 bottom-0 fixed px-6 py-6 w-full hidden max-md:block backdrop-blur transition"
+    x-trap.inert="navOpen"
+  >
+    <div class="relative">
+      <button @click="navOpen = false" class="absolute top-5 right-5 z-50">
+        {{ render_partial('shared/partials/icons/x.html', class="w-6 h-6 fill-grayscale-800 dark:fill-gray-100 hover:fill-primary-700 dark:hover:fill-primary-400") }}
+      </button>
+      <ul
+        class="flex flex-col rounded-3xl px-6 py-6 bg-grayscale-50/90 text-md font-medium text-grayscale-800 shadow-2xl shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:text-grayscale-200 dark:ring-white/10"
+      >
+        <li>
+          <span
+            class="cursor-default relative block px-3 py-3 text-grayscale-600 dark:text-grayscale-300 text-sm mb-5"
+            >Navigation</span
+          >
+        </li>
+        {% for nav_item in nav_items %}
           <li>
-            <a href="{{ url_for('html:logout') }}">Log out</a>
+            <a
+              href="{{ nav_item.get('url') }}"
+              x-data="{
+                id: {{ loop.index }},
+                get selected() {
+                  return this.selectedNavItem === this.id
+                },
+                set selected(value) {
+                  this.selectedNavItem = value ? this.id : null
+                },
+              }"
+              @click="selected = !selected"
+              class="relative block px-3 py-3 transition hover:text-primary-700 dark:hover:text-primary-00"
+              >{{ nav_item.get("name") }}</a
+            >
           </li>
-        {% else %}
-          <li>
-            <a href="{{ url_for('html:login_get') }}">Log in</a>
-          </li>
-        {% endif %}
+        {% endfor %}
       </ul>
     </div>
   </nav>

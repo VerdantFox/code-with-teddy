@@ -1,12 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html
+  lang="en"
+  x-data="{darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches)}"
+  :class="darkMode ? 'dark' : ''"
+  class="max-xl:text-[95%] max-lg:text-[90%] max-md:text-[85%]"
+>
   {% include 'shared/partials/head.html' %}
-
-  <body hx-ext="response-targets" class="text-neutral-700">
+  {% if not body_class %}
+    {% set body_class = "text-neutral-700 dark:text-neutral-100 dark:bg-grayscale-900" %}
+  {% endif %}
+  <body
+    hx-ext="response-targets"
+    class="{{ body_class }} transition-all duration-300"
+  >
+    {# Weird hack to make top spacing not break #}
+    <div class="h-[0.02px]"></div>
     {% include 'shared/partials/refresh_access.html' %}
     {% include 'shared/partials/navbar.html' %}
     {{ render_partial('shared/partials/flash_messages.html', request=request) }}
-    {% block content %}
-    {% endblock content %}
+    <main>
+      {% block content %}
+      {% endblock content %}
+    </main>
   </body>
 </html>

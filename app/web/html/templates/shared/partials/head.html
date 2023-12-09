@@ -10,25 +10,15 @@
     rel="stylesheet"
     href="{{ url_for('html:static', path='css/styles.css') }}"
   />
-  <script
-    defer
-    src="{{ url_for('html:static', path='js/htmx.js') }}?1.9.8"
-  ></script>
-  <script
-    defer
-    src="{{ url_for('html:static', path='js/alpine.js') }}?3.13.12"
-  ></script>
-  <script
-    defer
-    src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.2/dist/cdn.min.js"
-  ></script>
-  <script
-    type="module"
-    src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
-  ></script>
-  <script
-    nomodule
-    src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
-  ></script>
-  <title>Todos app</title>
+  <!-- External JavaScript Libraries (loaded from our code) -->
+  <!-- No defer -- some extensions might now work with defer set -->
+  <script src="{{ url_for('html:static', path='js/libraries/htmx.js') }}?1.9.8"></script>
+  <!-- No defer -- get flash of unstyled content with defer set -->
+  <script src="{{ url_for('html:static', path='js/libraries/alpine.js') }}?3.13.3"></script>
+  {% if page_title %}
+    {% set page_title = page_title + "| Teddy Williams" %}
+  {% else %}
+    {% set page_title = "Teddy Williams" %}
+  {% endif %}
+  <title>{{ page_title }}</title>
 </head>

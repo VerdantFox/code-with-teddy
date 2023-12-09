@@ -2,14 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+}
+
 @layer components {
   .section-container {
-    @apply max-w-5xl mx-auto px-8;
+    @apply max-w-6xl mx-auto px-8;
   }
-
-  .form-text-field {
-    @apply rounded-lg focus-visible:ring-4 focus-visible:ring-teal-300;
-  }
+}
+[x-cloak] {
+  display: none !important;
 }
 
 /* Define outside of components so they are definitely generated */
