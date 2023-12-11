@@ -13,8 +13,6 @@
   <!-- External JavaScript Libraries (loaded from our code) -->
   <!-- No defer -- some extensions might now work with defer set -->
   <script src="{{ url_for('html:static', path='js/libraries/htmx.js') }}?1.9.8"></script>
-  <!-- No defer -- get flash of unstyled content with defer set -->
-  <script src="{{ url_for('html:static', path='js/libraries/alpine.js') }}?3.13.3"></script>
   {% if page_title %}
     {% set page_title = page_title + "| Teddy Williams" %}
   {% else %}

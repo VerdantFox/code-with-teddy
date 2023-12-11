@@ -1,0 +1,274 @@
+<section>
+  <div class="section-container pb-36 text-lg">
+    <!-- Head section -->
+    <div class="mb-20">
+      <h2 class="max-w-xl text-4xl font-bold [text-wrap:balance] mb-10">
+        Bits and Bytes: My Tech Favorites
+      </h2>
+      <p class="max-w-2xl text-2xl [text-wrap:balance]">
+        Curious About My Software Stack, Beloved Gadgets, and Top Picks? Here's
+        the Lowdown!
+      </p>
+    </div>
+
+    <!-- Things -->
+    <div
+      class="bg-offset-50 dark:bg-grayscale-800 rounded-xl px-16 max-xs:px-6 py-16 shadow-lg transition-bg-color duration-500"
+    >
+      <div
+        class="grid grid-cols-[min-content_1fr] max-md:grid-cols-1 gap-16 max-w-3xl"
+      >
+        <!-- Hardware -->
+        <div
+          class="flex flex-col gap-6 items-center max-md:flex-row max-md:justify-start"
+        >
+          <h3 class="text-2xl font-semibold">Hardware</h3>
+          {{ render_partial('shared/partials/icons/desktop-tower.html', class="w-12 h-12") }}
+        </div>
+        <div class="flex flex-col gap-12 mb-8 max-md:mb-20">
+          <div>
+            <h4 class="mb-2 font-semibold">Custom Built PC</h4>
+            <p>
+              I built my PC back in 2017. It's running a GTX-970 graphics card,
+              Intel i5 CPU, 16GB of RAM, and a 1TB SSD. I use it for coding and
+              gaming. I think I might upgrade a few parts soon. 16GB of ram is
+              starting to feel a little cramped.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">Dual monitors</h4>
+            <p>
+              I currently run two 19 inch monitors that don't match. I think my
+              dream setup would involve a third, extra wide 4k monitor.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://www.amazon.com/gp/product/B07B9TVQ82"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >HyperX Pulsefire Surge mouse</a
+              >
+            </h4>
+            <p>It's just a cheap optical mouse with fun RGB lighting.</p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://www.amazon.com/gp/product/B00EQV0W02"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+              >
+                CM Storm QuickFire XT - Full Size Mechanical Gaming Keyboard
+              </a>
+            </h4>
+            <p>
+              I use it with MX Brown Switches. I love the feel of mechanical
+              keyboards.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://www.amazon.com/gp/product/B01G53FAFK"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >EasyAcc G1 Gaming Headset</a
+              >
+            </h4>
+            <p>
+              I literally Googled "headsets for big heads" to find this because
+              my last headset was too tight. 😅
+            </p>
+          </div>
+        </div>
+
+        <!-- Dev tools -->
+        <div
+          class="flex flex-col gap-6 items-center max-md:flex-row max-md:justify-start"
+        >
+          <h3 class="text-2xl font-semibold">Dev tools</h3>
+          {{ render_partial('shared/partials/icons/code.html', class="w-12 h-12") }}
+        </div>
+        <div class="flex flex-col gap-12 mb-8 max-md:mb-20">
+          <div>
+            <h4 class="mb-2 font-semibold">
+              Ubuntu 22.04 (linux) operating system
+            </h4>
+            <p>
+              I have a dual boot with Windows 10 for gaming, but I do most of my
+              development in Ubuntu. For work, I use a Windows 10 laptop with
+              WSL (Windows sub-system for Linux).
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              VS Code text editor with the One Dark Pro theme
+            </h4>
+            <p>
+              I love VS Code. It's fast and so customizable with extensions.
+              Check out my blog post on
+              <a
+                class="link"
+                href="https://verdantfox.com/blog/my-top-20-favorite-vs-code-extensions"
+                target="_blank"
+                rel="noopener noreferrer"
+                >my top 20 favorite VS Code extensions</a
+              >.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              Oh My Zsh terminal with a custom theme
+            </h4>
+            <p>
+              My prompt shows the current user, the relative directory, and my
+              git branch. It also shows the time on the right side.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://brave.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >Vivaldi Browser</a
+              >
+            </h4>
+            <p>
+              It's chromium based, hyper-customizable, and has a built-in
+              ad-blocker and other privacy features.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://www.gimp.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+              >
+                GIMP - GNU Image Manipulation Program
+              </a>
+            </h4>
+            <p>
+              GIMP is an open-source image editor, like Photoshop, but free and
+              probably not as good.
+            </p>
+          </div>
+        </div>
+
+        <!-- Podcasts -->
+        <div
+          class="flex flex-col gap-6 items-center max-md:flex-row max-md:justify-start"
+        >
+          <h3 class="text-2xl font-semibold">Podcasts</h3>
+          {{ render_partial('shared/partials/icons/microphone.html', class="w-12 h-12") }}
+        </div>
+        <div class="flex flex-col gap-12 mb-8">
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://pythonbytes.fm"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >Python Bytes
+              </a>
+            </h4>
+            <p>
+              A weekly podcast by Michael Kennedy and Brian Okken that delivers
+              brief, insightful episodes covering new Python tools, tips, and
+              news.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://talkpython.fm"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >Talk Python to Me</a
+              >
+            </h4>
+            <p>
+              Hosted by Michael Kennedy, Talk Python to Me is an in-depth
+              interview podcast exploring various Python topics and trends
+              within the Python community.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://syntax.fm"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >Syntax</a
+              >
+            </h4>
+            <p>
+              Syntax, hosted by Wes Bos and Scott Tolinski, is a web development
+              podcast offering practical insights and tips for building modern
+              web applications.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://www.codenewbie.org/podcast"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >Code Newbie</a
+              >
+            </h4>
+            <p>
+              Code Newbie, hosted by Saron Yitbarek, is a supportive podcast and
+              community for coding beginners, featuring interviews and advice
+              from individuals in the coding world.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://www.redhat.com/en/compiler-podcast"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >Compiler</a
+              >
+            </h4>
+            <p>
+              Compiler, a podcast by Red Hat hosted by Angela Andrews and Brent
+              Simoneaux, explores the stories and impact of open source projects
+              and technology on society.
+            </p>
+          </div>
+          <div>
+            <h4 class="mb-2 font-semibold">
+              <a
+                href="https://irlpodcast.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+                >IRL</a
+              >
+            </h4>
+            <p>
+              Mozilla's IRL, hosted by Manoush Zomorodi, is a podcast discussing
+              the real-world impact of technology on privacy, online
+              communities, and the human-tech relationship.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,10 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 1 %}
+
+{% block content %}
+  {% include "/main/about/sections/landing.html" %}
+  {% include "/main/about/sections/philosophies.html" %}
+  {% include "/main/about/sections/random_facts.html" %}
+  {% include "/main/about/sections/uses.html" %}
+  {{ render_partial('shared/partials/bottom_nav.html', next_page=("projects", url_for("html:landing"))) }}
+{% endblock content %}

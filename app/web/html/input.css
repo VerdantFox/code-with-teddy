@@ -3,9 +3,16 @@
 @tailwind utilities;
 
 @layer base {
+  .transition-bg-color {
+    transition-property: background-color, opacity;
+  }
 }
 
 @layer components {
+  .link {
+    @apply text-primary-800 hover:text-primary-700 border-primary-800 hover:border-primary-700 dark:text-primary-300 dark:hover:text-primary-500  dark:border-primary-300 dark:hover:border-primary-500 border-b transition duration-300;
+  }
+
   .section-container {
     @apply max-w-6xl mx-auto px-8;
   }

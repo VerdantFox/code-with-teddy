@@ -1,0 +1,85 @@
+<footer
+  class="relative bg-offset-100 dark:bg-grayscale-800 transition-bg-color duration-500 shadow-xl"
+>
+  <a
+    class="absolute top-0 left-1/2 rounded-full bg-offset-100 dark:bg-grayscale-800 p-3 -translate-y-8 -translate-x-1/2 hover:-translate-y-9 transition-bg-color transition-transform duration-500 shadow-lg"
+    title="Scroll to top"
+    href="#"
+  >
+    {{ render_partial('shared/partials/icons/caret-double-up.html', class="w-12 h-12") }}
+  </a>
+  <div
+    x-data="{year: new Date().getFullYear()}"
+    class="section-container py-12 flex justify-between gap-12 max-md:flex-col items-center max-md:pt-20"
+  >
+    <div>
+      <p class="mb-6">
+        &copy; <span x-text="year">2023</span> Designed & Coded by
+        <span
+          class="text-offset-800 dark:text-offset-300 font-semibold duration-500"
+          >Teddy Williams</span
+        >
+      </p>
+      <div class="flex gap-6 justify-center items-center">
+        <a
+          class="fill-primary-800 hover:fill-primary-600 dark:fill-primary-300 dark:hover:fill-primary-500 transition duration-300"
+          target="_blank"
+          href="mailto:theodore.f.williams@gmail.com"
+          title="Teddy's Email"
+          aria-label="Teddy's Email"
+        >
+          {{ render_partial('shared/partials/icons/mail.html', class="w-10 h-10") }}
+        </a>
+        <a
+          class="fill-primary-800 hover:fill-primary-600 dark:fill-primary-300 dark:hover:fill-primary-500 transition duration-300"
+          target="_blank"
+          href="https://github.com/VerdantFox"
+          title="Teddy's GitHub"
+          aria-label="Teddy's GitHub"
+        >
+          {{ render_partial('shared/partials/icons/logo-github.html', class="w-10 h-10") }}
+        </a>
+        <a
+          class="fill-primary-800 hover:fill-primary-600 dark:fill-primary-300 dark:hover:fill-primary-500 transition duration-300"
+          target="_blank"
+          href="https://www.linkedin.com/in/theodore-f-williams/"
+          title="Teddy's LinkedIn"
+          aria-label="Teddy's LinkedIn"
+        >
+          {{ render_partial('shared/partials/icons/logo-linkedin.html', class="w-10 h-10") }}
+        </a>
+        <a
+          class="fill-primary-800 hover:fill-primary-600 dark:fill-primary-300 dark:hover:fill-primary-500 transition duration-300"
+          target="_blank"
+          href="https://fosstodon.org/@verdantfox"
+          title="Teddy's Mastodon"
+          aria-label="Teddy's Mastodon"
+        >
+          {{ render_partial('shared/partials/icons/logo-mastodon.html', class="w-10 h-10") }}
+        </a>
+      </div>
+    </div>
+    <div class="flex gap-6 text-lg font-semibold">
+      <a
+        href="#"
+        class="text-primary-800 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-500 transition duration-300"
+        >About</a
+      >
+      <a
+        href="#"
+        class="text-primary-800 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-500 transition duration-300"
+        >Projects</a
+      >
+      <a
+        href="#"
+        class="text-primary-800 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-500 transition duration-300"
+        >Experience</a
+      >
+      <a
+        href="#"
+        class="text-primary-800 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-500 transition duration-300"
+        >Blog</a
+      >
+    </div>
+  </div>
+</footer>

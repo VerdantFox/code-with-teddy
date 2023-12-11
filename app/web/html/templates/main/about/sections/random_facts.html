@@ -1,0 +1,74 @@
+{%
+  set grid_images = [
+  ("arches", "Teddy sitting in Arches National Park"),
+  ("cooking", "Teddy cooking, wearing an apron, holding up a spatula"),
+  ("games", "Teddy and friend playing a board game"),
+  ("halloween_mask", "Teddy posing with a steampunk plague mask for Halloween"),
+  ("mountain","Teddy standing on a mountain peak"),
+  ("rock_climbing", "Teddy rock climbing outdoors"),
+  ("scuba", "Teddy SCUBA diving in the ocean"),
+  ("snow_dip", "Teddy and his partner Tristine doing a swing dance dip in the snow"),
+  ("stella", "Teddy's cat Stella, in a Christmas tree"),
+  ("swingtime_dip", "Teddy and his partner Tristine doing a swing dance dip in front of a neon sign"),
+  ("thailand", "Teddy feeding an elephant in Thailand"),
+  ("tigger", "Teddy's cat Tigger, sitting on Teddy's lap in a chair"),
+  ]
+%}
+<section>
+  <div
+    class="px-8 mx-auto max-w-7xl pt-32 pb-44 grid grid-cols-[3fr_2fr] max-md:grid-cols-1 items-center justify-center gap-16"
+  >
+    <!-- Image grid -->
+    <div
+      class="grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-4 max-xs:grid-cols-3 gap-2 max-md:gap-1"
+    >
+      {% for image, description in grid_images %}
+        <div
+          class="inline-block flex justify-center items-center overflow-hidden  rounded-lg max-md:rounded-md shadow"
+        >
+          <picture>
+            <source
+              srcset="
+                {{ url_for('html:static', path='/images/main/about/grid/' + image + '.webp') }}
+              "
+              type="image/webp"
+            />
+            <source
+              srcset="
+                {{ url_for('html:static', path='/images/main/about/grid/' + image + '.jpg') }}
+              "
+              type="image/jpg"
+            />
+            <img
+              src="{{ url_for('html:static', path='/images/main/about/grid/' + image + '.jpg') }}"
+              alt="{{ description }}"
+              title="{{ description }}"
+              class="w-full hover:scale-125 transition duration-500"
+              loading="lazy"
+            />
+          </picture>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Random facts -->
+    <div class="max-md:row-start-1">
+      <h2 class="font-bold text-4xl max-md:text-3xl mb-10">
+        Random facts about me
+      </h2>
+      <ul class="flex flex-col gap-2 text-lg">
+        <li>😻 Tristine and my two cute cats share my home</li>
+        <li>🪴 My place is alive with plants and aquarium fish</li>
+        <li>🐠 SCUBA diving tops my vacation activities</li>
+        <li>🦊 Foxes make me happy</li>
+        <li>🕺Swing dancing is my jam</li>
+        <li>🏔️ I've bagged twelve 14K+ foot mountains</li>
+        <li>🇹🇭 I explored Thailand on my last big adventure</li>
+        <li>🧗‍♂️ Rock climbing is my newest hobby</li>
+        <li>🎲 Everdell is my current board game love</li>
+        <li>🎮 Strategy video games are my bread-and-butter</li>
+        <li>📚 The wheel of Time is my latest book binge</li>
+      </ul>
+    </div>
+  </div>
+</section>

@@ -2,11 +2,7 @@
   set nav_items = [
   {
   'name': 'About',
-  'url': "#",
-  },
-  {
-  'name': 'blog',
-  'url': "#",
+  'url': url_for('html:landing'),
   },
   {
   'name': 'Projects',
@@ -17,7 +13,7 @@
   'url': "#",
   },
   {
-  'name': 'Skills',
+  'name': 'blog',
   'url': "#",
   },
   ]
@@ -39,8 +35,7 @@
                   if (Math.abs(currentScroll - lastScroll) < 2) return 
                   showNav = (currentScroll  < lastScroll);
                   navAtTop = currentScroll < 30;
-                  lastScroll = currentScroll;
-                  console.log(`did last scroll:${lastScroll} ${currentScroll}`)"
+                  lastScroll = currentScroll;"
   @resize.window="
     let width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
     if (width > 768) {
@@ -77,9 +72,9 @@
               height="512"
               decoding="async"
               data-nimg="1"
-              class="rounded-full bg-grayscale-100 object-cover dark:bg-grayscale-800 h-10 w-10 transition duration-500"
+              class="rounded-full bg-offset-300 object-cover dark:bg-offset-300 h-10 w-10 transition duration-500"
               sizes="2.25rem"
-              src="{{ url_for('html:static', path='/images/landing/teddy_avatar.png') }}"
+              src="{{ url_for('html:static', path='/images/shared/avatar.png') }}"
             />
           </div>
         </a>

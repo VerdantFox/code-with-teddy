@@ -3,7 +3,7 @@
   lang="en"
   x-data="{darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches)}"
   :class="darkMode ? 'dark' : ''"
-  class="max-xl:text-[95%] max-lg:text-[90%] max-md:text-[85%]"
+  class="max-xl:text-[95%] max-lg:text-[90%] max-md:text-[85%] scroll-smooth"
 >
   {% include 'shared/partials/head.html' %}
   {% if not body_class %}
@@ -11,16 +11,21 @@
   {% endif %}
   <body
     hx-ext="response-targets"
-    class="{{ body_class }} transition-all duration-300"
+    class="{{ body_class }} transition duration-500"
   >
+    <!-- No defer -- get flash of unstyled content with defer set -->
+    <script src="{{ url_for('html:static', path='js/libraries/alpine.js') }}?3.13.3"></script>
     {# Weird hack to make top spacing not break #}
     <div class="h-[0.02px]"></div>
+
     {% include 'shared/partials/refresh_access.html' %}
     {% include 'shared/partials/navbar.html' %}
     {{ render_partial('shared/partials/flash_messages.html', request=request) }}
+
     <main>
       {% block content %}
       {% endblock content %}
     </main>
+    {% include "shared/partials/footer.html" %}
   </body>
 </html>

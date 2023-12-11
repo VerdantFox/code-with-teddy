@@ -19,7 +19,7 @@ async def landing(
         "HX-Refresh": "true",
     }
     return templates.TemplateResponse(
-        "landing/landing.html",
+        "main/about/about.html",
         {"request": request},
         headers=headers,
     )
