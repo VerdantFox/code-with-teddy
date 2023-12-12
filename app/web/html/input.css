@@ -18,7 +18,7 @@
     @apply inline-block px-8 py-4 text-lg flex gap-4 items-center justify-center rounded-xl;
   }
 
-  .btn-solid {
+  .btn-filled {
     @apply btn text-white bg-primary-500 dark:bg-primary-700 hover:bg-primary-600 dark:hover:bg-primary-800 active:bg-primary-700 dark:active:bg-primary-900 disabled:bg-primary-200  disabled:text-primary-700 dark:disabled:text-primary-100 dark:disabled:bg-primary-900 disabled:opacity-50 transition-bg-color duration-300;
   }
 
