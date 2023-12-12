@@ -6,5 +6,5 @@
   {% include "/main/about/sections/philosophies.html" %}
   {% include "/main/about/sections/random_facts.html" %}
   {% include "/main/about/sections/uses.html" %}
-  {{ render_partial('shared/partials/bottom_nav.html', next_page=("projects", url_for("html:landing"))) }}
+  {{ render_partial('shared/partials/previous_next_nav.html', next_page=("projects", url_for("html:projects"))) }}
 {% endblock content %}
