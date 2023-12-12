@@ -1,0 +1,10 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 2 %}
+
+{% block content %}
+  {% include "/main/about/sections/landing.html" %}
+  {% include "/main/about/sections/philosophies.html" %}
+  {% include "/main/about/sections/random_facts.html" %}
+  {% include "/main/about/sections/uses.html" %}
+  {{ render_partial('shared/partials/previous_next_nav.html', previous_page=("about", url_for("html:landing")) , next_page=("experience", url_for("html:experience"))) }}
+{% endblock content %}

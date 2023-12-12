@@ -1,0 +1,23 @@
+{% if previous_page or next_page %}
+  <nav
+    aria-label="previous and next page links"
+    class="section-container flex items-center justify-between mb-12"
+  >
+    {% if previous_page %}
+      <a class="btn-outline" href="{{ previous_page[1] }}"
+        >{{ render_partial("/shared/partials/icons/arrow-fat-left.html", class="inline-block h-5 w-5") }}
+        <span>{{ previous_page[0] }}</span></a
+      >
+    {% else %}
+      <div></div>
+    {% endif %}
+    {% if next_page %}
+      <a class="btn-outline" href="{{ next_page[1] }}">
+        <span>{{ next_page[0] }}</span>
+        {{ render_partial("/shared/partials/icons/arrow-fat-right.html", class="inline-block h-5 w-5") }}</a
+      >
+    {% else %}
+      <div></div>
+    {% endif %}
+  </nav>
+{% endif %}
