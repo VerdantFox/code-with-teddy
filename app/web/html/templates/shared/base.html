@@ -13,8 +13,6 @@
     hx-ext="response-targets"
     class="{{ body_class }} transition duration-500"
   >
-    <!-- No defer -- get flash of unstyled content with defer set -->
-    <script src="{{ url_for('html:static', path='js/libraries/alpine.js') }}?3.13.3"></script>
     {# Weird hack to make top spacing not break #}
     <div class="h-[0.02px]"></div>
 

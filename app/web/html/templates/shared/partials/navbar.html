@@ -55,7 +55,7 @@
       class="mx-auto max-w-6xl relative flex justify-between items-center gap-4"
     >
       <!-- Home link image (left) -->
-      <div class="flex flex-1 g">
+      <div class="flex flex-1 g" title="Code With Teddy">
         <a
           aria-label="Home"
           class="pointer-events-auto flex items-center justify-center gap-2 text-lg font-semibold"
@@ -144,6 +144,7 @@
             @click="darkMode = !darkMode"
             :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
             class="group rounded-full  px-2 py-2 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
+            :title="darkMode ? 'Switch to light theme' : 'Switch to dark theme'"
           >
             {{ render_partial('shared/partials/icons/sun.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300", xshow="!darkMode") }}
             {{ render_partial('shared/partials/icons/moon-stars.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 dark:group-hover:fill-primary-400 transition-all duration-300", xshow="darkMode") }}

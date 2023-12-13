@@ -2,7 +2,7 @@
   set grid_images = [
   ("arches", "Teddy sitting in Arches National Park"),
   ("cooking", "Teddy cooking, wearing an apron, holding up a spatula"),
-  ("games", "Teddy and friend playing a board game"),
+  ("games", "Teddy and a friend playing a board game"),
   ("halloween_mask", "Teddy posing with a steampunk plague mask for Halloween"),
   ("mountain","Teddy standing on a mountain peak"),
   ("rock_climbing", "Teddy rock climbing outdoors"),
@@ -42,7 +42,6 @@
             <img
               src="{{ url_for('html:static', path='/images/main/about/grid/' + image + '.jpg') }}"
               alt="{{ description }}"
-              title="{{ description }}"
               class="w-full hover:scale-125 transition duration-500"
               loading="lazy"
             />
