@@ -7,6 +7,7 @@
       <a
         class="btn-outline max-xs:text-sm max-xs:py-2 max-xs:px-4"
         href="{{ previous_page[1] }}"
+        @click="smoothScroll = false; setTimeout(() => smoothScroll = true, 50)"
         >{{ render_partial("/shared/partials/icons/arrow-fat-left.html", class="inline-block h-5 w-5 max-xs:h-4 max-xs:w-4") }}
         <span>{{ previous_page[0] }}</span></a
       >
@@ -17,6 +18,7 @@
       <a
         class="btn-outline max-xs:text-sm max-xs:py-2 max-xs:px-4"
         href="{{ next_page[1] }}"
+        @click="smoothScroll = false; setTimeout(() => smoothScroll = true, 50)"
       >
         <span>{{ next_page[0] }}</span>
         {{ render_partial("/shared/partials/icons/arrow-fat-right.html", class="inline-block h-5 w-5  max-xs:h-4 max-xs:w-4") }}</a

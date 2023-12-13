@@ -6,6 +6,10 @@
   .transition-bg-color {
     transition-property: background-color, opacity;
   }
+
+  .transition-shadowform {
+    transition-property: transform, box-shadow;
+  }
 }
 
 @layer components {

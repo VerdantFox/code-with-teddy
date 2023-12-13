@@ -8,20 +8,20 @@ from app.web.html.const import templates
 # ----------- Routers -----------
 router = APIRouter(tags=["landing"])
 
+# headers = {
+#     "HX-Replace-Url": str(request.url_for("html:landing")),
+#     "HX-Refresh": "true",
+# }
+
 
 @router.get("/", response_model=None)
 async def landing(
     request: Request,
 ) -> _TemplateResponse:
     """Return the portfolio landing (about) page."""
-    headers = {
-        "HX-Replace-Url": str(request.url_for("html:landing")),
-        "HX-Refresh": "true",
-    }
     return templates.TemplateResponse(
         "main/about/about.html",
         {"request": request},
-        headers=headers,
     )
 
 
@@ -30,14 +30,9 @@ async def projects(
     request: Request,
 ) -> _TemplateResponse:
     """Return the portfolio landing page."""
-    headers = {
-        "HX-Replace-Url": str(request.url_for("html:projects")),
-        "HX-Refresh": "true",
-    }
     return templates.TemplateResponse(
         "main/projects/projects.html",
         {"request": request},
-        headers=headers,
     )
 
 
@@ -46,12 +41,7 @@ async def experience(
     request: Request,
 ) -> _TemplateResponse:
     """Return the portfolio landing page."""
-    headers = {
-        "HX-Replace-Url": str(request.url_for("html:experience")),
-        "HX-Refresh": "true",
-    }
     return templates.TemplateResponse(
         "main/experience/experience.html",
         {"request": request},
-        headers=headers,
     )
