@@ -10,6 +10,10 @@
   .transition-shadowform {
     transition-property: transform, box-shadow;
   }
+
+  .transition-shadow-bg-transform {
+    transition-property: background-color, opacity, transform, box-shadow;
+  }
 }
 
 @layer components {

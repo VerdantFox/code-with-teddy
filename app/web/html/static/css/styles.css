@@ -633,8 +633,8 @@ select {
   transition-property: background-color, opacity;
 }
 
-.transition-shadowform {
-  transition-property: transform, box-shadow;
+.transition-shadow-bg-transform {
+  transition-property: background-color, opacity, transform, box-shadow;
 }
 
 *, ::before, ::after {
@@ -2063,12 +2063,6 @@ select {
 
 .transition-all {
   transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-.transition-shadow {
-  transition-property: box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
