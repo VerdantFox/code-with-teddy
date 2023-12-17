@@ -18,7 +18,7 @@
 
 @layer components {
   .section-container {
-    @apply max-w-6xl mx-auto px-8;
+    @apply max-w-6xl mx-auto px-8 max-xs:px-4;
   }
 
   /* Buttons */

@@ -49,7 +49,7 @@ dependencies = [
     # SQLAlchemy: database toolkit
     "SQLAlchemy",
     # Uvicorn: ASGI server
-    "uvicorn",
+    "uvicorn[standard]",
     # WTForms: web forms library
     "WTForms",
 ]
