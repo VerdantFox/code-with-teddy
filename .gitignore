@@ -29,3 +29,4 @@ blog_uploaded/
 # Other
 certbot/
 **/logs/
+*.db

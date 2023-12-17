@@ -32,7 +32,7 @@
   x-data="{navOpen: false, selectedNavItem: {{ active_nav_item }}, showNav: true, lastScroll: 9999999999, navAtTop: window.pageYOffset < 30}"
   class="pointer-events-none z-40 w-full relative"
   @scroll.window="let currentScroll = window.pageYOffset;
-                  if (Math.abs(currentScroll - lastScroll) < 2) return 
+                  if (Math.abs(currentScroll - lastScroll) < 2) return
                   showNav = (currentScroll  < lastScroll);
                   navAtTop = currentScroll < 30;
                   lastScroll = currentScroll;"

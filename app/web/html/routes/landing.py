@@ -8,10 +8,10 @@ from app.web.html.const import templates
 # ----------- Routers -----------
 router = APIRouter(tags=["landing"])
 
-# headers = {
+# headers = {  noqa: ERA001 (commented-out-code)
 #     "HX-Replace-Url": str(request.url_for("html:landing")),
 #     "HX-Refresh": "true",
-# }
+# }  noqa: ERA001 (commented-out-code)
 
 
 @router.get("/", response_model=None)
