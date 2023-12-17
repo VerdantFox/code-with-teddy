@@ -10,11 +10,7 @@
   {% if not body_class %}
     {% set body_class = "text-neutral-700 dark:text-neutral-100 dark:bg-grayscale-900" %}
   {% endif %}
-  <body
-    hx-ext="response-targets"
-    class="{{ body_class }} transition duration-500"
-    hx-boost="true"
-  >
+  <body hx-ext="response-targets" class="{{ body_class }}" hx-boost="true">
     {# Weird hack to make top spacing not break #}
     <div class="h-[0.02px]"></div>
 

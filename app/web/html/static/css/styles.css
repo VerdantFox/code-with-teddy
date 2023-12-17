@@ -633,6 +633,10 @@ select {
   transition-property: background-color, opacity;
 }
 
+.transition-shadowform {
+  transition-property: transform, box-shadow;
+}
+
 .transition-shadow-bg-transform {
   transition-property: background-color, opacity, transform, box-shadow;
 }
@@ -2598,6 +2602,10 @@ select {
 
 .duration-0 {
   transition-duration: 0s;
+}
+
+.duration-1000 {
+  transition-duration: 1000ms;
 }
 
 .ease-in-out {

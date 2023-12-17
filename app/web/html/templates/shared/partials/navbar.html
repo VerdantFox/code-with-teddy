@@ -46,7 +46,7 @@
   <!-- Top navbar -->
   <div
     :class="{'top-0': showNav, '-top-24': !showNav}"
-    class="transition-all duration-300 px-6 py-6 w-full fixed"
+    class="px-6 py-6 w-full fixed"
     x-show="!navOpen"
     x-transition:enter.opacity.duration.200ms
     x-transition:leave.opacity.duration.500ms
@@ -107,11 +107,11 @@
                 }"
                 @click="selected = !selected; smoothScroll = false; setTimeout(() => smoothScroll = true, 50)"
                 :class="selected ? 'text-primary-600 dark:text-primary-400' : ''"
-                class="relative block px-3 py-2 transition duration-300 hover:text-primary-600 dark:hover:text-primary-400"
+                class="relative block px-3 py-2 hover:text-primary-600 dark:hover:text-primary-400"
                 >{{ nav_item.get("name") }}
                 <span
                   :class="selected & (!navAtTop | hover) ? 'from-primary-600/0 via-primary-600/40 to-primary-600/0 dark:from-primary-400/0 dark:via-primary-400/40 dark:to-primary-400/0' : ''"
-                  class="absolute inset-x-1 -bottom-px h-px bg-gradient-to-r transition duration-300"
+                  class="absolute inset-x-1 -bottom-px h-px bg-gradient-to-r"
                 ></span
               ></a>
             </li>
