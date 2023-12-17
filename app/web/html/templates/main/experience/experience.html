@@ -1,0 +1,10 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 3 %}
+
+{% block content %}
+  {% include "/main/experience/sections/head.html" %}
+  {% include "/main/experience/sections/history.html" %}
+  {% include "/main/experience/sections/skills.html" %}
+  <!-- TODO: Update 'next' link to blog -->
+  {{ render_partial('shared/partials/previous_next_nav.html', previous_page=("projects", url_for("html:projects")) , next_page=("blog", url_for("html:experience"))) }}
+{% endblock content %}
