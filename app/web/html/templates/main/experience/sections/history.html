@@ -33,10 +33,15 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-6 top-[4rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 top-0 left-0"
+        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 top-0 left-0 group"
       >
-        {{ render_partial('shared/partials/icons/exam.html', title="Picture of a paper with A+ written on it", class="max-lg:hidden absolute top-4 right-4 h-10 w-10") }}
-        {{ render_partial('shared/partials/icons/graduation-cap.html', title="Picture of a graduation cap", class="lg:hidden absolute top-4 right-4 h-10 w-10") }}
+        <div class="max-lg:hidden">
+          {{ render_partial('shared/partials/icons/exam.html', title="Picture of a paper with A+ written on it", class="max-lg:hidden absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
+        </div>
+        <div class="lg:hidden">
+          {{ render_partial('shared/partials/icons/graduation-cap.html', title="Picture of a graduation cap", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
+        </div>
+
         <p class="italic mb-2">2009&mdash;2013</p>
         <h3 class="text-lg font-semibold mb-2">
           Attended University of California, Davis
@@ -58,9 +63,9 @@
         class="max-lg:hidden lg:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/4 left-1/2 translate-x-16  top-[15rem]"
       ></div>
       <article
-        class="max-lg:hidden lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[10rem] right-0"
+        class="max-lg:hidden lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[10rem] right-0 group"
       >
-        {{ render_partial('shared/partials/icons/graduation-cap.html', title="Picture of a graduation cap", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/graduation-cap.html', title="Picture of a graduation cap", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
         <p class="italic mb-2">2013</p>
         <h3 class="text-lg font-semibold mb-2">Graduated College</h3>
         <ul class="list-disc ml-4">
@@ -83,9 +88,9 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-20 top-[18rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4  lg:top-[17rem] left-0"
+        class="max-lg:relative lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4  lg:top-[17rem] left-0 group"
       >
-        {{ render_partial('shared/partials/icons/plane-takeoff.html', title="Picture of a plane taking off", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/plane-takeoff.html', title="Picture of a plane taking off", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
 
         <p class="italic mb-2">2013</p>
         <h3 class="text-lg font-semibold mb-2">Moved to Spokane, WA</h3>
@@ -110,9 +115,9 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-28 top-[30.4rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[22rem] right-0"
+        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[22rem] right-0 group"
       >
-        {{ render_partial('shared/partials/icons/flask.html', title="Picture of a chemistry flask", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/flask.html', title="Picture of a chemistry flask", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
         <p class="italic mb-2">2013&mdash;2018</p>
         <h3 class="text-lg font-semibold mb-2">Primary Research Assistant</h3>
         <ul class="list-disc ml-4">
@@ -146,9 +151,9 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-20 top-[45.4rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[41rem] right-0"
+        class="max-lg:relative lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[41rem] right-0 group"
       >
-        {{ render_partial('shared/partials/icons/mountains.html', title="Picture of mountains", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/mountains.html', title="Picture of mountains", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
         <p class="italic mb-2">2015</p>
         <h3 class="text-lg font-semibold mb-2">Moved to Colorado</h3>
         <ul class="list-disc ml-4">
@@ -178,9 +183,9 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-20 top-[58.2rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[32rem] left-0"
+        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[32rem] left-0 group"
       >
-        {{ render_partial('shared/partials/icons/books.html', title="Picture of books", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/books.html', title="Picture of books", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
         <p class="italic mb-2">2017</p>
         <h3 class="text-lg font-semibold mb-2">
           My self-taught coding journey began
@@ -208,9 +213,9 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-28 top-[71.2rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[47rem] left-0"
+        class="max-lg:relative lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[47rem] left-0 group"
       >
-        {{ render_partial('shared/partials/icons/scales.html', title="Picture of a weight scale", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/scales.html', title="Picture of a weight scale", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
         <p class="italic mb-2">2018&mdash;2022</p>
         <h3 class="text-lg font-semibold mb-2">
           Software Developer at OpenText, Denver, CO
@@ -244,9 +249,9 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-20 top-[89.2rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[54rem] right-0"
+        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[54rem] right-0 group"
       >
-        {{ render_partial('shared/partials/icons/face-mask.html', title="Picture of a face mask", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/face-mask.html', title="Picture of a face mask", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
         <p class="italic mb-2">2020</p>
         <h3 class="text-lg font-semibold mb-2">Pandemic hit</h3>
         <ul class="list-disc ml-4">
@@ -270,9 +275,9 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-20 top-[101.5rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[67rem] right-0"
+        class="max-lg:relative lg:absolute bg-primary-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[67rem] right-0 group"
       >
-        {{ render_partial('shared/partials/icons/device-mobile.html', title="Picture of a touchscreen cellphone", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/device-mobile.html', title="Picture of a touchscreen cellphone", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
         <p class="italic mb-2">2022&mdash;2022</p>
         <h3 class="text-lg font-semibold mb-2">
           Sr. Software Engineer at Shopkick
@@ -299,9 +304,9 @@
         class="max-md:hidden lg:hidden md:absolute bg-grayscale-700 dark:bg-grayscale-400 -z-20 h-2 w-1/2 left-20 top-[115.5rem]"
       ></div>
       <article
-        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[67rem] left-0"
+        class="max-lg:relative lg:absolute bg-offset-100 border-2 border-transparent dark:bg-grayscale-800 dark:border-offset-800 p-8 rounded-lg ml-auto max-md:mx-auto max-w-md max-lg:max-w-xl mb-4 lg:top-[67rem] left-0 group"
       >
-        {{ render_partial('shared/partials/icons/lightbulb-filament.html', title="Picture of a lightbulb", class="absolute top-4 right-4 h-10 w-10") }}
+        {{ render_partial('shared/partials/icons/lightbulb-filament.html', title="Picture of a lightbulb", class="absolute top-4 right-4 h-10 w-10 group-hover:wiggle-once") }}
         <p class="italic mb-2">2022&mdash;present</p>
         <h3 class="text-lg font-semibold mb-2">
           Sr. Software Engineer at Ascend Analytics

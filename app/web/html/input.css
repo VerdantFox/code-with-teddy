@@ -43,6 +43,26 @@
     @apply link border-b border-primary-700 hover:border-primary-500 dark:border-primary-300 dark:hover:border-primary-500 active:border-primary-400 dark:active:border-primary-600;
   }
 }
+
+@layer utilities {
+  .wiggle-once {
+    display: inline-block;
+    animation: wiggle 0.3s linear;
+  }
+
+  @keyframes wiggle {
+    33% {
+      transform: rotate(10deg);
+    }
+    66% {
+      transform: rotate(-10deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+}
+
 [x-cloak] {
   display: none !important;
 }
