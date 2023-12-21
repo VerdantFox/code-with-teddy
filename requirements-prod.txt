@@ -416,6 +416,7 @@ pydantic==2.5.2 \
     # via
     #   code-with-teddy (pyproject.toml)
     #   fastapi
+    #   pydantic-settings
 pydantic-core==2.14.5 \
     --hash=sha256:038c9f763e650712b899f983076ce783175397c848da04985658e7628cbe873b \
     --hash=sha256:074f3d86f081ce61414d2dc44901f4f83617329c6f3ab49d2bc6c96948b2c26b \
@@ -523,10 +524,16 @@ pydantic-core==2.14.5 \
     --hash=sha256:fb2ed8b3fe4bf4506d6dab3b93b83bbc22237e230cba03866d561c3577517d18 \
     --hash=sha256:fe0a5a1025eb797752136ac8b4fa21aa891e3d74fd340f864ff982d649691867
     # via pydantic
+pydantic-settings==2.1.0 \
+    --hash=sha256:26b1492e0a24755626ac5e6d715e9077ab7ad4fb5f19a8b7ed7011d52f36141c \
+    --hash=sha256:7621c0cb5d90d1140d2f0ef557bdf03573aac7035948109adf2574770b77605a
+    # via code-with-teddy (pyproject.toml)
 python-dotenv==1.0.0 \
     --hash=sha256:a8df96034aae6d2d50a4ebe8216326c61c3eb64836776504fcca410e5937a3ba \
     --hash=sha256:f5971a9226b701070a4bf2c38c89e5a3f0d64de8debda981d1db98583009122a
-    # via uvicorn
+    # via
+    #   pydantic-settings
+    #   uvicorn
 python-jose==3.3.0 \
     --hash=sha256:55779b5e6ad599c6336191246e95eb2293a9ddebd555f796a65f838f07e5d78a \
     --hash=sha256:9b1376b023f8b298536eedd47ae1089bcdb848f1535ab30555cd92002d78923a

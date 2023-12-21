@@ -5,6 +5,5 @@
   {% include "/main/experience/sections/head.html" %}
   {% include "/main/experience/sections/history.html" %}
   {% include "/main/experience/sections/skills.html" %}
-  <!-- TODO: Update 'next' link to blog -->
-  {{ render_partial('shared/partials/previous_next_nav.html', previous_page=("projects", url_for("html:projects")) , next_page=("blog", url_for("html:experience"))) }}
+  {{ render_partial('shared/partials/previous_next_nav.html', previous_page=("Projects", url_for("html:projects")) , next_page=("Blog", url_for("html:list_blog_posts"))) }}
 {% endblock content %}

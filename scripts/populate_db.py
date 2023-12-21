@@ -14,11 +14,13 @@ You can run (or not run) this script automatically as the last step of the
 import os
 from datetime import datetime, timedelta, timezone
 
+from app import permissions
 from app.datastore import db_models
-from app.datastore.database import Session
+from app.datastore.database import Session, engine
+from app.web import auth
 
 # DB connection constants
-DB_STRING_KEY = "DB_CONNECTION_STRING_SECRET"
+DB_STRING_KEY = "DB_CONNECTION_STRING"
 LOCAL_DB_CONNECTION_STRING = "postgresql+psycopg2://postgres:postgres@localhost:5432/postgres"
 
 # datetime constants
@@ -32,6 +34,19 @@ LAST_WEEK = TODAY - timedelta(days=7)
 NEXT_WEEK = TODAY + timedelta(days=7)
 
 
+def populate_database() -> None:
+    """Run the populate db script."""
+    db_connection_before = os.environ.get(DB_STRING_KEY)
+    os.environ[DB_STRING_KEY] = LOCAL_DB_CONNECTION_STRING
+    session = Session(engine)
+    pop_db = PopulateDB(session=Session(engine))
+    with session.begin():
+        pop_db.populate()
+
+    if db_connection_before:
+        os.environ[DB_STRING_KEY] = db_connection_before
+
+
 class PopulateDB:
     """Populates the database with dummy data."""
 
@@ -42,23 +57,49 @@ class PopulateDB:
 
     def _populate_users(self) -> None:
         """Populate the users table."""
-        self.users = []
+        self.users = [
+            db_models.User(
+                username="rand",
+                email="dragon@gmail.com",
+                full_name="Rand Al'Thor",
+                timezone="America/Denver",
+                password_hash=auth.hash_password("password"),
+                role=permissions.Role.ADMIN,
+            ),
+            db_models.User(
+                username="mat",
+                email="alwayslucky@email.com",
+                full_name="Matrim Cauthon",
+                timezone="America/Chicago",
+                password_hash=auth.hash_password("password"),
+                role=permissions.Role.USER,
+            ),
+            db_models.User(
+                username="perrin",
+                email="wolfboy@email.com",
+                full_name="Perrin Aybara",
+                timezone="America/Seattle",
+                password_hash=auth.hash_password("password"),
+                role=permissions.Role.USER,
+            ),
+            db_models.User(
+                username="egwene",
+                email="magicmaiden@email.com",
+                full_name="Egwene al'Vere",
+                timezone="America/Denver",
+                password_hash=auth.hash_password("password"),
+                role=permissions.Role.REVIEWER,
+            ),
+        ]
+        for user in self.users:
+            self.session.add(user)
+            self.session.commit()
+            self.session.refresh(user)
 
     def populate(self) -> None:
         """Populate the database with dummy data."""
         self._populate_users()
 
 
-def populate_database(db: Session) -> None:
-    """Run the populate db script."""
-    db_connection_before = os.environ.get(DB_STRING_KEY)
-    os.environ[DB_STRING_KEY] = LOCAL_DB_CONNECTION_STRING
-    pop_db = PopulateDB(session=db)
-    pop_db.populate()
-    if db_connection_before:
-        os.environ[DB_STRING_KEY] = db_connection_before
-
-
 if __name__ == "__main__":
-    db = Session()
-    populate_database(db)
+    populate_database()

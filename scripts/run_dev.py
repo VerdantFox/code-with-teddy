@@ -21,7 +21,12 @@ def main(
     *,
     browser_sync: Annotated[
         bool,
-        typer.Option(..., "--browser-sync/--no-browser-sync", "-b/-nb", help="Don't run browser-sync."),
+        typer.Option(
+            ...,
+            "--browser-sync/--no-browser-sync",
+            "-b/-nb",
+            help="Don't run browser-sync.",
+        ),
     ] = True,
 ) -> None:
     """Run the app in development mode."""

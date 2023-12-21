@@ -6,11 +6,16 @@ from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-DB_URL = "sqlite:///./db.db"
+from app.settings import settings
 
-engine = create_engine(DB_URL, connect_args={"check_same_thread": False})
+# connect_args={"check_same_thread": False} for SQLite
 
-
+engine = create_engine(
+    settings.db_connection_string,
+    echo=settings.db_echo,
+    pool_size=settings.db_pool_size,
+    pool_pre_ping=True,
+)
 SessionLocal = sessionmaker(engine, expire_on_commit=False)
 
 

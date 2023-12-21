@@ -1,20 +1,49 @@
 """db_models: SQLAlchemy models for the database."""
+from datetime import datetime
 from typing import Annotated, ClassVar
 
-from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import (
-    DeclarativeBase,
-    Mapped,
-    mapped_column,
-)
+import sqlalchemy as sa
+from sqlalchemy import Column, Computed, ForeignKey, Index, String, Table
+from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from app import mixins
 from app.permissions import Role
 
+# PK types
 IntPK = Annotated[int, mapped_column(primary_key=True)]
-UniqueStr = Annotated[str, mapped_column(unique=True)]
-UsersFk = Annotated[int, mapped_column(ForeignKey("users.id"))]
+StrPK = Annotated[str, mapped_column(primary_key=True)]
+
+# String types
+StrUnique = Annotated[str, mapped_column(unique=True)]
+StrIndexedUnique = Annotated[str, mapped_column(unique=True, index=True)]
+StrNullable = Annotated[str, mapped_column(nullable=True)]
+StrNullableIndexed = Annotated[str, mapped_column(nullable=True, index=True)]
+
+# Integer types
+IntNullable = Annotated[int, mapped_column(nullable=True)]
+IntIndexed = Annotated[int, mapped_column(index=True)]
+IntIndexedDefaultZero = Annotated[int, mapped_column(index=True, default=0)]
+
+# Validated types
 str100 = Annotated[str, 100]
+
+# Boolean types
+BoolDefaultFalse = Annotated[bool, mapped_column(default=False)]
+BoolDefaultTrue = Annotated[bool, mapped_column(default=True)]
+
+# Datetime types
+DateTimeIndexed = Annotated[datetime, mapped_column(index=True)]
+
+# ForeignKey types
+UsersFk = Annotated[int, mapped_column(ForeignKey("users.id"), index=True)]
+BlogPostFK = Annotated[int, mapped_column(ForeignKey("blog_posts.id"), index=True)]
+
+
+class TSVector(sa.types.TypeDecorator):
+    """Vector type for PostgreSQL full-text search."""
+
+    impl = TSVECTOR
 
 
 class Base(DeclarativeBase):
@@ -25,20 +54,124 @@ class Base(DeclarativeBase):
     }
 
 
+# --------- User models ---------
 class User(Base, mixins.AuthUserMixin):
     """User model."""
 
     __tablename__ = "users"
 
     id: Mapped[IntPK]
-    username: Mapped[UniqueStr]
-    email: Mapped[UniqueStr]
+    # User info
+    username: Mapped[StrIndexedUnique]
     full_name: Mapped[str]
+    email: Mapped[StrIndexedUnique]
     timezone: Mapped[str]
 
-    password_hash: Mapped[str]
-    google_oauth_id: Mapped[str] = mapped_column(nullable=True)
-    github_oauth_id: Mapped[str] = mapped_column(nullable=True)
+    # Auth stuff
+    password_hash: Mapped[StrNullable]
+    google_oauth_id: Mapped[StrNullableIndexed]
+    github_oauth_id: Mapped[StrNullableIndexed]
 
+    # Permissions
     role: Mapped[Role]
-    is_active: Mapped[bool] = mapped_column(default=False)
+
+    def __repr__(self) -> str:
+        return f"db_models.User(id={self.id}, username={self.username}, role={self.role})"
+
+
+# --------- Blog models ---------
+# Association table for many-to-many relationship between blog posts and tags
+blog_tags_associations = Table(
+    "blog_tags_associations",
+    Base.metadata,
+    Column("blog_post_id", ForeignKey("blog_posts.id")),
+    Column("blog_post_tag_id", ForeignKey("blog_post_tags.tag")),
+)
+
+
+class BlogPost(Base):
+    """Blog post model."""
+
+    __tablename__ = "blog_posts"
+
+    id: Mapped[IntPK]
+    title: Mapped[StrIndexedUnique]
+    slug: Mapped[StrIndexedUnique]
+    old_slugs: Mapped[list["OldBlogPostSlug"]] = relationship(back_populates="blog_post")
+    read_mins: Mapped[IntNullable]
+    is_published: Mapped[BoolDefaultFalse]
+    tags: Mapped[list["BlogPostTag"]] = relationship(
+        secondary="blog_tags_associations", back_populates="blog_posts"
+    )
+    markdown_description: Mapped[str]
+    markdown_content: Mapped[str]
+    html_description: Mapped[str]
+    html_content: Mapped[str]
+    html_toc: Mapped[str]
+    media: Mapped[list["BlogPostMedia"]] = relationship(back_populates="blog_post")
+    created_timestamp: Mapped[DateTimeIndexed]
+    updated_timestamp: Mapped[DateTimeIndexed]
+    likes: Mapped[IntIndexed]
+    views: Mapped[IntIndexed]
+    can_comment: Mapped[BoolDefaultTrue]
+    comments: Mapped[list["BlogPostComment"]] = relationship(back_populates="blog_post")
+
+    ts_vector: Mapped[TSVector] = mapped_column(
+        TSVector(),
+        Computed("to_tsvector('english', title || ' ' || markdown_content)", persisted=True),
+    )
+    __table_args__ = (Index("ix_blog_post_ts_vector", ts_vector, postgresql_using="gin"),)
+
+
+class OldBlogPostSlug(Base):
+    """Old blog posts slugs model."""
+
+    __tablename__ = "old_blog_slugs"
+
+    slug: Mapped[StrPK]
+    blog_post_id: Mapped[BlogPostFK | None]
+    blog_post: Mapped["BlogPost"] = relationship(back_populates="old_slugs")
+
+
+class BlogPostTag(Base):
+    """Blog post tags model."""
+
+    __tablename__ = "blog_post_tags"
+
+    tag: Mapped[StrPK]
+    blog_posts: Mapped[list["BlogPost"]] = relationship(
+        secondary="blog_tags_associations", back_populates="tags"
+    )
+
+
+class BlogPostMedia(Base):
+    """Blog post media model.
+
+    Might include images or videos.
+    """
+
+    __tablename__ = "blog_post_media"
+
+    id: Mapped[IntPK]
+    blog_post_id: Mapped[BlogPostFK | None]
+    blog_post: Mapped["BlogPost"] = relationship(back_populates="media")
+    name: Mapped[str]
+    location: Mapped[str]
+    extensions: Mapped[str]
+
+
+class BlogPostComment(Base):
+    """Blog post comment model."""
+
+    __tablename__ = "blog_post_comments"
+
+    id: Mapped[IntPK]
+    blog_post_id: Mapped[BlogPostFK | None]
+    blog_post: Mapped["BlogPost"] = relationship(back_populates="comments")
+    user_id: Mapped[UsersFk | None]
+    user: Mapped["User"] = relationship()
+    content: Mapped[str]
+    created_timestamp: Mapped[DateTimeIndexed]
+    updated_timestamp: Mapped[DateTimeIndexed]
+    likes: Mapped[IntIndexedDefaultZero]
+    parent_id: Mapped[IntNullable]
