@@ -1,0 +1,6 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 1 %}
+
+{% block content %}
+  {{ render_partial('shared/partials/previous_next_nav.html', previous_page=("Experience", url_for("html:experience"))) }}
+{% endblock content %}
