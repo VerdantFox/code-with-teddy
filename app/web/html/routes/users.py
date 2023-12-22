@@ -7,6 +7,7 @@ from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import Form, PasswordField, StringField, validators
 
+from app import constants
 from app.datastore import db_models
 from app.datastore.database import DBSession
 from app.permissions import Role
@@ -50,7 +51,7 @@ async def login_get(
     }
     return templates.TemplateResponse(
         LOGIN_TEMPLATE,
-        {"request": request, "form": login_form},
+        {constants.REQUEST: request, "form": login_form},
         headers=headers,
     )
 
@@ -67,7 +68,7 @@ async def login_post(
         return templates.TemplateResponse(
             LOGIN_TEMPLATE,
             {
-                "request": request,
+                constants.REQUEST: request,
                 "message": FlashMessage(
                     msg="Invalid username or password",
                     category=FlashCategory.ERROR,
@@ -87,7 +88,7 @@ async def login_post(
         return templates.TemplateResponse(
             LOGIN_TEMPLATE,
             {
-                "request": request,
+                constants.REQUEST: request,
                 "message": FlashMessage(msg=e.detail, category=FlashCategory.ERROR),
                 "form": login_form,
             },
@@ -140,7 +141,7 @@ async def register_get(request: Request) -> _TemplateResponse:
     login_form = RegisterUserForm(**form_data)
     return templates.TemplateResponse(
         REGISTER_TEMPLATE,
-        {"request": request, "form": login_form},
+        {constants.REQUEST: request, "form": login_form},
     )
 
 
@@ -156,7 +157,7 @@ async def register_post(
         return templates.TemplateResponse(
             REGISTER_TEMPLATE,
             {
-                "request": request,
+                constants.REQUEST: request,
                 "message": FlashMessage(
                     msg="Invalid form fields.",
                     category=FlashCategory.ERROR,
@@ -180,7 +181,7 @@ async def register_post(
         return templates.TemplateResponse(
             REGISTER_TEMPLATE,
             {
-                "request": request,
+                constants.REQUEST: request,
                 "message": FlashMessage(
                     msg="Username or email already exists. Already have an account? Login!",
                     category=FlashCategory.ERROR,

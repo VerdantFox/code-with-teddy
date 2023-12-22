@@ -3,6 +3,7 @@
 from fastapi import APIRouter, Request
 from starlette.templating import _TemplateResponse
 
+from app import constants
 from app.web.html.const import templates
 
 # ----------- Routers -----------
@@ -21,7 +22,7 @@ async def landing(
     """Return the portfolio landing (about) page."""
     return templates.TemplateResponse(
         "main/about/about.html",
-        {"request": request},
+        {constants.REQUEST: request},
     )
 
 
@@ -32,7 +33,7 @@ async def projects(
     """Return the portfolio landing page."""
     return templates.TemplateResponse(
         "main/projects/projects.html",
-        {"request": request},
+        {constants.REQUEST: request},
     )
 
 
@@ -43,5 +44,5 @@ async def experience(
     """Return the portfolio landing page."""
     return templates.TemplateResponse(
         "main/experience/experience.html",
-        {"request": request},
+        {constants.REQUEST: request},
     )

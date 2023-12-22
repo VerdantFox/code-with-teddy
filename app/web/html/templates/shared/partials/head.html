@@ -1,4 +1,4 @@
-{% set static_version = 1 %}
+{% set libraries_static_version = 1 %}
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,22 +11,22 @@
     rel="stylesheet"
     href="{{ url_for('html:static', path='css/styles.css') }}?{{ static_version }}"
   />
+  <link
+    rel="stylesheet"
+    href="{{ url_for('html:static', path='css/libraries/tippy.css') }}?6.3.7"
+  />
+  {% block custom_css %}{% endblock custom_css %}
+
   <!-- External JavaScript Libraries (loaded from our code) -->
-  <!-- No defer -- get flash of unstyled content with defer set. But get warning with no defer. GAH!
-       TODO: Maybe store dark persistence in a cookie instead of local storage... -->
   <script
     defer
-    src="{{ url_for('html:static', path='js/libraries/alpine.js') }}?3.13.3"
+    src="{{ url_for('html:static', path='js/libraries/bundled-deferred.js') }}?{{ libraries_static_version }}"
   ></script>
-  <!-- No defer -- some extensions might now work with defer set -->
-  <script src="{{ url_for('html:static', path='js/libraries/htmx.js') }}?1.9.8"></script>
-  {% if page_title %}
-    {% set page_title = page_title + "| Teddy Williams" %}
-  {% else %}
-    {% set page_title = "Teddy Williams" %}
-  {% endif %}
-  <title>{{ page_title }}</title>
+  <script src="{{ url_for('html:static', path='js/libraries/bundled-non-deferred.js') }}?{{ libraries_static_version }}"></script>
 
+  <!-- Custom JavaScript -->
+  <script src="{{ url_for('html:static', path='js/custom/script.js') }}?{{ static_version }}"></script>
+  {% block custom_js %}{% endblock custom_js %}
   <script>
     // Handle initial dark mode state here before body loads
     // to avoid flash of unstyled content. Afterwards, handled by Alpine.js.
@@ -40,4 +40,11 @@
       document.documentElement.classList.remove("dark")
     }
   </script>
+
+  {% if page_title %}
+    {% set page_title = page_title + "| Teddy Williams" %}
+  {% else %}
+    {% set page_title = "Teddy Williams" %}
+  {% endif %}
+  <title>{{ page_title }}</title>
 </head>

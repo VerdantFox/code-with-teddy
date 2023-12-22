@@ -65,7 +65,9 @@ class User(Base, mixins.AuthUserMixin):
     username: Mapped[StrIndexedUnique]
     full_name: Mapped[str]
     email: Mapped[StrIndexedUnique]
-    timezone: Mapped[str]
+    timezone: Mapped[StrNullable]
+    is_active: Mapped[BoolDefaultTrue]
+    avatar_location: Mapped[StrNullable]
 
     # Auth stuff
     password_hash: Mapped[StrNullable]

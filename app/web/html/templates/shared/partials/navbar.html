@@ -46,7 +46,7 @@
   <!-- Top navbar -->
   <div
     :class="{'top-0': showNav, '-top-24': !showNav}"
-    class="px-6 py-6 w-full fixed"
+    class="px-6 py-6 w-full fixed transition-all duration-300"
     x-show="!navOpen"
     x-transition:enter.opacity.duration.200ms
     x-transition:leave.opacity.duration.500ms
@@ -135,20 +135,117 @@
         </div>
       </div>
 
-      <!-- Dark Mode Button (right)-->
-      <div class="flex justify-end md:flex-1">
-        <div class="pointer-events-auto">
-          <button
-            type="button"
-            aria-label="Switch to dark theme"
-            @click="darkMode = !darkMode"
-            :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
-            class="group rounded-full  px-2 py-2 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
-            :title="darkMode ? 'Switch to light theme' : 'Switch to dark theme'"
-          >
-            {{ render_partial('shared/partials/icons/sun.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300", xshow="!darkMode") }}
-            {{ render_partial('shared/partials/icons/moon-stars.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 dark:group-hover:fill-primary-400 transition-all duration-300", xshow="darkMode") }}
-          </button>
+      <!-- User and dark mode buttons(right)-->
+      <div class="flex justify-end items-center md:flex-1">
+        {% if current_user %}
+          <!-- Users button -->
+          <div class="flex items-center">
+            <div
+              x-data="{menuOpen: false}"
+              @click.away="menuOpen = false"
+              class="pointer-events-auto mr-2"
+              @scroll.window="menuOpen = false"
+            >
+              <button
+                type="button"
+                @click="menuOpen = !menuOpen"
+                aria-label="User details"
+                :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
+                class="group rounded-full  px-1.5 py-1.5 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
+                title="User details"
+              >
+                {{ render_partial('shared/partials/icons/user-circle.html', class="h-7 w-7 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}
+              </button>
+              {#
+            <!-- Dropdown logged in -->
+            <div
+              class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+              role="menu"
+              aria-orientation="vertical"
+              aria-labelledby="user-menu-button"
+              tabindex="-1"
+            >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
+                role="menuitem"
+                tabindex="-1"
+                id="user-menu-item-0"
+                >Your Profile</a
+              >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
+                role="menuitem"
+                tabindex="-1"
+                id="user-menu-item-1"
+                >Settings</a
+              >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
+                role="menuitem"
+                tabindex="-1"
+                id="user-menu-item-2"
+                >Sign out</a
+              >
+            </div>
+            #}
+              <!-- Dropdown not logged in -->
+              <div
+                x-show="menuOpen && showNav"
+                class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="user-menu-button"
+                tabindex="-1"
+              >
+                <span
+                  class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 flex justify-between items-center gap-1"
+                >
+                  <a
+                    class="flex-grow flex items-center gap-2"
+                    href="#"
+                    role="menuitem"
+                    tabindex="-1"
+                    id="user-menu-item-0"
+                  >
+                    <span
+                      >{{ render_partial('shared/partials/icons/sign-in.html', class="h-5 w-5 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}</span
+                    >
+                    <span>Log in</span>
+                  </a>
+                  <button
+                    id="tippy"
+                    type="button"
+                    class="tippy group"
+                    data-tippy-theme="light-border"
+                    data-tippy-delay="[100, 200]"
+                    data-tippy-content="<strong>Why login?</strong><br>Login is for blog-post commenting and interacting with certain projects. If you aren't using those features, don't worry about it. 🙂"
+                  >
+                    {{ render_partial('shared/partials/icons/question.html', class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Dark mode button -->
+        <div class="flex justify-end md:flex">
+          <div class="pointer-events-auto">
+            <button
+              type="button"
+              aria-label="Switch to dark theme"
+              @click="darkMode = !darkMode"
+              :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
+              class="group rounded-full  px-2 py-2 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
+              :title="darkMode ? 'Switch to light theme' : 'Switch to dark theme'"
+            >
+              {{ render_partial('shared/partials/icons/sun.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300", xshow="!darkMode") }}
+              {{ render_partial('shared/partials/icons/moon-stars.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 dark:group-hover:fill-primary-400 transition-all duration-300", xshow="darkMode") }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -159,7 +256,7 @@
     aria-label="Main navigation"
     x-show="navOpen"
     x-transition:enter.opacity.duration.200ms
-    @click.away="navOpen = false"
+    @keydown.escape.window="navOpen = false"
     class="pointer-events-auto top-0 bottom-0 fixed px-6 py-6 w-full hidden max-md:block backdrop-blur transition"
     x-trap.inert="navOpen"
   >
@@ -169,6 +266,7 @@
       </button>
       <ul
         class="flex flex-col rounded-3xl px-6 py-6 bg-grayscale-50/90 text-md font-medium text-grayscale-800 shadow-2xl shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:text-grayscale-200 dark:ring-white/10"
+        @click.away="navOpen = false"
       >
         <li>
           <span

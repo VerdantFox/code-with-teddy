@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request, status
 from pydantic import BaseModel
 from starlette.templating import _TemplateResponse
 
+from app import constants
 from app.web.html.const import templates
 
 # ----------- Routers -----------
@@ -26,6 +27,6 @@ async def general_error(
     html_error = WebAppError(detail=detail, status_code=status_code)
     return templates.TemplateResponse(
         "errors/general_error.html",
-        {"request": request, "error": html_error},
+        {constants.REQUEST: request, "error": html_error},
         status_code=html_error.status_code,
     )
