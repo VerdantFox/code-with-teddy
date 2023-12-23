@@ -156,77 +156,78 @@
               >
                 {{ render_partial('shared/partials/icons/user-circle.html', class="h-7 w-7 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}
               </button>
-              {#
-            <!-- Dropdown logged in -->
-            <div
-              class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="user-menu-button"
-              tabindex="-1"
-            >
-              <a
-                href="#"
-                class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
-                role="menuitem"
-                tabindex="-1"
-                id="user-menu-item-0"
-                >Your Profile</a
-              >
-              <a
-                href="#"
-                class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
-                role="menuitem"
-                tabindex="-1"
-                id="user-menu-item-1"
-                >Settings</a
-              >
-              <a
-                href="#"
-                class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
-                role="menuitem"
-                tabindex="-1"
-                id="user-menu-item-2"
-                >Sign out</a
-              >
-            </div>
-            #}
-              <!-- Dropdown not logged in -->
-              <div
-                x-show="menuOpen && showNav"
-                class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="user-menu-button"
-                tabindex="-1"
-              >
-                <span
-                  class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 flex justify-between items-center gap-1"
+              {% if current_user.is_authenticated %}
+                <!-- Dropdown logged in -->
+                <div
+                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-menu-button"
+                  tabindex="-1"
                 >
                   <a
-                    class="flex-grow flex items-center gap-2"
                     href="#"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
                     role="menuitem"
                     tabindex="-1"
                     id="user-menu-item-0"
+                    >Your Profile</a
                   >
-                    <span
-                      >{{ render_partial('shared/partials/icons/sign-in.html', class="h-5 w-5 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}</span
+                  <a
+                    href="#"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
+                    role="menuitem"
+                    tabindex="-1"
+                    id="user-menu-item-1"
+                    >Settings</a
+                  >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
+                    role="menuitem"
+                    tabindex="-1"
+                    id="user-menu-item-2"
+                    >Sign out</a
+                  >
+                </div>
+              {% else %}
+                <!-- Dropdown not logged in -->
+                <div
+                  x-show="menuOpen && showNav"
+                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-menu-button"
+                  tabindex="-1"
+                >
+                  <span
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 flex justify-between items-center gap-1"
+                  >
+                    <a
+                      class="flex-grow flex items-center gap-2"
+                      href="{{ url_for('html:login_get') }}"
+                      role="menuitem"
+                      tabindex="-1"
+                      id="user-menu-item-0"
                     >
-                    <span>Log in</span>
-                  </a>
-                  <button
-                    id="tippy"
-                    type="button"
-                    class="tippy group"
-                    data-tippy-theme="light-border"
-                    data-tippy-delay="[100, 200]"
-                    data-tippy-content="<strong>Why login?</strong><br>Login is for blog-post commenting and interacting with certain projects. If you aren't using those features, don't worry about it. 🙂"
-                  >
-                    {{ render_partial('shared/partials/icons/question.html', class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
-                  </button>
-                </span>
-              </div>
+                      <span
+                        >{{ render_partial('shared/partials/icons/sign-in.html', class="h-5 w-5 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}</span
+                      >
+                      <span>Log in</span>
+                    </a>
+                    <button
+                      id="tippy"
+                      type="button"
+                      class="tippy group"
+                      data-tippy-theme="light-border"
+                      data-tippy-delay="[100, 200]"
+                      data-tippy-content="<strong>Why login?</strong><br>Login is for blog-post commenting and interacting with certain projects. If you aren't using those features, don't worry about it. 🙂"
+                    >
+                      {{ render_partial('shared/partials/icons/question.html', class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
+                    </button>
+                  </span>
+                </div>
+              {% endif %}
             </div>
           </div>
         {% endif %}

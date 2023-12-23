@@ -17,7 +17,7 @@ from app.web.html.flash_messages import FlashCategory, FlashMessage
 from app.web.html.routes.auth import login_for_access_token
 
 # ----------- Routers -----------
-router = APIRouter(tags=["users"], prefix="/users")
+router = APIRouter(tags=["users"])
 
 LOGIN_TEMPLATE = "users/login.html"
 REGISTER_TEMPLATE = "users/register.html"
