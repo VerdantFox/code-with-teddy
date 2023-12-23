@@ -2,5 +2,27 @@
 {% set active_nav_item = 4 %}
 
 {% block content %}
+  <section>
+    <div class="section-container py-64">
+      <h1 class="text-5xl font-bold mb-20">Code Chronicles</h1>
+      <p class="text-2xl max-w-3xl mb-10">
+        In the dim glow of my computer screen, after hours of wrestling with a
+        particularly stubborn bug, it finally happened. The lines of code
+        aligned, the program ran seamlessly, and I felt that rush of triumph.
+        Join me as I revisit these eureka moments and unravel the mysteries
+        behind the code.
+      </p>
+      <p class="text-2xl max-w-3xl">
+        In this blog, I write about my experiences and journey as a software
+        developer, about coding topics that I've struggled with in the hopes
+        that you don't have to, and about things I've learned that I think are
+        awesome. This space is a melting pot of tutorials, discussions on tools,
+        and explorations of intriguing software development concepts. My goal is
+        to create a space where you can discover solutions, glean insights, and
+        perhaps find a spark of inspiration.
+      </p>
+    </div>
+  </section>
+
   {{ render_partial('shared/partials/previous_next_nav.html', previous_page=("Experience", url_for("html:experience"))) }}
 {% endblock content %}

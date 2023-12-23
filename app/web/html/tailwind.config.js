@@ -91,10 +91,6 @@ module.exports = {
           950: "#1c1917",
         },
       },
-      backgroundImage: {
-        "hero-pattern-light": "url('/images/landing/hero-hex-grid-light.svg')",
-        "hero-pattern-dark": "url('/images/landing/hero-hex-grid-dark.svg')",
-      },
     },
   },
   plugins: [require("@tailwindcss/forms")],
