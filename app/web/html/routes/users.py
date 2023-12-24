@@ -1,6 +1,8 @@
 """users: HTML routes for users."""
+from typing import Annotated
+
 import sqlalchemy
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Query, Request, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import Form, HiddenField, PasswordField, StringField, validators
@@ -35,6 +37,24 @@ class LoginForm(Form):
     redirect_url: HiddenField = HiddenField()
 
 
+@router.get("/login", response_model=None)
+async def login_get(
+    request: Request,
+    username: Annotated[str | None, Query()] = None,
+    redirect_url: Annotated[str | None, Query()] = None,
+) -> _TemplateResponse:
+    """Return the login page for GET requests."""
+    login_form = LoginForm()
+    if username:
+        login_form.username.data = username
+    if redirect_url:
+        login_form.redirect_url.data = redirect_url
+    return templates.TemplateResponse(
+        LOGIN_TEMPLATE,
+        {constants.REQUEST: request, "login_form": login_form},
+    )
+
+
 @router.post("/login", response_model=None)
 async def login_post(
     request: Request,
@@ -56,9 +76,8 @@ async def login_post(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    response = RedirectResponse(
-        url=login_form.redirect_url.data, status_code=status.HTTP_303_SEE_OTHER
-    )
+    redirect_url = login_form.redirect_url.data or "/"
+    response = RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     try:
         await login_for_access_token(
             response=response,
@@ -96,12 +115,8 @@ class RegisterUserForm(Form):
         "Username",
         validators=[validators.Length(min=3, max=25)],
     )
-    first_name: StringField = StringField(
-        "First Name",
-        validators=[validators.Length(min=1, max=25)],
-    )
-    last_name: StringField = StringField(
-        "Last Name",
+    name: StringField = StringField(
+        "Full Name",
         validators=[validators.Length(min=1, max=25)],
     )
     password: PasswordField = PasswordField(
@@ -115,16 +130,21 @@ class RegisterUserForm(Form):
             validators.EqualTo("password", message="Passwords must match"),
         ],
     )
+    redirect_url: HiddenField = HiddenField()
 
 
 @router.get("/register", response_model=None)
-async def register_get(request: Request) -> _TemplateResponse:
+async def register_get(
+    request: Request,
+    redirect_url: Annotated[str | None, Query()] = None,
+) -> _TemplateResponse:
     """Return the user registration page."""
-    form_data = await request.form()
-    login_form = RegisterUserForm(**form_data)
+    register_form = RegisterUserForm()
+    if redirect_url:
+        register_form.redirect_url.data = redirect_url
     return templates.TemplateResponse(
         REGISTER_TEMPLATE,
-        {constants.REQUEST: request, "form": login_form},
+        {constants.REQUEST: request, "form": register_form},
     )
 
 
@@ -149,11 +169,10 @@ async def register_post(
             },
         )
     user_model = db_models.User(
-        email=register_form.email.data,
         username=register_form.username.data,
-        first_name=register_form.first_name.data,
-        last_name=register_form.last_name.data,
-        hashed_password=auth.hash_password(register_form.password.data),
+        email=register_form.email.data,
+        full_name=register_form.name.data,
+        password_hash=auth.hash_password(register_form.password.data),
         role=Role.USER,
         is_active=True,
     )
@@ -181,6 +200,7 @@ async def register_post(
     return RedirectResponse(
         request.url_for("html:login_get").include_query_params(
             username=user_model.username,
+            redirect_url=register_form.redirect_url.data,
         ),
         status_code=status.HTTP_302_FOUND,
     )

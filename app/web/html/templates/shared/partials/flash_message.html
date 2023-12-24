@@ -4,6 +4,7 @@
     role="alert"
     x-data="{ show: true }"
     x-show="show"
+    x-cloak
     {% if message.timeout %}
       {% set timeout = message.timeout * 1000 %}
       x-init="setTimeout(() => show = false, {{ timeout }})"

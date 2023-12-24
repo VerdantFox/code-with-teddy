@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 
 from app.settings import settings
 
@@ -16,12 +16,11 @@ engine = create_engine(
     pool_size=settings.db_pool_size,
     pool_pre_ping=True,
 )
-SessionLocal = sessionmaker(engine, expire_on_commit=False)
 
 
 def get_db_session() -> Generator[Session, None, None]:
     """Start a SessionLocal transaction and yield it."""
-    with SessionLocal.begin() as session:
+    with Session(engine) as session:
         yield session
 
 

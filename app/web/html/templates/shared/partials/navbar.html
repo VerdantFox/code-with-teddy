@@ -48,6 +48,7 @@
     :class="{'top-0': showNav, '-top-24': !showNav}"
     class="px-6 py-6 w-full fixed transition-all duration-300"
     x-show="!mobileNavOpen"
+    x-cloak
     x-transition:enter.opacity.duration.200ms
     x-transition:leave.opacity.duration.500ms
   >
@@ -158,30 +159,35 @@
                 <!-- Dropdown logged in -->
                 <div
                   x-show="menuOpen && showNav"
+                  x-cloak
                   class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="user-menu-button"
                   tabindex="-1"
                 >
-                  <a
-                    href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left"
-                    role="menuitem"
-                    tabindex="-1"
-                    id="user-menu-item-0"
-                    >Your Profile</a
+                  <p
+                    class="block px-4 py-2 text-md text-gray-800 dark:text-white w-full text-left font-bold"
                   >
+                    Welcome
+                    <span class="text-offset-700 dark:text-offset-300"
+                      >{{ current_user.username }}</span
+                    >
+                  </p>
                   <a
                     href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left flex justify-start items-center gap-2"
                     role="menuitem"
                     tabindex="-1"
                     id="user-menu-item-1"
-                    >Settings</a
                   >
+                    <span>
+                      {{ render_partial('shared/partials/icons/user-gear.html', class="h-5 w-5") }}
+                    </span>
+                    <span>User Settings</span>
+                  </a>
                   <button
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left flex justify-start items-center gap-2"
                     role="menuitem"
                     tabindex="-1"
                     id="user-menu-item-2"
@@ -190,13 +196,17 @@
                     hx-target="body"
                     hx-swap="outerHTML"
                   >
-                    Sign out
+                    <span>
+                      {{ render_partial('shared/partials/icons/sign-out.html', class="h-5 w-5") }}
+                    </span>
+                    <span>Sign Out</span>
                   </button>
                 </div>
               {% else %}
                 <!-- Dropdown not logged in -->
                 <div
                   x-show="menuOpen && showNav"
+                  x-cloak
                   class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                   aria-orientation="vertical"
@@ -213,10 +223,10 @@
                       id="user-menu-item-0"
                       @click="loginModalOpen = true; console.log(loginModalOpen)"
                     >
-                      <span
-                        >{{ render_partial('shared/partials/icons/sign-in.html', class="h-5 w-5 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}</span
-                      >
-                      <span>Log in</span>
+                      <span>
+                        {{ render_partial('shared/partials/icons/sign-in.html', class="h-5 w-5") }}
+                      </span>
+                      <span>Sign In</span>
                     </button>
                     <button
                       id="tippy"
@@ -259,6 +269,7 @@
   <nav
     aria-label="Main navigation"
     x-show="mobileNavOpen"
+    x-cloak
     x-transition:enter.opacity.duration.200ms
     @keydown.escape.window="mobileNavOpen = false"
     class="pointer-events-auto top-0 bottom-0 fixed px-6 py-6 w-full hidden max-md:block backdrop-blur transition"

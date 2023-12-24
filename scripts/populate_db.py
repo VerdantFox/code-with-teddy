@@ -39,8 +39,8 @@ def populate_database() -> None:
     db_connection_before = os.environ.get(DB_STRING_KEY)
     os.environ[DB_STRING_KEY] = LOCAL_DB_CONNECTION_STRING
     session = Session(engine)
-    pop_db = PopulateDB(session=Session(engine))
-    with session.begin():
+    pop_db = PopulateDB(session=session)
+    with session:
         pop_db.populate()
 
     if db_connection_before:

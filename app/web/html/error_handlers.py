@@ -52,3 +52,19 @@ def register_error_handlers(app: FastAPI) -> None:
                 status_code=error.status_code,
             ),
         )
+
+    @app.exception_handler(Exception)
+    async def general_error(
+        request: Request,
+        _error: Exception,
+    ) -> RedirectResponse:
+        return RedirectResponse(
+            request.url_for("html:general_error").include_query_params(
+                detail=(
+                    "Something went wrong on the server."
+                    " See logs for details or contact Teddy Williams to report a problem."
+                ),
+                status_code=500,
+            ),
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
