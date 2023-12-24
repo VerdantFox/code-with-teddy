@@ -10,13 +10,13 @@ from app.web.html.const import templates
 router = APIRouter(tags=["landing"])
 
 # headers = {  noqa: ERA001 (commented-out-code)
-#     "HX-Replace-Url": str(request.url_for("html:landing")),
+#     "HX-Replace-Url": str(request.url_for("html:about")),
 #     "HX-Refresh": "true",
 # }  noqa: ERA001 (commented-out-code)
 
 
 @router.get("/", response_model=None)
-async def landing(
+async def about(
     request: Request,
 ) -> _TemplateResponse:
     """Return the portfolio landing (about) page."""

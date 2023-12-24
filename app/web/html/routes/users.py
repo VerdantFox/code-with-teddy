@@ -1,11 +1,9 @@
 """users: HTML routes for users."""
-from typing import Annotated
-
 import sqlalchemy
-from fastapi import APIRouter, Query, Request, status
+from fastapi import APIRouter, Request, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
-from wtforms import Form, PasswordField, StringField, validators
+from wtforms import Form, HiddenField, PasswordField, StringField, validators
 
 from app import constants
 from app.datastore import db_models
@@ -34,26 +32,7 @@ class LoginForm(Form):
         "Password",
         validators=[validators.Length(min=8, max=25)],
     )
-
-
-@router.get("/login", response_model=None)
-async def login_get(
-    request: Request,
-    username: Annotated[str | None, Query()] = None,
-) -> _TemplateResponse:
-    """Return the login page for GET requests."""
-    login_form = LoginForm()
-    if username:
-        login_form.username.data = username
-    headers = {
-        "HX-Replace-Url": str(request.url_for("html:login_get")),
-        "HX-Refresh": "true",
-    }
-    return templates.TemplateResponse(
-        LOGIN_TEMPLATE,
-        {constants.REQUEST: request, "form": login_form},
-        headers=headers,
-    )
+    redirect_url: HiddenField = HiddenField()
 
 
 @router.post("/login", response_model=None)
@@ -66,17 +45,20 @@ async def login_post(
     login_form = LoginForm(**form_data)
     if not login_form.validate():
         return templates.TemplateResponse(
-            LOGIN_TEMPLATE,
+            "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
                 "message": FlashMessage(
                     msg="Invalid username or password",
                     category=FlashCategory.ERROR,
                 ),
-                "form": login_form,
+                "login_form": login_form,
             },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    response = RedirectResponse(
+        url=login_form.redirect_url.data, status_code=status.HTTP_303_SEE_OTHER
+    )
     try:
         await login_for_access_token(
             response=response,
@@ -86,12 +68,13 @@ async def login_post(
         )
     except errors.UserNotAuthenticatedError as e:
         return templates.TemplateResponse(
-            LOGIN_TEMPLATE,
+            "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
                 "message": FlashMessage(msg=e.detail, category=FlashCategory.ERROR),
-                "form": login_form,
+                "login_form": login_form,
             },
+            status_code=status.HTTP_401_UNAUTHORIZED,
         )
 
     FlashMessage(
@@ -206,8 +189,10 @@ async def register_post(
 @router.post("/logout", response_model=None)
 async def logout(request: Request) -> RedirectResponse:
     """Log the user out and redirect to the home page."""
+    form_data = await request.form()
+    redirect_url = str(form_data.get("redirect_url", "/"))
     response = RedirectResponse(
-        request.url_for("html:login_get"),
+        redirect_url,
         status_code=status.HTTP_303_SEE_OTHER,
     )
     response.delete_cookie(key="access_token", httponly=True)

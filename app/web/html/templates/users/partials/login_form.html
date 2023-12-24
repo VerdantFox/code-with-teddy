@@ -1,15 +1,22 @@
-<form method="POST" action="{{ url_for('html:login_post' ) }}" class="">
+<form
+  id="login-form"
+  method="POST"
+  class=""
+  hx-post="{{ url_for('html:login_post' ) }}"
+  hx-target="body"
+  hx-target-4*="#login-form"
+  hx-swap="outerHTML"
+>
   {{ render_partial('shared/partials/flash_message.html', message=message) }}
   <div class="flex flex-col gap-6 mb-6">
-    {{ render_partial('shared/partials/forms/field.html', field=form.username) }}
-    {{ render_partial('shared/partials/forms/field.html', field=form.password) }}
+    {{ login_form.redirect_url() }}
+    {{ render_partial('shared/partials/forms/field.html', field=login_form.username) }}
+    {{ render_partial('shared/partials/forms/field.html', field=login_form.password) }}
   </div>
   {{ render_partial('shared/partials/forms/submit_button.html', text="Log in") }}
   <p>
     Don't have an account?
-    <a
-      href="{{ url_for('html:register_get') }}"
-      class="text-teal-600 hover:text-teal-700 hover:underline underline-offset-4"
+    <a href="{{ url_for('html:register_get') }}" class="link"
       >Register here...</a
     >
   </p>

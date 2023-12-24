@@ -18,31 +18,7 @@
       aria-label="Close"
       @click="show = false"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 256 256"
-        class="w-4 h-4 stroke-current hover:stroke-teal-500 hover:scale-125 duration-300 border-0"
-      >
-        <rect width="256" height="256" fill="none" />
-        <line
-          x1="200"
-          y1="56"
-          x2="56"
-          y2="200"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="16"
-        />
-        <line
-          x1="200"
-          y1="200"
-          x2="56"
-          y2="56"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="16"
-        />
-      </svg>
+      {{ render_partial('shared/partials/icons/x.html', class="w-4 h-4 stroke-current hover:scale-125 transition-transform duration-300 border-0") }}
     </button>
   </div>
 {% endif %}

@@ -6,6 +6,7 @@ from starlette.templating import _TemplateResponse
 from app import constants
 from app.web.auth import LoggedInUser, LoggedInUserOptional
 from app.web.html.const import templates
+from app.web.html.routes.users import LoginForm
 
 # ----------- Routers -----------
 router = APIRouter(tags=["blog"])
@@ -13,12 +14,18 @@ router = APIRouter(tags=["blog"])
 
 @router.get("/blog", response_model=None)
 async def list_blog_posts(
-    request: Request, current_user: LoggedInUserOptional
+    request: Request,
+    current_user: LoggedInUserOptional,
 ) -> _TemplateResponse:
     """Return the blog list page."""
+    login_form = LoginForm(redirect_url=str(request.url))
     return templates.TemplateResponse(
         "main/blog/list_posts.html",
-        {constants.REQUEST: request, constants.CURRENT_USER: current_user},
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            "login_form": login_form,
+        },
     )
 
 

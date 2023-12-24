@@ -2,7 +2,7 @@
   set nav_items = [
   {
   'name': 'About',
-  'url': url_for('html:landing'),
+  'url': url_for('html:about'),
   },
   {
   'name': 'Projects',
@@ -18,18 +18,18 @@
   },
   ]
 %}
-{%
-  set user_nav_items = [
-  {"name": "Your Profile", "url": "#"},
-  {"name": "Settings", "url": "#"},
-  {"name": "Sign out", "url": "#"},
-  ]
-%}
 {% if not active_nav_item %}
   {% set active_nav_item = 0 %}
 {% endif %}
 <header
-  x-data="{navOpen: false, selectedNavItem: {{ active_nav_item }}, showNav: true, lastScroll: 9999999999, navAtTop: window.pageYOffset < 30}"
+  x-data="{
+    mobileNavOpen: false,
+    selectedNavItem: {{ active_nav_item }},
+    showNav: true,
+    lastScroll: 9999999999,
+    navAtTop: window.pageYOffset < 30,
+    loginModalOpen: false,
+  }"
   class="pointer-events-none z-40 w-full relative"
   @scroll.window="let currentScroll = window.pageYOffset;
                   if (Math.abs(currentScroll - lastScroll) < 2) return
@@ -39,7 +39,7 @@
   @resize.window="
     let width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
     if (width > 768) {
-      navOpen = false
+      mobileNavOpen = false
     }
   "
 >
@@ -47,7 +47,7 @@
   <div
     :class="{'top-0': showNav, '-top-24': !showNav}"
     class="px-6 py-6 w-full fixed transition-all duration-300"
-    x-show="!navOpen"
+    x-show="!mobileNavOpen"
     x-transition:enter.opacity.duration.200ms
     x-transition:leave.opacity.duration.500ms
   >
@@ -59,7 +59,7 @@
         <a
           aria-label="Home"
           class="pointer-events-auto flex items-center justify-center gap-2 text-lg font-semibold"
-          href="{{ url_for('html:landing') }}"
+          href="{{ url_for('html:about') }}"
         >
           <div
             :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
@@ -68,8 +68,6 @@
             <img
               alt=""
               fetchpriority="high"
-              width="512"
-              height="512"
               decoding="async"
               data-nimg="1"
               class="rounded-full bg-offset-300 object-cover dark:bg-offset-300 h-10 w-10 transition duration-500"
@@ -90,7 +88,7 @@
           @mouseover="hover = true"
           @mouseover.away="hover = false"
           :class="navAtTop ? '' : 'bg-grayscale-50/90 dark:bg-grayscale-800/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:ring-white/10'"
-          class="flex rounded-full  px-3 text-md font-medium text-grayscale-800  backdrop-blur  dark:text-grayscale-200 hover:bg-grayscale-50/90 hover:dark:bg-grayscale-800/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hvoer:dark:ring-white/10 transition duration-200"
+          class="flex rounded-full px-3 text-md font-medium text-grayscale-800  backdrop-blur  dark:text-grayscale-200 hover:bg-grayscale-50/90 hover:dark:bg-grayscale-800/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hvoer:dark:ring-white/10 transition duration-200"
         >
           {% for nav_item in nav_items %}
             <li>
@@ -123,12 +121,12 @@
       <div class="max-md:flex max-md:flex-1 max-md:justify-end hidden">
         <div class="pointer-events-auto">
           <button
-            @click="navOpen = !navOpen"
+            @click="mobileNavOpen = !mobileNavOpen"
             :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
             class="group flex items-center rounded-full  px-4 py-2 text-md font-medium text-grayscale-800  backdrop-blur  dark:text-grayscale-200 hover:ring-1 ring-grayscale-900/5  dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 duration-300 transition-all"
             type="button"
             aria-controls="mobile-menu"
-            :aria-expanded="navOpen"
+            :aria-expanded="mobileNavOpen"
           >
             Menu{{ render_partial('shared/partials/icons/caret-down.html', class="ml-3 h-3 w-3 fill-grayscale-500 group-hover:fill-grayscale-700 dark:group-hover:fill-grayscale-400") }}
           </button>
@@ -159,6 +157,7 @@
               {% if current_user.is_authenticated %}
                 <!-- Dropdown logged in -->
                 <div
+                  x-show="menuOpen && showNav"
                   class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-grayscale-700 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                   aria-orientation="vertical"
@@ -167,7 +166,7 @@
                 >
                   <a
                     href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left"
                     role="menuitem"
                     tabindex="-1"
                     id="user-menu-item-0"
@@ -175,20 +174,24 @@
                   >
                   <a
                     href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left"
                     role="menuitem"
                     tabindex="-1"
                     id="user-menu-item-1"
                     >Settings</a
                   >
-                  <a
-                    href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600"
+                  <button
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left"
                     role="menuitem"
                     tabindex="-1"
                     id="user-menu-item-2"
-                    >Sign out</a
+                    hx-post="{{ url_for('html:logout') }}"
+                    hx-vals='{"redirect_url": "{{ request.url }}"}'
+                    hx-target="body"
+                    hx-swap="outerHTML"
                   >
+                    Sign out
+                  </button>
                 </div>
               {% else %}
                 <!-- Dropdown not logged in -->
@@ -201,20 +204,20 @@
                   tabindex="-1"
                 >
                   <span
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 flex justify-between items-center gap-1"
+                    class="block text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 flex justify-between items-center gap-1 pr-4"
                   >
-                    <a
-                      class="flex-grow flex items-center gap-2"
-                      href="{{ url_for('html:login_get') }}"
+                    <button
+                      class="flex-grow flex items-center gap-2 pl-4 py-2 w-full text-left"
                       role="menuitem"
                       tabindex="-1"
                       id="user-menu-item-0"
+                      @click="loginModalOpen = true; console.log(loginModalOpen)"
                     >
                       <span
                         >{{ render_partial('shared/partials/icons/sign-in.html', class="h-5 w-5 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}</span
                       >
                       <span>Log in</span>
-                    </a>
+                    </button>
                     <button
                       id="tippy"
                       type="button"
@@ -255,19 +258,22 @@
   <!-- Mobile nav links (modal) -->
   <nav
     aria-label="Main navigation"
-    x-show="navOpen"
+    x-show="mobileNavOpen"
     x-transition:enter.opacity.duration.200ms
-    @keydown.escape.window="navOpen = false"
+    @keydown.escape.window="mobileNavOpen = false"
     class="pointer-events-auto top-0 bottom-0 fixed px-6 py-6 w-full hidden max-md:block backdrop-blur transition"
-    x-trap.inert="navOpen"
+    x-trap.inert="mobileNavOpen"
   >
     <div class="relative">
-      <button @click="navOpen = false" class="absolute top-5 right-5 z-50">
+      <button
+        @click="mobileNavOpen = false"
+        class="absolute top-5 right-5 z-50"
+      >
         {{ render_partial('shared/partials/icons/x.html', class="w-6 h-6 fill-grayscale-800 dark:fill-gray-100 hover:fill-primary-700 dark:hover:fill-primary-400") }}
       </button>
       <ul
         class="flex flex-col rounded-3xl px-6 py-6 bg-grayscale-50/90 text-md font-medium text-grayscale-800 shadow-2xl shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:text-grayscale-200 dark:ring-white/10"
-        @click.away="navOpen = false"
+        @click.away="mobileNavOpen = false"
       >
         <li>
           <span
@@ -297,4 +303,8 @@
       </ul>
     </div>
   </nav>
+
+  {% if current_user and login_form %}
+    {{ render_partial('users/login_modal.html',request=request, login_form=login_form, message=message) }}
+  {% endif %}
 </header>

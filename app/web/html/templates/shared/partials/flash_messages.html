@@ -1,10 +1,14 @@
 {% set messages = get_flashed_messages(request) %}
 {% if messages %}
-  <ul role="list" class="mt-6 w-full flex flex-col">
-    {% for message in messages %}
-      <li class="w-full">
-        {{ render_partial('shared/partials/flash_message.html', message=message) }}
-      </li>
-    {% endfor %}
-  </ul>
+  <div class="absolute top-16 left-0 w-full">
+    <div class="section-container">
+      <ul role="list" class="mt-6 w-full flex flex-col">
+        {% for message in messages %}
+          <li class="w-full">
+            {{ render_partial('shared/partials/flash_message.html', message=message) }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 {% endif %}

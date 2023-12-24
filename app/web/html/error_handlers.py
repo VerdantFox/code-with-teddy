@@ -16,14 +16,16 @@ def register_error_handlers(app: FastAPI) -> None:
         request: Request,
         _error: errors.UserNotValidatedError,
     ) -> RedirectResponse:
-        FlashMessage(
-            msg="Login session expired. Please log in again.",
-            category=FlashCategory.ERROR,
-        )
-        return RedirectResponse(
-            request.url_for("html:login_get"),
+        response = RedirectResponse(
+            request.url,
             status_code=status.HTTP_303_SEE_OTHER,
         )
+        response.delete_cookie(key="access_token", httponly=True)
+        FlashMessage(
+            msg="Login session expired. Please log in again.",
+            category=FlashCategory.WARNING,
+        )
+        return response
 
     @app.exception_handler(errors.UserNotAuthenticatedError)
     async def not_logged_in_handler(
