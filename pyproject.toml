@@ -48,6 +48,8 @@ dependencies = [
     "pydantic",
     # Pydantic-settings: Pydantic settings management
     "pydantic-settings",
+    # Pytz: timezone library
+    "pytz",
     # SQLAlchemy: database toolkit
     "SQLAlchemy",
     # Uvicorn: ASGI server
@@ -80,6 +82,8 @@ dev = [
     "setuptools",
     # Typer: CLI toolkit
     "typer[all]",
+    # Types-*: type stubs for external libraries
+    "types-pytz",
 ]
 
 [project.urls]

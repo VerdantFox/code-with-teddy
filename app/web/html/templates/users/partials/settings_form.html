@@ -1,0 +1,13 @@
+<form method="POST" action="{{ url_for('html:user_settings_post' ) }}">
+  {{ render_partial('shared/partials/flash_message.html', message=message) }}
+  <div class="grid grid-cols-2 gap-6 max-lg:grid-cols-1 mb-8">
+    {{ render_partial('shared/partials/forms/field.html', field=form.email, class="col-span-2 max-lg:col-span-1") }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.username) }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.name) }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.password) }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.confirm_password) }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.timezone) }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.avatar_url) }}
+  </div>
+  {{ render_partial('shared/partials/forms/submit_button.html', text="Update Settings", class="max-lg:w-full") }}
+</form>

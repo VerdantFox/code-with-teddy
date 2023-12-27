@@ -84,6 +84,7 @@ repos:
       - id: mypy
         additional_dependencies:
           - pydantic==2.5.1
+          - types-pytz==2023.3.1.1
 
   # - repo: local
   #   hooks:

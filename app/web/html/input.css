@@ -22,16 +22,24 @@
   }
 
   /* Buttons */
+  .btn-base {
+    @apply inline-block flex gap-4 items-center justify-center;
+  }
+
   .btn {
-    @apply inline-block px-8 py-4 text-lg flex gap-4 items-center justify-center rounded-xl;
+    @apply btn-base px-8 py-4 text-lg rounded-xl;
+  }
+
+  .btn-sm {
+    @apply btn-base px-4 py-2 text-base rounded-md;
   }
 
   .btn-filled {
-    @apply btn text-white bg-primary-500 dark:bg-primary-700 hover:bg-primary-600 dark:hover:bg-primary-800 active:bg-primary-700 dark:active:bg-primary-900 disabled:bg-primary-200  disabled:text-primary-700 dark:disabled:text-primary-100 dark:disabled:bg-primary-900 disabled:opacity-50 transition-bg-color duration-300;
+    @apply text-white bg-primary-700 dark:bg-primary-700 hover:bg-primary-800 active:bg-primary-900 disabled:text-primary-100 disabled:bg-primary-800 disabled:opacity-50 transition-bg-color duration-300;
   }
 
   .btn-outline {
-    @apply btn text-primary-700 dark:text-primary-50 bg-white border dark:bg-grayscale-800 border-primary-700 dark:border-primary-50 hover:bg-primary-50 dark:hover:bg-grayscale-700 active:bg-primary-100 dark:active:bg-grayscale-600 disabled:hover:bg-white dark:disabled:hover:bg-grayscale-800 disabled:opacity-50 transition duration-300;
+    @apply text-primary-700 dark:text-primary-50 bg-white border dark:bg-grayscale-800 border-primary-700 dark:border-primary-50 hover:bg-primary-50 dark:hover:bg-grayscale-700 active:bg-primary-100 dark:active:bg-grayscale-600 disabled:hover:bg-white dark:disabled:hover:bg-grayscale-800 disabled:opacity-50 transition duration-300;
   }
 
   /* Links */

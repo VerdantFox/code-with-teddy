@@ -1,13 +1,10 @@
 <form
   id="login-form"
   method="POST"
-  class=""
-  {% if use_htmx %}
-    hx-post="{{ url_for('html:login_post' ) }}" hx-target="body"
-    hx-target-4*="#login-form" hx-swap="outerHTML"
-  {% else %}
-    action="{{ url_for('html:login_post' ) }}"
-  {% endif %}
+  hx-post="{{ url_for('html:login_post' ) }}"
+  hx-target="body"
+  hx-target-4*="#login-form"
+  hx-swap="outerHTML"
 >
   {{ render_partial('shared/partials/flash_message.html', message=message) }}
   <div class="flex flex-col gap-6 mb-10">

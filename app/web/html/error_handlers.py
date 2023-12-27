@@ -24,7 +24,7 @@ def register_error_handlers(app: FastAPI) -> None:
         FlashMessage(
             msg="Login session expired. Please log in again.",
             category=FlashCategory.WARNING,
-        )
+        ).flash(request)
         return response
 
     @app.exception_handler(errors.UserNotAuthenticatedError)
@@ -35,7 +35,7 @@ def register_error_handlers(app: FastAPI) -> None:
         FlashMessage(
             msg="Please log in to use that service.",
             category=FlashCategory.ERROR,
-        )
+        ).flash(request)
         return RedirectResponse(
             request.url_for("html:login_get"),
             status_code=status.HTTP_303_SEE_OTHER,
@@ -62,7 +62,7 @@ def register_error_handlers(app: FastAPI) -> None:
             request.url_for("html:general_error").include_query_params(
                 detail=(
                     "Something went wrong on the server."
-                    " See logs for details or contact Teddy Williams to report a problem."
+                    " Contact Teddy Williams to report a problem."
                 ),
                 status_code=500,
             ),

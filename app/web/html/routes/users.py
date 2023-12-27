@@ -5,7 +5,7 @@ import sqlalchemy
 from fastapi import APIRouter, Query, Request, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
-from wtforms import Form, HiddenField, PasswordField, StringField, validators
+from wtforms import Form, HiddenField, PasswordField, SelectField, StringField, validators
 
 from app import constants
 from app.datastore import db_models
@@ -69,7 +69,7 @@ async def login_post(
             {
                 constants.REQUEST: request,
                 "message": FlashMessage(
-                    msg="Invalid username or password",
+                    msg="Invalid form field(s). See errors on form.",
                     category=FlashCategory.ERROR,
                 ),
                 "login_form": login_form,
@@ -162,7 +162,7 @@ async def register_post(
             {
                 constants.REQUEST: request,
                 "message": FlashMessage(
-                    msg="Invalid form fields.",
+                    msg="Invalid form field(s). See errors on form.",
                     category=FlashCategory.ERROR,
                 ),
                 "form": register_form,
@@ -222,3 +222,136 @@ async def logout(request: Request) -> RedirectResponse:
         timeout=5,
     ).flash(request)
     return response
+
+
+class UserSettingsForm(Form):
+    """Form for user settings page."""
+
+    email: StringField = StringField(
+        "Email",
+        validators=[validators.Length(min=1, max=25)],
+    )
+    username: StringField = StringField(
+        "Username",
+        validators=[validators.Length(min=3, max=25)],
+    )
+    name: StringField = StringField(
+        "Full Name",
+        validators=[validators.Length(min=1, max=25)],
+    )
+    password: PasswordField = PasswordField(
+        "Update Password",
+        validators=[validators.optional(), validators.Length(min=8, max=25)],
+    )
+    confirm_password: PasswordField = PasswordField(
+        "Confirm Updated Password",
+        validators=[
+            validators.EqualTo("password", message="Passwords must match"),
+        ],
+    )
+    timezone: StringField = SelectField(
+        "Timezone",
+        choices=constants.TIMEZONES,
+    )
+    avatar_url: StringField = StringField(
+        "Remote Avatar URL",
+        validators=[validators.Length(min=0, max=2000)],
+    )
+
+
+@router.get("/user-settings", response_model=None)
+async def user_settings_get(
+    request: Request,
+    current_user: auth.LoggedInUser,
+) -> _TemplateResponse:
+    """Return the user settings page."""
+    form = UserSettingsForm()
+    form.email.data = current_user.email
+    form.username.data = current_user.username
+    form.name.data = current_user.full_name
+    form.timezone.data = current_user.timezone
+    form.avatar_url.data = current_user.avatar_location
+    return templates.TemplateResponse(
+        "users/settings.html",
+        {constants.REQUEST: request, "form": form, constants.CURRENT_USER: current_user},
+    )
+
+
+@router.post("/user-settings", response_model=None)
+async def user_settings_post(
+    request: Request,
+    current_user: auth.LoggedInUser,
+    db: DBSession,
+) -> _TemplateResponse | RedirectResponse:
+    """Return the user settings page."""
+    form_data = await request.form()
+    user_details = {
+        "email": form_data.get("email") or current_user.email,
+        "username": form_data.get("username") or current_user.username,
+        "name": form_data.get("name") or current_user.full_name,
+        "timezone": form_data.get("timezone") or current_user.timezone,
+        "avatar_url": form_data.get("avatar_url") or current_user.avatar_location,
+        "password": form_data.get("password"),
+        "confirm_password": form_data.get("confirm_password"),
+    }
+    form = UserSettingsForm(
+        **user_details,
+    )
+    if not form.validate():
+        return templates.TemplateResponse(
+            "users/settings.html",
+            {
+                constants.REQUEST: request,
+                "message": FlashMessage(
+                    msg="Invalid form field(s). See errors on form.",
+                    category=FlashCategory.ERROR,
+                ),
+                "form": form,
+                constants.CURRENT_USER: current_user,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+
+    update_user_settings_from_form(form=form, user=current_user)
+
+    try:
+        db.commit()
+    except sqlalchemy.exc.IntegrityError:
+        return templates.TemplateResponse(
+            "users/settings.html",
+            {
+                constants.REQUEST: request,
+                "message": FlashMessage(
+                    msg="Username or email already exists. Already have an account? Login!",
+                    category=FlashCategory.ERROR,
+                ),
+                "form": form,
+                constants.CURRENT_USER: current_user,
+            },
+        )
+    db.refresh(current_user)
+
+    FlashMessage(
+        msg="Settings updated!",
+        category=FlashCategory.SUCCESS,
+        timeout=5,
+    ).flash(request)
+    return RedirectResponse(
+        url=request.url_for("html:user_settings_get"), status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+def update_user_settings_from_form(form: UserSettingsForm, user: db_models.User) -> None:
+    """Update a user model from a form."""
+    if form.password.data:
+        user.password_hash = auth.hash_password(form.password.data)
+    if form.email.data:
+        user.email = form.email.data
+    if form.username.data:
+        user.username = form.username.data
+    if form.name.data:
+        user.full_name = form.name.data
+    if form.timezone.data:
+        user.timezone = form.timezone.data
+    if form.avatar_url.data:
+        user.avatar_location = form.avatar_url.data
