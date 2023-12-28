@@ -250,7 +250,7 @@
           <div class="pointer-events-auto">
             <button
               type="button"
-              aria-label="Switch to dark theme"
+              :aria-label="darkMode ? 'Switch to light theme' : 'Switch to dark theme'"
               @click="darkMode = !darkMode"
               :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
               class="group rounded-full  px-2 py-2 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"

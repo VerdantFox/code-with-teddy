@@ -1,9 +1,19 @@
 {% if request.cookies.get("access_token") and not no_content %}
-  <div
-    hidden
-    hx-get="{{ url_for('html:refresh_access_token') }}"
-    hx-trigger="every 10m"
-    hx-target="this"
-    hx-swap="outerHTML"
-  ></div>
+  {% if refresh %}
+    <div
+      hidden
+      hx-get="{{ url_for('html:refresh_access_token') }}"
+      hx-trigger="every 5m"
+      hx-target="this"
+      hx-swap="outerHTML"
+    ></div>
+  {% else %}
+    <div
+      hidden
+      hx-get="{{ url_for('html:refresh_access_token') }}"
+      hx-trigger="load"
+      hx-target="this"
+      hx-swap="outerHTML"
+    ></div>
+  {% endif %}
 {% endif %}

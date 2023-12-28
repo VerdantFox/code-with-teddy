@@ -17,10 +17,10 @@
     hx-target-error="body"
     hx-swap="outerHTML"
   >
+    {% include 'shared/partials/refresh_access.html' %}
     {# Weird hack to make top spacing not break #}
     <div class="h-[0.02px]"></div>
 
-    {% include 'shared/partials/refresh_access.html' %}
     {% include 'shared/partials/navbar.html' %}
     {{ render_partial('shared/partials/flash_messages.html', request=request) }}
 

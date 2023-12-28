@@ -63,7 +63,7 @@
                 {# class="btn-filled px-6 py-2 text-md flex items-start justify-center gap-1" #}
                 class="link flex items-start justify-center gap-1"
                 ><span>Visit</span>
-                {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5") }}</a
+                {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
               >
               <a
                 href="http://"
@@ -71,10 +71,16 @@
                 rel="noopener noreferrer"
                 class="link flex items-start justify-center gap-1"
                 ><span>GitHub</span>
-                {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5") }}</a
+                {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
               >
             </div>
-            <ul class="flex gap-2 flex-wrap">
+            <p id="technologies-label-{{ loop.index }}" class="screenreader">
+              Technologies used
+            </p>
+            <ul
+              aria-labelledby="technologies-label-{{ loop.index }}"
+              class="flex gap-2 flex-wrap"
+            >
               {%
                 set tags = [
                 "python",

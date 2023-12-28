@@ -62,6 +62,8 @@ async def refresh_access_token(
         )
         response.delete_cookie(key=ACCESS_TOKEN_KEY)
         return response
-    response = templates.TemplateResponse(REFRESH_ACCESS_PARTIAL, {"request": request})
+    response = templates.TemplateResponse(
+        REFRESH_ACCESS_PARTIAL, {"request": request, "refresh": True}
+    )
     response.set_cookie(key=ACCESS_TOKEN_KEY, value=token.access_token)
     return response

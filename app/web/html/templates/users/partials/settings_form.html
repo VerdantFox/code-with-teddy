@@ -1,13 +1,61 @@
 <form method="POST" action="{{ url_for('html:user_settings_post' ) }}">
   {{ render_partial('shared/partials/flash_message.html', message=message) }}
-  <div class="grid grid-cols-2 gap-6 max-lg:grid-cols-1 mb-8">
+  <div class="grid grid-cols-2 gap-6 max-lg:grid-cols-1 mb-12">
     {{ render_partial('shared/partials/forms/field.html', field=form.email, class="col-span-2 max-lg:col-span-1") }}
     {{ render_partial('shared/partials/forms/field.html', field=form.username) }}
     {{ render_partial('shared/partials/forms/field.html', field=form.name) }}
     {{ render_partial('shared/partials/forms/field.html', field=form.password) }}
     {{ render_partial('shared/partials/forms/field.html', field=form.confirm_password) }}
     {{ render_partial('shared/partials/forms/field.html', field=form.timezone) }}
-    {{ render_partial('shared/partials/forms/field.html', field=form.avatar_url) }}
   </div>
+  <div class="mb-12">
+    <div
+      id="avatar-image"
+      class="w-36 h-36 rounded-full overflow-hidden flex items-center justify-center mx-auto mb-12"
+    >
+      {{ render_partial('shared/partials/icons/user-thin.html', class="w-36 h-36") }}
+    </div>
+    <div
+      class="col-span-2 max-lg:col-span-1 flex items-center justify-start gap-8"
+    >
+      {{ render_partial('shared/partials/forms/file_upload_field.html', field=form.avatar_upload) }}
+      <span class="text-lg font-bold">OR</span>
+      {{ render_partial('shared/partials/forms/field.html', field=form.avatar_url, class="w-full") }}
+    </div>
+  </div>
+
   {{ render_partial('shared/partials/forms/submit_button.html', text="Update Settings", class="max-lg:w-full") }}
+
+  <script>
+    const chooseFile = document.getElementById("{{ form.avatar_upload.id }}")
+    const remoteFile = document.getElementById("{{ form.avatar_url.id }}")
+    const imgPreview = document.getElementById("avatar-image")
+
+    chooseFile.addEventListener("change", function () {
+      getImgData()
+    })
+    remoteFile.addEventListener("change", function () {
+      getImgData()
+    })
+
+    function getImgData() {
+      const files = chooseFile.files[0]
+      console.log(files)
+      if (files) {
+        const fileReader = new FileReader()
+        fileReader.readAsDataURL(files)
+        fileReader.addEventListener("load", function () {
+          imgPreview.innerHTML =
+            '<img src="' + this.result + '" class="object-cover h-36 w-36" />'
+        })
+        console.log("uploaded file")
+      } else if (remoteFile.value) {
+        imgPreview.innerHTML =
+          '<img src="' +
+          remoteFile.value +
+          '" class="object-cover h-36 w-36" />'
+        console.log("remote file")
+      }
+    }
+  </script>
 </form>

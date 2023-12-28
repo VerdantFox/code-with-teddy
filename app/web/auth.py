@@ -27,7 +27,7 @@ OptionalCookieDependency = Annotated[str | None, Cookie()]  # key matches param 
 # TODO: Replace with actual password in secrets
 SECRET_KEY = "a32739cd7e677c1b8dfcf560a68d59793efdd035fa14dc488192b815d3b5e498"  # noqa: S105 (hardcoded-password-string)
 ALGORITHM = "HS256"
-TOKEN_EXPIRATION = timedelta(minutes=15)
+TOKEN_EXPIRATION = timedelta(minutes=30)
 
 
 # ------------ Functions ------------

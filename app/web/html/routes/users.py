@@ -1,11 +1,20 @@
 """users: HTML routes for users."""
+import re
 from typing import Annotated
 
 import sqlalchemy
 from fastapi import APIRouter, Query, Request, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
-from wtforms import Form, HiddenField, PasswordField, SelectField, StringField, validators
+from wtforms import (
+    FileField,
+    Form,
+    HiddenField,
+    PasswordField,
+    SelectField,
+    StringField,
+    validators,
+)
 
 from app import constants
 from app.datastore import db_models
@@ -256,6 +265,15 @@ class UserSettingsForm(Form):
     avatar_url: StringField = StringField(
         "Remote Avatar URL",
         validators=[validators.Length(min=0, max=2000)],
+    )
+    avatar_upload: FileField = FileField(
+        "Upload Avatar",
+        validators=[
+            validators.optional(),
+            validators.regexp(
+                r"\.(jpg|jpeg|png|webp)$", re.IGNORECASE, message="Invalid file type"
+            ),
+        ],
     )
 
 
