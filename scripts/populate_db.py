@@ -65,6 +65,7 @@ class PopulateDB:
                 timezone="America/Denver",
                 password_hash=auth.hash_password("password"),
                 role=permissions.Role.ADMIN,
+                avatar_location="/media/local/rand.jpeg",
             ),
             db_models.User(
                 username="mat",
@@ -73,6 +74,7 @@ class PopulateDB:
                 timezone="America/Chicago",
                 password_hash=auth.hash_password("password"),
                 role=permissions.Role.USER,
+                avatar_location="https://static.wikia.nocookie.net/wot/images/c/cb/Mat_cauthon_son_of_battles_by_reddera-d993o0f.jpg",
             ),
             db_models.User(
                 username="perrin",
@@ -89,6 +91,7 @@ class PopulateDB:
                 timezone="America/Denver",
                 password_hash=auth.hash_password("password"),
                 role=permissions.Role.REVIEWER,
+                avatar_location="https://static.wikia.nocookie.net/wot-prime/images/e/e1/Egwene_s2_icon.jpg",
             ),
         ]
         for user in self.users:
