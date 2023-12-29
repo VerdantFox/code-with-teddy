@@ -1,9 +1,14 @@
 """error_handlers: Error handlers for the HTML web package."""
+import logging
+
 from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import RedirectResponse
 
 from app.web import errors
 from app.web.html.flash_messages import FlashCategory, FlashMessage
+
+logger = logging.getLogger(__name__)
 
 ERROR_TEMPLATE = "errors/general_error.html"
 
@@ -51,6 +56,23 @@ def register_error_handlers(app: FastAPI) -> None:
                 detail=error.detail,
                 status_code=error.status_code,
             ),
+        )
+
+    @app.exception_handler(RequestValidationError)
+    async def web_validation_error(
+        request: Request,
+        error: RequestValidationError,
+    ) -> RedirectResponse:
+        logger.error("Form submission errors: %s", error.errors())
+        return RedirectResponse(
+            request.url_for("html:general_error").include_query_params(
+                detail=(
+                    "Something went wrong with the form submission. Please report to Teddy "
+                    "if the problem persists."
+                ),
+                status_code=422,
+            ),
+            status_code=status.HTTP_303_SEE_OTHER,
         )
 
     @app.exception_handler(Exception)

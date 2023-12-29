@@ -31,17 +31,17 @@
               {#
               <source
               srcset="
-                {{ url_for('html:static', path='/images/main/about/grid/' + image + '.webp') }}
+                {{ url_for('html:static', path='/media/main/about/grid/' + image + '.webp') }}
               "
               type="image/webp"
               />
             #}
               <source
-                :srcset="darkMode ? '{{ url_for('html:static', path='/images/main/projects/website-dark.png') }}' : '{{ url_for('html:static', path='/images/main/projects/website-light.png') }}'"
+                :srcset="darkMode ? '{{ url_for('html:static', path='/media/main/projects/website-dark.png') }}' : '{{ url_for('html:static', path='/media/main/projects/website-light.png') }}'"
                 type="image/png"
               />
               <img
-                :src="darkMode ? '{{ url_for('html:static', path='/images/main/projects/website-dark.png') }}' : '{{ url_for('html:static', path='/images/main/projects/website-light.png') }}'"
+                :src="darkMode ? '{{ url_for('html:static', path='/media/main/projects/website-dark.png') }}' : '{{ url_for('html:static', path='/media/main/projects/website-light.png') }}'"
                 alt="{{ description }}"
                 title="{{ description }}"
                 class="w-full"

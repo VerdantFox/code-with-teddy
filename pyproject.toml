@@ -38,6 +38,8 @@ dependencies = [
     "jinja2",
     # Itsdangerous: cryptographically signed tokens
     "itsdangerous",
+    # Pillow: image processing library
+    "pillow",
     # Python-jose: JSON Web Tokens
     "python-jose[cryptography]",
     # Python-mulitpart: multipart form data parser

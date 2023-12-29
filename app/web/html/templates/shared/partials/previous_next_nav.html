@@ -5,7 +5,7 @@
   >
     {% if previous_page %}
       <a
-        class="btn btn-outline max-xs:text-sm max-xs:py-2 max-xs:px-4"
+        class="btn btn-outline max-xs:text-sm max-xs:py-2 max-xs:px-4 focus-visible:ring-2 focus-visible:ring-primary-600"
         href="{{ previous_page[1] }}"
         @click="smoothScroll = false; setTimeout(() => smoothScroll = true, 100)"
         >{{ render_partial("/shared/partials/icons/arrow-fat-left.html", class="inline-block h-5 w-5 max-xs:h-4 max-xs:w-4", aria_hidden="true") }}

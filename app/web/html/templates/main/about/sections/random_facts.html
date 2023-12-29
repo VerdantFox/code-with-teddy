@@ -29,18 +29,18 @@
           <picture>
             <source
               srcset="
-                {{ url_for('html:static', path='/images/main/about/grid/' + image + '.webp') }}
+                {{ url_for('html:static', path='/media/main/about/grid/' + image + '.webp') }}
               "
               type="image/webp"
             />
             <source
               srcset="
-                {{ url_for('html:static', path='/images/main/about/grid/' + image + '.jpg') }}
+                {{ url_for('html:static', path='/media/main/about/grid/' + image + '.jpg') }}
               "
               type="image/jpg"
             />
             <img
-              src="{{ url_for('html:static', path='/images/main/about/grid/' + image + '.jpg') }}"
+              src="{{ url_for('html:static', path='/media/main/about/grid/' + image + '.jpg') }}"
               alt="{{ description }}"
               class="w-full hover:scale-125 transition duration-500"
               loading="lazy"

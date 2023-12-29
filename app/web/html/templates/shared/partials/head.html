@@ -1,50 +1,45 @@
-{% set libraries_static_version = 1 %}
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preconnect" href="https://fonts.bunny.net" />
-  <link
-    href="https://fonts.bunny.net/css?family=roboto:400,500,700"
-    rel="stylesheet"
-  />
-  <link
-    rel="stylesheet"
-    href="{{ url_for('html:static', path='css/tailwind-styles.css') }}?{{ static_version }}"
-  />
-  <link
-    rel="stylesheet"
-    href="{{ url_for('html:static', path='css/libraries/tippy.css') }}?6.3.7"
-  />
-  {% block custom_css %}{% endblock custom_css %}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="preconnect" href="https://fonts.bunny.net" />
+<link
+  href="https://fonts.bunny.net/css?family=roboto:400,500,700"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('html:static', path='css/tailwind-styles.css') }}?{{ static_version }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('html:static', path='css/libraries/tippy.css') }}?6.3.7"
+/>
 
-  <!-- External JavaScript Libraries (loaded from our code) -->
-  <script
-    defer
-    src="{{ url_for('html:static', path='js/libraries/bundled-deferred.js') }}?{{ libraries_static_version }}"
-  ></script>
-  <script src="{{ url_for('html:static', path='js/libraries/bundled-non-deferred.js') }}?{{ libraries_static_version }}"></script>
+<!-- External JavaScript Libraries (loaded from our code) -->
+<script
+  defer
+  src="{{ url_for('html:static', path='js/libraries/bundled-deferred.js') }}?{{ libraries_static_version }}"
+></script>
+<script src="{{ url_for('html:static', path='js/libraries/bundled-non-deferred.js') }}?{{ libraries_static_version }}"></script>
 
-  <!-- Custom JavaScript -->
-  <script src="{{ url_for('html:static', path='js/custom/script.js') }}?{{ static_version }}"></script>
-  {% block custom_js %}{% endblock custom_js %}
-  <script>
-    // Handle initial dark mode state here before body loads
-    // to avoid flash of unstyled content. Afterwards, handled by Alpine.js.
-    if (
-      localStorage._x_darkMode === "true" ||
-      (!("_x_darkMode" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
-  </script>
+<!-- Custom JavaScript -->
+<script src="{{ url_for('html:static', path='js/custom/script.js') }}?{{ static_version }}"></script>
+<script>
+  // Handle initial dark mode state here before body loads
+  // to avoid flash of unstyled content. Afterwards, handled by Alpine.js.
+  if (
+    localStorage._x_darkMode === "true" ||
+    (!("_x_darkMode" in localStorage) &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+  ) {
+    document.documentElement.classList.add("dark")
+  } else {
+    document.documentElement.classList.remove("dark")
+  }
+</script>
 
-  {% if page_title %}
-    {% set page_title = page_title + "| Teddy Williams" %}
-  {% else %}
-    {% set page_title = "Teddy Williams" %}
-  {% endif %}
-  <title>{{ page_title }}</title>
-</head>
+{% if page_title %}
+  {% set page_title = page_title + "| Teddy Williams" %}
+{% else %}
+  {% set page_title = "Teddy Williams" %}
+{% endif %}
+<title>{{ page_title }}</title>

@@ -30,3 +30,4 @@ blog_uploaded/
 certbot/
 **/logs/
 *.db
+**/avatars/

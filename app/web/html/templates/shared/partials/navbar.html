@@ -73,7 +73,7 @@
               data-nimg="1"
               class="rounded-full bg-offset-300 object-cover dark:bg-offset-300 h-10 w-10 transition duration-500"
               sizes="2.25rem"
-              src="{{ url_for('html:static', path='/images/shared/avatar.png') }}"
+              src="{{ url_for('html:static', path='/media/shared/avatar.png') }}"
             />
           </div>
         </a>
@@ -138,11 +138,11 @@
       <div class="flex justify-end items-center md:flex-1">
         {% if current_user %}
           <!-- Users button -->
-          <div class="flex items-center">
+          <div class="flex items-center justify-center">
             <div
               x-data="{menuOpen: false}"
               @click.away="menuOpen = false"
-              class="pointer-events-auto mr-2"
+              class="pointer-events-auto mr-2 flex items-center justify-center"
               @scroll.window="menuOpen = false"
             >
               <button
@@ -150,10 +150,13 @@
                 @click="menuOpen = !menuOpen"
                 aria-label="User details"
                 :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
-                class="group rounded-full  px-1.5 py-1.5 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
+                class="group rounded-full  p-1.5 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
                 title="User details"
               >
+                {#
                 {{ render_partial('shared/partials/icons/user-circle.html', class="h-7 w-7 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}
+                #}
+                {{ render_partial('users/partials/avatar.html', class="h-8 w-8 object-cover rounded-full fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300", request=request, current_user=current_user, user_icon='user-circle') }}
               </button>
               {% if current_user.is_authenticated %}
                 <!-- Dropdown logged in -->
@@ -246,7 +249,7 @@
         {% endif %}
 
         <!-- Dark mode button -->
-        <div class="flex justify-end md:flex">
+        <div class="flex justify-end items-center md:flex">
           <div class="pointer-events-auto">
             <button
               type="button"

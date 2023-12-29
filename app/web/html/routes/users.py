@@ -1,9 +1,10 @@
 """users: HTML routes for users."""
 import re
 from typing import Annotated
+from uuid import uuid4
 
 import sqlalchemy
-from fastapi import APIRouter, Query, Request, status
+from fastapi import APIRouter, Query, Request, UploadFile, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import (
@@ -20,6 +21,7 @@ from app import constants
 from app.datastore import db_models
 from app.datastore.database import DBSession
 from app.permissions import Role
+from app.services.media import media_handler
 from app.web import auth, errors
 from app.web.html.const import templates
 from app.web.html.flash_messages import FlashCategory, FlashMessage
@@ -233,6 +235,13 @@ async def logout(request: Request) -> RedirectResponse:
     return response
 
 
+file_ext_validator = validators.regexp(
+    r"\.(jpg|jpeg|png|webp|svg)$",
+    re.IGNORECASE,
+    message="Invalid file extension. Allowed: jpg, jpeg, png, svg, webp",
+)
+
+
 class UserSettingsForm(Form):
     """Form for user settings page."""
 
@@ -264,16 +273,11 @@ class UserSettingsForm(Form):
     )
     avatar_url: StringField = StringField(
         "Remote Avatar URL",
-        validators=[validators.Length(min=0, max=2000)],
+        validators=[validators.optional(), validators.Length(min=0, max=2000), file_ext_validator],
     )
     avatar_upload: FileField = FileField(
         "Upload Avatar",
-        validators=[
-            validators.optional(),
-            validators.regexp(
-                r"\.(jpg|jpeg|png|webp)$", re.IGNORECASE, message="Invalid file type"
-            ),
-        ],
+        validators=[validators.optional(), file_ext_validator],
     )
 
 
@@ -300,6 +304,7 @@ async def user_settings_post(
     request: Request,
     current_user: auth.LoggedInUser,
     db: DBSession,
+    avatar_upload: UploadFile | None = None,
 ) -> _TemplateResponse | RedirectResponse:
     """Return the user settings page."""
     form_data = await request.form()
@@ -311,6 +316,7 @@ async def user_settings_post(
         "avatar_url": form_data.get("avatar_url") or current_user.avatar_location,
         "password": form_data.get("password"),
         "confirm_password": form_data.get("confirm_password"),
+        "avatar_upload": avatar_upload,
     }
     form = UserSettingsForm(
         **user_details,
@@ -330,7 +336,7 @@ async def user_settings_post(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
 
-    update_user_settings_from_form(form=form, user=current_user)
+    await update_user_settings_from_form(form=form, user=current_user)
 
     try:
         db.commit()
@@ -359,7 +365,7 @@ async def user_settings_post(
     )
 
 
-def update_user_settings_from_form(form: UserSettingsForm, user: db_models.User) -> None:
+async def update_user_settings_from_form(form: UserSettingsForm, user: db_models.User) -> None:  # noqa: C901 (too-complex)
     """Update a user model from a form."""
     if form.password.data:
         user.password_hash = auth.hash_password(form.password.data)
@@ -371,5 +377,12 @@ def update_user_settings_from_form(form: UserSettingsForm, user: db_models.User)
         user.full_name = form.name.data
     if form.timezone.data:
         user.timezone = form.timezone.data
-    if form.avatar_url.data:
+    avatar_before = user.avatar_location
+    if form.avatar_upload.data:
+        upload_file = form.avatar_upload.data
+        name = f"{user.id}_{uuid4()}"
+        user.avatar_location = await media_handler.upload_avatar(pic=upload_file, name=name)
+    if form.avatar_url.data and not form.avatar_upload.data:
         user.avatar_location = form.avatar_url.data
+    if avatar_before != user.avatar_location:
+        media_handler.del_media_from_path_str(avatar_before)
