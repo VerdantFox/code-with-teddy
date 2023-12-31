@@ -139,9 +139,12 @@ def encode_access_token(payload: dict[str, str | int | datetime]) -> web_models.
     return web_models.Token(access_token=access_token, token_type="bearer")  # noqa: S106 (hardcoded-password-func-arg)
 
 
-def authenticate_user(username: str, password: str, db: DBSession) -> db_models.User:
+def authenticate_user(username_or_email: str, password: str, db: DBSession) -> db_models.User:
     """Authenticate a user."""
-    user = db.query(db_models.User).filter(db_models.User.username == username).first()
+    if "@" in username_or_email:
+        user = db.query(db_models.User).filter(db_models.User.email == username_or_email).first()
+    else:
+        user = db.query(db_models.User).filter(db_models.User.username == username_or_email).first()
     if not user:
         raise errors.UserNotAuthenticatedError
     if not verify_password(password, user.password_hash):

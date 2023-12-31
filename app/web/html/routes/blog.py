@@ -2,6 +2,12 @@
 
 from fastapi import APIRouter, Request
 from starlette.templating import _TemplateResponse
+from wtforms import (
+    BooleanField,
+    Form,
+    StringField,
+    validators,
+)
 
 from app import constants
 from app.permissions import Action, requires_permission
@@ -28,6 +34,19 @@ async def list_blog_posts(
             "login_form": login_form,
         },
     )
+
+
+class BlogPostForm(Form):
+    """Form for creating and editing blog posts."""
+
+    title = StringField("Title", description="My cool post")
+    tags = StringField("Tags", [validators.optional()], description="python, fastapi, web")
+    can_comment = BooleanField("Allow comments", default=True)
+    is_published = BooleanField("Publish", default=False)
+    description = StringField(
+        "Description", description="Short markdown description (couple paragraphs)"
+    )
+    content = StringField("Content", description="Markdown content (the whole blog post)")
 
 
 @router.get("/blog/create", response_model=None)

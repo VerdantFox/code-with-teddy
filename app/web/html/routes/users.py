@@ -37,8 +37,9 @@ REGISTER_TEMPLATE = "users/register.html"
 class LoginForm(Form):
     """Form for user login page."""
 
-    username: StringField = StringField(
-        "Username",
+    username_or_email: StringField = StringField(
+        "Username or Email",
+        description="awesome@email.com",
         validators=[validators.Length(min=3, max=25)],
     )
     password: PasswordField = PasswordField(
@@ -90,7 +91,7 @@ async def login_post(
         await login_for_access_token(
             response=response,
             db=db,
-            username=login_form.username.data,
+            username_or_email=login_form.username_or_email.data,
             password=login_form.password.data,
         )
     except errors.UserNotAuthenticatedError as e:
@@ -116,14 +117,17 @@ class RegisterUserForm(Form):
 
     email: StringField = StringField(
         "Email",
+        description="awesome@email.com",
         validators=[validators.Length(min=1, max=25)],
     )
     username: StringField = StringField(
         "Username",
+        description="awesome_username",
         validators=[validators.Length(min=3, max=25)],
     )
     name: StringField = StringField(
         "Full Name",
+        description="John Doe",
         validators=[validators.Length(min=1, max=25)],
     )
     password: PasswordField = PasswordField(
@@ -240,14 +244,17 @@ class UserSettingsForm(Form):
 
     email: StringField = StringField(
         "Email",
+        description="new@email.com",
         validators=[validators.Length(min=1, max=25)],
     )
     username: StringField = StringField(
         "Username",
+        description="my_new_username",
         validators=[validators.Length(min=3, max=25)],
     )
     name: StringField = StringField(
         "Full Name",
+        description="John Doe",
         validators=[validators.Length(min=1, max=25)],
     )
     password: PasswordField = PasswordField(
@@ -266,6 +273,7 @@ class UserSettingsForm(Form):
     )
     avatar_url: StringField = StringField(
         "Remote Avatar URL",
+        description="https://example.com/avatar.png",
         validators=[validators.optional(), validators.Length(min=0, max=2000), file_ext_validator],
     )
     avatar_upload: FileField = FileField(

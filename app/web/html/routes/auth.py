@@ -19,11 +19,11 @@ ACCESS_TOKEN_KEY = "access_token"  # noqa: S105 (hardcoded-password-string)
 async def login_for_access_token(
     response: Response,
     db: DBSession,
-    username: ft.StrFormField,
+    username_or_email: ft.StrFormField,
     password: ft.StrFormField,
 ) -> Token:
     """Authenticate a user, set a cookie with the access token, and return the token."""
-    user = auth.authenticate_user(username=username, password=password, db=db)
+    user = auth.authenticate_user(username_or_email=username_or_email, password=password, db=db)
     token = auth.create_access_token(user=user)
     response.set_cookie(
         key=ACCESS_TOKEN_KEY,

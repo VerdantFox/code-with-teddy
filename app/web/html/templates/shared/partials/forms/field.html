@@ -1,6 +1,9 @@
 {% if not extra_fields %}
   {% set extra_fields = {} %}
 {% endif %}
+{% if field.description %}
+  {% set _ = extra_fields.update({"placeholder": field.description}) %}
+{% endif %}
 <div class="flex flex-col gap-2 {{ class }}">
   {{ field.label }}
   {{ field(class="rounded-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white", **extra_fields) }}
