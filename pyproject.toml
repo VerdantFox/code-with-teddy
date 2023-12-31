@@ -28,6 +28,10 @@ maintainers = [
 dependencies = [
     # Bcrypt: password hashing library
     "bcrypt",
+    # BeautifulSoup: HTML parser
+    "beautifulsoup4",
+    # Bleach: HTML sanitizer
+    "bleach",
     # Email-validator: email validation library for Pydantic
     "email-validator",
     # FastAPI: web framework
@@ -38,6 +42,12 @@ dependencies = [
     "jinja2",
     # Itsdangerous: cryptographically signed tokens
     "itsdangerous",
+    # Markdown: Markdown parser
+    "markdown",
+    # Micawber: oEmbed consumer
+    "micawber",
+    # Pygments: syntax highlighting library
+    "pygments",
     # Pillow: image processing library
     "pillow",
     # Python-jose: JSON Web Tokens

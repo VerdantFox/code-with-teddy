@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request
 from starlette.templating import _TemplateResponse
 
 from app import constants
+from app.permissions import Action, requires_permission
 from app.web.auth import LoggedInUser, LoggedInUserOptional
 from app.web.html.const import templates
 from app.web.html.routes.users import LoginForm
@@ -29,6 +30,16 @@ async def list_blog_posts(
     )
 
 
+@router.get("/blog/create", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def create_blog_post(request: Request, current_user: LoggedInUser) -> _TemplateResponse:
+    """Return page to create a blog post."""
+    return templates.TemplateResponse(
+        "main/blog/edit_post.html",
+        {constants.REQUEST: request, constants.CURRENT_USER: current_user},
+    )
+
+
 @router.get("/blog/{slug}", response_model=None)
 async def read_blog_post(
     request: Request,
@@ -42,16 +53,8 @@ async def read_blog_post(
     )
 
 
-@router.get("/blog/create", response_model=None)
-async def create_blog_post(request: Request, current_user: LoggedInUser) -> _TemplateResponse:
-    """Return page to create a blog post."""
-    return templates.TemplateResponse(
-        "main/blog/edit_post.html",
-        {constants.REQUEST: request, constants.CURRENT_USER: current_user},
-    )
-
-
 @router.get("/blog/{bp_id}/edit", response_model=None)
+@requires_permission(Action.EDIT_BP)
 async def edit_blog_post(
     request: Request,
     current_user: LoggedInUser,
@@ -65,6 +68,7 @@ async def edit_blog_post(
 
 
 @router.get("/blog/{bp_id}/upload-media", response_model=None)
+@requires_permission(Action.EDIT_BP)
 async def upload_media_for_blog_post(
     request: Request,
     current_user: LoggedInUser,

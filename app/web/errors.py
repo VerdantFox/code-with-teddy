@@ -30,26 +30,12 @@ class UserNotAuthenticatedError(WebError):
 class UserNotValidatedError(WebError):
     """User not validated."""
 
-    detail = "Unable to validate user from JWT"
+    detail = "Unable to validate user from JWT token"
     status_code = status.HTTP_401_UNAUTHORIZED
 
 
 class UserPermissionsError(WebError):
     """User does not have permission to perform this action."""
 
-    detail = "User does not have permission to perform this action"
+    detail = "You do not have permission to perform this action"
     status_code = status.HTTP_403_FORBIDDEN
-
-
-class TodoNotOwnedError(WebError):
-    """Todo not owned by user."""
-
-    detail = "Todo not owned by user"
-    status_code = status.HTTP_403_FORBIDDEN
-
-
-class TodoNotFoundError(WebError):
-    """Todo not found."""
-
-    detail = "Todo not found"
-    status_code = status.HTTP_404_NOT_FOUND

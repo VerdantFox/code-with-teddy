@@ -1,6 +1,13 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
-
+{%
+  set admin_extras = [
+  {
+  "href": url_for("html:create_blog_post"),
+  "icon": "hammer",
+  "text": "Create Blog Post"}
+  ]
+%}
 {% block content %}
   <section>
     <div class="section-container py-64">
