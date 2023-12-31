@@ -12,7 +12,7 @@
   <p class="mt-8">
     Already have an account?
     <a
-      href="{{ url_for('html:login_get') }}{% if form.redirect_url.data %}?redirect_url={{ form.redirect_url.data }}{% endif %}"
+      href="{{ url_for('html:login_get') }}{% if form.redirect_url.data %}?next={{ form.redirect_url.data }}{% endif %}"
       class="text-teal-600 hover:text-teal-700 hover:underline underline-offset-4"
     >
       Log in here...

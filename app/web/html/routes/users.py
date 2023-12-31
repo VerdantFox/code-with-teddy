@@ -52,7 +52,7 @@ class LoginForm(Form):
 async def login_get(
     request: Request,
     username: Annotated[str | None, Query()] = None,
-    redirect_url: Annotated[str | None, Query()] = None,
+    redirect_url: Annotated[str | None, Query(alias="next")] = None,
 ) -> _TemplateResponse:
     """Return the login page for GET requests."""
     login_form = LoginForm()
@@ -147,7 +147,7 @@ class RegisterUserForm(Form):
 @router.get("/register", response_model=None)
 async def register_get(
     request: Request,
-    redirect_url: Annotated[str | None, Query()] = None,
+    redirect_url: Annotated[str | None, Query(alias="next")] = None,
 ) -> _TemplateResponse:
     """Return the user registration page."""
     register_form = RegisterUserForm()

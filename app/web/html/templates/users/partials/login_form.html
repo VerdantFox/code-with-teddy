@@ -16,7 +16,7 @@
   <p class="mt-8">
     Don't have an account?
     <a
-      href="{{ url_for('html:register_get') }}{% if login_form.redirect_url.data %}?redirect_url={{ login_form.redirect_url.data }}{% endif %}"
+      href="{{ url_for('html:register_get') }}{% if login_form.redirect_url.data %}?next={{ login_form.redirect_url.data }}{% endif %}"
       class="link"
       >Register here...</a
     >
