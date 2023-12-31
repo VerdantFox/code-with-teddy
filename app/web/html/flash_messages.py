@@ -25,13 +25,26 @@ class FlashMessage(BaseModel):
 
     msg: str
     category: FlashCategory = FlashCategory.INFO
-    timeout: int | None = None
+    timeout: int | None = 5
 
     def flash(self, request: Request) -> None:
         """Add this message to the session."""
         if MESSAGES not in request.session:
             request.session[MESSAGES] = []
         request.session[MESSAGES].append(self.model_dump())
+
+
+class FormErrorMessage(FlashMessage):
+    """Message to be displayed to the user for form errors.
+
+    Includes commonsense defaults for form errors.
+    Typically this error would not call flash() directly, but instead
+    be passed to the TemplateResponse.
+    """
+
+    msg: str = "Invalid form field(s). See errors on form."
+    category: FlashCategory = FlashCategory.ERROR
+    timeout: int | None = None
 
 
 def get_flashed_messages(request: Request) -> list[FlashMessage]:

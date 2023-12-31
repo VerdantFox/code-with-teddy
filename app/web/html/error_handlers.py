@@ -42,7 +42,7 @@ def register_error_handlers(app: FastAPI) -> None:
             category=FlashCategory.ERROR,
         ).flash(request)
         return RedirectResponse(
-            request.url_for("html:login_get"),
+            request.url_for("html:login_get").include_query_params(next=request.url),
             status_code=status.HTTP_303_SEE_OTHER,
         )
 

@@ -24,7 +24,7 @@ from app.permissions import Role
 from app.services.media import media_handler
 from app.web import auth, errors
 from app.web.html.const import templates
-from app.web.html.flash_messages import FlashCategory, FlashMessage
+from app.web.html.flash_messages import FlashCategory, FlashMessage, FormErrorMessage
 from app.web.html.routes.auth import login_for_access_token
 
 # ----------- Routers -----------
@@ -79,10 +79,7 @@ async def login_post(
             "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
-                "message": FlashMessage(
-                    msg="Invalid form field(s). See errors on form.",
-                    category=FlashCategory.ERROR,
-                ),
+                "message": FormErrorMessage(),
                 "login_form": login_form,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -101,7 +98,7 @@ async def login_post(
             "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
-                "message": FlashMessage(msg=e.detail, category=FlashCategory.ERROR),
+                "message": FormErrorMessage(msg=e.detail),
                 "login_form": login_form,
             },
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -110,7 +107,6 @@ async def login_post(
     FlashMessage(
         msg="You are logged in!",
         category=FlashCategory.SUCCESS,
-        timeout=5,
     ).flash(request)
     return response
 
@@ -172,10 +168,7 @@ async def register_post(
             REGISTER_TEMPLATE,
             {
                 constants.REQUEST: request,
-                "message": FlashMessage(
-                    msg="Invalid form field(s). See errors on form.",
-                    category=FlashCategory.ERROR,
-                ),
+                "message": FormErrorMessage(),
                 "form": register_form,
             },
         )
@@ -190,15 +183,17 @@ async def register_post(
     db.add(user_model)
     try:
         db.commit()
-    except sqlalchemy.exc.IntegrityError:
+    except sqlalchemy.exc.IntegrityError as e:
+        db.rollback()
+        if "email" in str(e):
+            register_form.email.errors.append("Email already exists for another account.")
+        if "username" in str(e):
+            register_form.username.errors.append("Username taken.")
         return templates.TemplateResponse(
             REGISTER_TEMPLATE,
             {
                 constants.REQUEST: request,
-                "message": FlashMessage(
-                    msg="Username or email already exists. Already have an account? Login!",
-                    category=FlashCategory.ERROR,
-                ),
+                "message": FormErrorMessage(),
                 "form": register_form,
             },
         )
@@ -206,7 +201,6 @@ async def register_post(
     FlashMessage(
         msg=f"User {user_model.username} created!",
         category=FlashCategory.SUCCESS,
-        timeout=5,
     ).flash(request)
     return RedirectResponse(
         request.url_for("html:login_get").include_query_params(
@@ -230,7 +224,6 @@ async def logout(request: Request) -> RedirectResponse:
     FlashMessage(
         msg="You are logged out!",
         category=FlashCategory.SUCCESS,
-        timeout=5,
     ).flash(request)
     return response
 
@@ -326,10 +319,7 @@ async def user_settings_post(
             "users/settings.html",
             {
                 constants.REQUEST: request,
-                "message": FlashMessage(
-                    msg="Invalid form field(s). See errors on form.",
-                    category=FlashCategory.ERROR,
-                ),
+                "message": FormErrorMessage(),
                 "form": form,
                 constants.CURRENT_USER: current_user,
             },
@@ -340,15 +330,17 @@ async def user_settings_post(
 
     try:
         db.commit()
-    except sqlalchemy.exc.IntegrityError:
+    except sqlalchemy.exc.IntegrityError as e:
+        db.rollback()
+        if "email" in str(e):
+            form.email.errors.append("Email already exists for another account.")
+        if "username" in str(e):
+            form.username.errors.append("Username taken.")
         return templates.TemplateResponse(
             "users/settings.html",
             {
                 constants.REQUEST: request,
-                "message": FlashMessage(
-                    msg="Username or email already exists. Already have an account? Login!",
-                    category=FlashCategory.ERROR,
-                ),
+                "message": FormErrorMessage(),
                 "form": form,
                 constants.CURRENT_USER: current_user,
             },
@@ -358,7 +350,6 @@ async def user_settings_post(
     FlashMessage(
         msg="Settings updated!",
         category=FlashCategory.SUCCESS,
-        timeout=5,
     ).flash(request)
     return RedirectResponse(
         url=request.url_for("html:user_settings_get"), status_code=status.HTTP_303_SEE_OTHER
