@@ -5,7 +5,9 @@ from starlette.templating import _TemplateResponse
 from wtforms import (
     BooleanField,
     Form,
+    HiddenField,
     StringField,
+    TextAreaField,
     validators,
 )
 
@@ -18,6 +20,9 @@ from app.web.html.routes.users import LoginForm
 # ----------- Routers -----------
 router = APIRouter(tags=["blog"])
 
+EDIT_BP_TEMPLATE = "blog/edit_post.html"
+UPLOAD_MEDIA_TEMPLATE = "blog/upload_media.html"
+
 
 @router.get("/blog", response_model=None)
 async def list_blog_posts(
@@ -27,7 +32,7 @@ async def list_blog_posts(
     """Return the blog list page."""
     login_form = LoginForm(redirect_url=str(request.url))
     return templates.TemplateResponse(
-        "main/blog/list_posts.html",
+        "blog/list_posts.html",
         {
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
@@ -39,23 +44,42 @@ async def list_blog_posts(
 class BlogPostForm(Form):
     """Form for creating and editing blog posts."""
 
+    is_new = HiddenField("Is new", default=False)
     title = StringField("Title", description="My cool post")
     tags = StringField("Tags", [validators.optional()], description="python, fastapi, web")
-    can_comment = BooleanField("Allow comments", default=True)
+    can_comment = BooleanField("Allow Comments", default=True)
     is_published = BooleanField("Publish", default=False)
-    description = StringField(
+    description = TextAreaField(
         "Description", description="Short markdown description (couple paragraphs)"
     )
-    content = StringField("Content", description="Markdown content (the whole blog post)")
+    content = TextAreaField("Content", description="Markdown content (the whole blog post)")
 
 
 @router.get("/blog/create", response_model=None)
 @requires_permission(Action.EDIT_BP)
-async def create_blog_post(request: Request, current_user: LoggedInUser) -> _TemplateResponse:
+async def create_bp_get(request: Request, current_user: LoggedInUser) -> _TemplateResponse:
     """Return page to create a blog post."""
     return templates.TemplateResponse(
-        "main/blog/edit_post.html",
-        {constants.REQUEST: request, constants.CURRENT_USER: current_user},
+        EDIT_BP_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            constants.FORM: BlogPostForm(is_new=True),
+        },
+    )
+
+
+@router.get("/blog/create", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def create_bp_post(request: Request, current_user: LoggedInUser) -> _TemplateResponse:
+    """Post the blog post create form."""
+    return templates.TemplateResponse(
+        EDIT_BP_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            constants.FORM: BlogPostForm(is_new=True),
+        },
     )
 
 
@@ -67,7 +91,7 @@ async def read_blog_post(
 ) -> _TemplateResponse:
     """Return page to read a blog post."""
     return templates.TemplateResponse(
-        "main/blog/read_post.html",
+        "blog/read_post.html",
         {constants.REQUEST: request, constants.CURRENT_USER: current_user},
     )
 
@@ -81,7 +105,7 @@ async def edit_blog_post(
 ) -> _TemplateResponse:
     """Return page to edit a blog post."""
     return templates.TemplateResponse(
-        "main/blog/edit_post.html",
+        EDIT_BP_TEMPLATE,
         {constants.REQUEST: request, constants.CURRENT_USER: current_user},
     )
 
@@ -95,6 +119,6 @@ async def upload_media_for_blog_post(
 ) -> _TemplateResponse:
     """Return page to edit a blog post."""
     return templates.TemplateResponse(
-        "main/blog/upload_media.html",
+        UPLOAD_MEDIA_TEMPLATE,
         {constants.REQUEST: request, constants.CURRENT_USER: current_user},
     )

@@ -1,13 +1,11 @@
 {% extends "shared/base.html" %}
 {% block content %}
-  <main>
-    <section
-      class="section-container flex flex-col justify-center items-center mt-48 mb-72"
-    >
-      <h1 class="text-6xl mt-16 mb-10 font-bold">
-        {{ error.status_code }} Error
-      </h1>
-      <p class="text-3xl font-semibold mb-10">{{ error.detail }}</p>
-    </section>
-  </main>
+  <section
+    class="section-container flex flex-col justify-center items-center mt-48 mb-72"
+  >
+    <h1 class="text-6xl mt-16 mb-10 font-bold">
+      {{ error.status_code }} Error
+    </h1>
+    <p class="text-3xl font-semibold mb-10">{{ error.detail }}</p>
+  </section>
 {% endblock content %}

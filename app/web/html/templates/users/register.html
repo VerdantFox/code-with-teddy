@@ -1,11 +1,9 @@
 {% extends "shared/base.html" %}
 {% block content %}
-  <main>
-    <section>
-      <div class="section-container pt-40 pb-72">
-        <h1 class="text-4xl mt-10 mb-10 font-bold">Register</h1>
-        {{ render_partial('users/partials/register_form.html', request=request, form=form, message=message) }}
-      </div>
-    </section>
-  </main>
+  <section>
+    <div class="section-container pt-40 pb-72">
+      <h1 class="text-4xl mt-10 mb-10 font-bold">Register</h1>
+      {{ render_partial('users/partials/register_form.html', request=request, form=form, message=message) }}
+    </div>
+  </section>
 {% endblock content %}

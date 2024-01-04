@@ -6,6 +6,6 @@
 {% endif %}
 <div class="flex flex-col gap-2 {{ class }}">
   {{ field.label }}
-  {{ field(class="rounded-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white", **extra_fields) }}
+  {{ field(class="rounded-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400", **extra_fields) }}
   {{ render_partial('shared/partials/forms/field_errors.html', errors=field.errors) }}
 </div>

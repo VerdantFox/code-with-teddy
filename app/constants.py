@@ -2,7 +2,9 @@
 
 import pytz
 
-INVALID_FORM_FIELDS = "Invalid form field(s). See errors on form."
+# String constants
 REQUEST = "request"
 CURRENT_USER = "current_user"
+FORM = "form"
+
 TIMEZONES = [(timezone, timezone) for timezone in pytz.common_timezones]

@@ -1,13 +1,11 @@
 {% extends "shared/base.html" %}
 {% block content %}
-  <main>
-    <section>
-      <div class="section-container pt-40 pb-72">
-        <h1 class="text-4xl mt-10 mb-10 font-bold">User Settings</h1>
-        {{ render_partial('users/partials/settings_form.html', request=request, form=form, message=message, current_user=current_user) }}
-      </div>
-    </section>
-  </main>
+  <section>
+    <div class="section-container pt-40 pb-72">
+      <h1 class="text-4xl mt-10 mb-10 font-bold">User Settings</h1>
+      {{ render_partial('users/partials/settings_form.html', request=request, form=form, message=message, current_user=current_user) }}
+    </div>
+  </section>
 {% endblock content %}
 
 {% block custom_js %}
