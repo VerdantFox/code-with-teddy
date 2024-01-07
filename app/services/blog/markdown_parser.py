@@ -10,9 +10,10 @@ from micawber import bootstrap_basic, parse_html
 from micawber.cache import Cache as OEmbedCache
 from pydantic import BaseModel
 
-# Configure micawber with the default OEmbed providers (YouTube, Flickr, etc).
+# Configure micawber with the default OEmbed providers (YouTube, etc).
 oembed_providers = bootstrap_basic(OEmbedCache())
 MAX_MEDIA_WIDTH = 800
+HTML_PARSER = "html.parser"
 
 
 class HTMLContent(BaseModel):
@@ -28,10 +29,10 @@ def markdown_to_html(markdown_content: str) -> HTMLContent:
     Also convert any media URLs into rich media objects such as video
     players or images.
     """
-    hilite = CodeHiliteExtension(linenums=False, css_class="highlight")
+    highlight = CodeHiliteExtension(linenums=False, css_class="highlight")
     extras = ExtraExtension()
     toc = TocExtension(toc_depth=3)
-    md = Markdown(extensions=[hilite, extras, toc])
+    md = Markdown(extensions=[highlight, extras, toc])
     assert hasattr(md, "toc")  # noqa: S101 (assert) -- for mypy
     html = md.convert(markdown_content)
     html = update_html(html)
@@ -46,33 +47,58 @@ def markdown_to_html(markdown_content: str) -> HTMLContent:
 
 def update_html(html: str) -> str:
     """Update the blog HTML content."""
-    html_soup = BeautifulSoup(html, "html.parser")
-    # Make all links open in new tab
+    html_soup = BeautifulSoup(html, HTML_PARSER)
+    _update_html_links(html_soup)
+    _update_html_headers(html_soup)
+    _update_html_pre_tags(html_soup)
+    _update_html_code_highlights(html_soup)
+    _update_html_images(html_soup)
+    return str(html_soup)
+
+
+def _update_html_links(html_soup: BeautifulSoup) -> None:
+    """Make all links open in new tab."""
     for a_tag in html_soup.find_all("a"):
         a_tag["target"] = "_blank"
         a_tag["rel"] = "noopener noreferrer"
-    # Fix header IDs that don't start alpha to work with scrollspy
+
+
+def _update_html_headers(html_soup: BeautifulSoup) -> None:
+    """Fix header IDs that don't start alpha to work with scrollspy."""
     for h_tag in html_soup.find_all(re.compile(r"^h[1-6]$")):
         if h_tag.get("id") and not h_tag["id"][0].isalpha():
             h_tag["id"] = f"blog-{h_tag['id']}"
-    # make all `pre` elements tab-to-able (for accessibility)
+
+
+def _update_html_pre_tags(html_soup: BeautifulSoup) -> None:
+    """Make all pre tags tab-to-able (for accessibility)."""
     for pre_tag in html_soup.find_all("pre"):
         pre_tag["tabindex"] = "0"
-    # Make all image paragraphs centered for captions.
-    # Was adding loading="lazy" to images, but it made table of contents
-    #    jump to wrong places until the images were properly loaded.
+
+
+def _update_html_code_highlights(html_soup: BeautifulSoup) -> None:
+    """Add "not-prose" class to all "highlight" code blocks."""
+    for code_tag in html_soup.find_all("div", {"class": "highlight"}):
+        code_tag["class"].append("not-prose")
+
+
+def _update_html_images(html_soup: BeautifulSoup) -> None:
+    """Make all image paragraphs centered for captions.
+
+    Was also adding loading="lazy" to images, but it made table of contents
+    jump to wrong places until the images were properly loaded.
+    """
     for img in html_soup.find_all("img"):
         if img.parent.name != "p":
             continue
         img.parent["class"] = "text-center"
     for picture in html_soup.find_all("picture"):
         picture.parent["class"] = "text-center"
-    return str(html_soup)
 
 
 def update_toc(toc: str) -> str:
     """Update the table of contents HTML."""
-    toc_soup = BeautifulSoup(toc, "html.parser")
+    toc_soup = BeautifulSoup(toc, HTML_PARSER)
     toc_class = toc_soup.find("div", {"class": "toc"})
     update_element_name_and_class(
         element=toc_class,
@@ -106,16 +132,16 @@ def update_toc(toc: str) -> str:
     # Add title comments and contact sections
     title = BeautifulSoup(
         '<a class="nav-link" href="#blog-title">Title</a>',
-        "html.parser",
+        HTML_PARSER,
     )
     toc_class.insert(0, title)
     about = BeautifulSoup(
         '<a class="nav-link" href="#about-the-author">About the author</a>',
-        "html.parser",
+        HTML_PARSER,
     )
     comments = BeautifulSoup(
         '<a class="nav-link" href="#comments-section">Comments</a>',
-        "html.parser",
+        HTML_PARSER,
     )
     toc_class.extend([about, comments])
     return str(toc_soup)

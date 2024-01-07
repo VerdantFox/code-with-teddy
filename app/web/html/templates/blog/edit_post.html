@@ -1,6 +1,13 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
 
+{% block custom_css %}
+  <link
+    rel="stylesheet"
+    href="{{ url_for('html:static', path='css/blog-code-hilights.css') }}?{{ static_version }}"
+  />
+{% endblock custom_css %}
+
 {% block content %}
   <div class="px-8 my-36">
     {% if form.is_new %}
@@ -9,9 +16,13 @@
       <h1 class="text-center text-5xl font-bold mb-24">Edit Blog Post</h1>
     {% endif %}
     <div class="grid grid-cols-2 gap-12">
-      {{ render_partial('blog/partials/edit_post_form.html', request=request, form=form, message=message) }}
       <div>
-        <h2>Second section</h2>
+        <h2 class="font-bold text-xl mb-12">Edit Blog Post</h2>
+        {{ render_partial('blog/partials/edit_post_form.html', request=request, form=form, message=message) }}
+      </div>
+      <div>
+        <h2 class="font-bold text-xl mb-12">Blog Post Preview</h2>
+        {{ render_partial('blog/partials/edit_preview.html', request=request, blog_post=blog_post) }}
       </div>
     </div>
   </div>
