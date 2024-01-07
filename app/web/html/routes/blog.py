@@ -1,25 +1,33 @@
 """landing: HTML routes for landing."""
 
-from fastapi import APIRouter, Request
+from logging import getLogger
+
+from fastapi import APIRouter, Request, status
+from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import (
-    BooleanField,
     Form,
-    HiddenField,
     StringField,
     TextAreaField,
     validators,
 )
 
 from app import constants
+from app.datastore import db_models
+from app.datastore.database import DBSession
 from app.permissions import Action, requires_permission
+from app.services.blog import blog_handler
 from app.web.auth import LoggedInUser, LoggedInUserOptional
 from app.web.html.const import templates
+from app.web.html.flash_messages import FlashCategory, FlashMessage, FormErrorMessage
 from app.web.html.routes.users import LoginForm
+from app.web.html.wtforms_fixes import BooleanField
 
 # ----------- Routers -----------
 router = APIRouter(tags=["blog"])
 
+logger = getLogger(__name__)
+BLOG_POST = "blog_post"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
 UPLOAD_MEDIA_TEMPLATE = "blog/upload_media.html"
 
@@ -44,7 +52,7 @@ async def list_blog_posts(
 class BlogPostForm(Form):
     """Form for creating and editing blog posts."""
 
-    is_new = HiddenField("Is new", default=False)
+    is_new = BooleanField("Is new", default=False)
     title = StringField("Title", description="My cool post")
     tags = StringField("Tags", [validators.optional()], description="python, fastapi, web")
     can_comment = BooleanField("Allow Comments", default=True)
@@ -69,17 +77,47 @@ async def create_bp_get(request: Request, current_user: LoggedInUser) -> _Templa
     )
 
 
-@router.get("/blog/create", response_model=None)
+@router.post("/blog/create", response_model=None)
 @requires_permission(Action.EDIT_BP)
-async def create_bp_post(request: Request, current_user: LoggedInUser) -> _TemplateResponse:
+async def create_bp_post(
+    request: Request, current_user: LoggedInUser, db: DBSession
+) -> _TemplateResponse | RedirectResponse:
     """Post the blog post create form."""
-    return templates.TemplateResponse(
-        EDIT_BP_TEMPLATE,
-        {
-            constants.REQUEST: request,
-            constants.CURRENT_USER: current_user,
-            constants.FORM: BlogPostForm(is_new=True),
-        },
+    form_data = await request.form()
+    form = BlogPostForm(**form_data)
+    if not form.validate():
+        return templates.TemplateResponse(
+            EDIT_BP_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                constants.FORM: form,
+                constants.MESSAGE: FormErrorMessage(),
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    input_data = blog_handler.SaveBlogInput(**form.data)
+    response = blog_handler.save_blog_post(db, input_data)
+    if not response.success or not response.blog_post:
+        for error_field, error_msg in response.field_errors.items():
+            form[error_field].errors.extend(error_msg)
+        return templates.TemplateResponse(
+            EDIT_BP_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                constants.FORM: form,
+                constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    FlashMessage(
+        msg="Blog Post Saved!",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    return RedirectResponse(
+        url=request.url_for("html:edit_bp_get", bp_id=response.blog_post.id),
+        status_code=status.HTTP_303_SEE_OTHER,
     )
 
 
@@ -98,7 +136,80 @@ async def read_blog_post(
 
 @router.get("/blog/{bp_id}/edit", response_model=None)
 @requires_permission(Action.EDIT_BP)
-async def edit_blog_post(
+async def edit_bp_get(
+    request: Request, current_user: LoggedInUser, db: DBSession, bp_id: int
+) -> _TemplateResponse:
+    """Return page to edit a blog post."""
+    bp = db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id).one()
+    form = BlogPostForm(
+        is_new=False,
+        title=bp.title,
+        tags=", ".join([tag.tag for tag in bp.tags]),
+        can_comment=bp.can_comment,
+        is_published=bp.is_published,
+        description=bp.markdown_description,
+        content=bp.markdown_content,
+    )
+
+    return templates.TemplateResponse(
+        EDIT_BP_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            constants.FORM: form,
+            BLOG_POST: bp,
+        },
+    )
+
+
+@router.post("/blog/{bp_id}/edit", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def edit_bp_post(
+    request: Request, current_user: LoggedInUser, db: DBSession, bp_id: int
+) -> _TemplateResponse | RedirectResponse:
+    """Return page to edit a blog post."""
+    bp = db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id).one()
+    form_data = await request.form()
+    form = BlogPostForm(**form_data)
+    if not form.validate():
+        return templates.TemplateResponse(
+            EDIT_BP_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                constants.FORM: form,
+                constants.MESSAGE: FormErrorMessage(),
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    input_data = blog_handler.SaveBlogInput(**form.data, existing_bp=bp)
+    response = blog_handler.save_blog_post(db, input_data)
+    if not response.success or not response.blog_post:
+        for error_field, error_msg in response.field_errors.items():
+            form[error_field].errors.extend(error_msg)
+        return templates.TemplateResponse(
+            EDIT_BP_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                constants.FORM: form,
+                constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    FlashMessage(
+        msg="Blog Post Updated!",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    return RedirectResponse(
+        url=request.url_for("html:edit_bp_get", bp_id=response.blog_post.id),
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@router.post("/blog/{bp_id}/live-edit", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def edit_bp_live_update(
     request: Request,
     current_user: LoggedInUser,
     bp_id: int,  # noqa: ARG001 (unused-argument)
@@ -110,7 +221,7 @@ async def edit_blog_post(
     )
 
 
-@router.get("/blog/{bp_id}/upload-media", response_model=None)
+@router.post("/blog/{bp_id}/upload-media", response_model=None)
 @requires_permission(Action.EDIT_BP)
 async def upload_media_for_blog_post(
     request: Request,

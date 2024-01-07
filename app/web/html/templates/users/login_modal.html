@@ -19,6 +19,14 @@
     >
       <h1 class="text-4xl mt-10 mb-10 font-bold">Sign In</h1>
       {{ render_partial('users/partials/login_form.html', request=request, login_form=login_form, message=message, use_htmx=True) }}
+      <p class="mt-8">
+        Don't have an account?
+        <a
+          href="{{ url_for('html:register_get') }}{% if login_form.redirect_url.data %}?next={{ login_form.redirect_url.data }}{% endif %}"
+          class="link"
+          >Register here...</a
+        >
+      </p>
     </div>
   </div>
 </div>

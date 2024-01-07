@@ -85,6 +85,7 @@ repos:
         additional_dependencies:
           - pydantic==2.5.1
           - types-pytz==2023.3.1.1
+          - types-markdown==3.5.0.20240106
 
   # - repo: local
   #   hooks:

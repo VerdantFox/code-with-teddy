@@ -100,22 +100,24 @@ class BlogPost(Base):
     title: Mapped[StrIndexedUnique]
     slug: Mapped[StrIndexedUnique]
     old_slugs: Mapped[list["OldBlogPostSlug"]] = relationship(back_populates="blog_post")
-    read_mins: Mapped[IntNullable]
-    is_published: Mapped[BoolDefaultFalse]
     tags: Mapped[list["BlogPostTag"]] = relationship(
         secondary="blog_tags_associations", back_populates="blog_posts"
     )
+    read_mins: Mapped[IntNullable]
+    is_published: Mapped[BoolDefaultFalse]
+    can_comment: Mapped[BoolDefaultTrue]
+
     markdown_description: Mapped[str]
     markdown_content: Mapped[str]
     html_description: Mapped[str]
     html_content: Mapped[str]
     html_toc: Mapped[str]
+
     media: Mapped[list["BlogPostMedia"]] = relationship(back_populates="blog_post")
     created_timestamp: Mapped[DateTimeIndexed]
     updated_timestamp: Mapped[DateTimeIndexed]
     likes: Mapped[IntIndexed]
     views: Mapped[IntIndexed]
-    can_comment: Mapped[BoolDefaultTrue]
     comments: Mapped[list["BlogPostComment"]] = relationship(back_populates="blog_post")
 
     ts_vector: Mapped[TSVector] = mapped_column(
@@ -131,7 +133,7 @@ class OldBlogPostSlug(Base):
     __tablename__ = "old_blog_slugs"
 
     slug: Mapped[StrPK]
-    blog_post_id: Mapped[BlogPostFK | None]
+    blog_post_id: Mapped[BlogPostFK]
     blog_post: Mapped["BlogPost"] = relationship(back_populates="old_slugs")
 
 

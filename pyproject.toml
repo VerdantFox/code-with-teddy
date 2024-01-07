@@ -96,6 +96,7 @@ dev = [
     "typer[all]",
     # Types-*: type stubs for external libraries
     "types-pytz",
+    "types-markdown",
 ]
 
 [project.urls]

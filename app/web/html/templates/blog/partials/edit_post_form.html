@@ -1,11 +1,15 @@
 <form
   method="POST"
-  action="{{ url_for('html:register_post' ) }}"
+  {% if form.is_new.data %}
+    action="{{ url_for('html:create_bp_post' ) }}"
+  {% else %}
+    action="{{ url_for('html:edit_bp_post', bp_id=request.path_params['bp_id'] ) }}"
+  {% endif %}
   class="@container"
 >
   {{ render_partial('shared/partials/flash_message.html', message=message) }}
   <div class="flex flex-col gap-6 mb-8">
-    {{ form.is_new() }}
+    {{ render_partial('shared/partials/forms/hidden_field.html', field=form.is_new) }}
     {{ render_partial('shared/partials/forms/field.html', field=form.title, class="") }}
     <div
       class="w-full  flex justify-between items-center gap-8 flex-col @2xl:flex-row"

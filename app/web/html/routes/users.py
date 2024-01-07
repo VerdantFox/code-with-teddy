@@ -58,7 +58,7 @@ async def login_get(
     """Return the login page for GET requests."""
     login_form = LoginForm()
     if username:
-        login_form.username.data = username
+        login_form.username_or_email.data = username
     if redirect_url:
         login_form.redirect_url.data = redirect_url
     return templates.TemplateResponse(
@@ -86,7 +86,20 @@ async def login_post(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     redirect_url = login_form.redirect_url.data or "/"
-    response = RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+    # Why not a RedirectResponse?
+    # Because we need to set the HX-Redirect header to perform
+    # a full-page redirect to update the url and title.
+    # HTML redirects don't pass through headers so HTMX
+    # can't see the redirect.
+    response = templates.TemplateResponse(
+        "users/partials/login_form.html",
+        {
+            constants.REQUEST: request,
+            "login_form": login_form,
+        },
+        headers={"HX-Redirect": redirect_url},
+    )
     try:
         await login_for_access_token(
             response=response,
