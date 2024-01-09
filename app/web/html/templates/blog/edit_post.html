@@ -1,5 +1,26 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
+{% set hx_boost = False %}
+
+{% block custom_js %}
+  <script>
+    var formSubmitting = false
+    function setFormSubmitting() {
+      formSubmitting = true
+    }
+
+    function promptForExit(event, isDirty) {
+      if (formSubmitting || !isDirty) {
+        return undefined
+      }
+
+      var confirmationMessage = "Any unsaved changes will be lost."
+
+      ;(event || window.event).returnValue = confirmationMessage //Gecko + IE
+      return confirmationMessage //Gecko + Webkit, Safari, Chrome etc.
+    }
+  </script>
+{% endblock custom_js %}
 
 {% block custom_css %}
   <link
@@ -15,14 +36,21 @@
     {% else %}
       <h1 class="text-center text-5xl font-bold mb-24">Edit Blog Post</h1>
     {% endif %}
-    <div class="grid grid-cols-2 gap-12">
-      <div>
+    <div class="grid grid-cols-2 gap-12 max-md:grid-cols-1">
+      <div
+        id="edit-blog-post-column"
+        x-data="{isDirty: false}"
+        x-init="window.addEventListener('beforeunload', (event) => { promptForExit(event, isDirty) })"
+        class="py-8"
+      >
         <h2 class="font-bold text-xl mb-12">Edit Blog Post</h2>
         {{ render_partial('blog/partials/edit_post_form.html', request=request, form=form, message=message) }}
       </div>
       <div>
         <h2 class="font-bold text-xl mb-12">Blog Post Preview</h2>
-        {{ render_partial('blog/partials/edit_preview.html', request=request, blog_post=blog_post) }}
+        <div id="preview" class="md:h-[85vh] md:overflow-y-auto">
+          {{ render_partial('blog/partials/edit_preview.html', request=request, blog_post=blog_post) }}
+        </div>
       </div>
     </div>
   </div>

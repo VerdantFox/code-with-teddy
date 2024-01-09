@@ -202,9 +202,9 @@ async def register_post(
         db.commit()
     except sqlalchemy.exc.IntegrityError as e:
         db.rollback()
-        if "email" in str(e):
+        if 'unique constraint "ix_users_email"' in str(e):
             register_form.email.errors.append("Email already exists for another account.")
-        if "username" in str(e):
+        if 'unique constraint "ix_users_username"' in str(e):
             register_form.username.errors.append("Username taken.")
         return templates.TemplateResponse(
             REGISTER_TEMPLATE,

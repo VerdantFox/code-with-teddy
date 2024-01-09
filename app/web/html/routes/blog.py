@@ -54,13 +54,21 @@ class BlogPostForm(Form):
 
     is_new = BooleanField("Is new", default=False)
     title = StringField("Title", description="My cool post")
-    tags = StringField("Tags", [validators.optional()], description="python, fastapi, web")
+    tags = StringField(
+        "Tags", validators=[validators.optional()], description="python, fastapi, web"
+    )
     can_comment = BooleanField("Allow Comments", default=True)
     is_published = BooleanField("Publish", default=False)
     description = TextAreaField(
-        "Description", description="Short markdown description (couple paragraphs)"
+        "Description",
+        description="Short markdown description (couple paragraphs)",
+        validators=[validators.Length(min=1)],
     )
-    content = TextAreaField("Content", description="Markdown content (the whole blog post)")
+    content = TextAreaField(
+        "Content",
+        description="Markdown content (the whole blog post)",
+        validators=[validators.Length(min=1)],
+    )
 
 
 @router.get("/blog/create", response_model=None)
@@ -207,17 +215,25 @@ async def edit_bp_post(
     )
 
 
-@router.post("/blog/{bp_id}/live-edit", response_model=None)
+@router.post("/blog/live-edit", response_model=None)
 @requires_permission(Action.EDIT_BP)
 async def edit_bp_live_update(
-    request: Request,
-    current_user: LoggedInUser,
-    bp_id: int,  # noqa: ARG001 (unused-argument)
-) -> _TemplateResponse:
+    request: Request, current_user: LoggedInUser
+) -> _TemplateResponse | str:
     """Return page to edit a blog post."""
+    form_data = await request.form()
+    form = BlogPostForm(**form_data)
+    if not form.validate():
+        return f"Invalid form data. Errors: {form.errors}"
+    input_data = blog_handler.SaveBlogInput(**form.data)
+    bp = blog_handler.set_new_bp_fields(data=input_data)
     return templates.TemplateResponse(
-        EDIT_BP_TEMPLATE,
-        {constants.REQUEST: request, constants.CURRENT_USER: current_user},
+        "blog/partials/edit_preview.html",
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            BLOG_POST: bp,
+        },
     )
 
 

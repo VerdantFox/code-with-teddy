@@ -66,17 +66,18 @@ def _save_bp_to_db(
 ) -> db_models.BlogPost:
     """Create or update a blog post and save it to the database."""
     if data.existing_bp:
-        blog_post = _update_existing_bp_fields(
+        blog_post = update_existing_bp_fields(
             db=db,
             data=data,
         )
     else:
-        blog_post = _create_new_bp(db=db, data=data)
+        blog_post = create_new_bp(db=db, data=data)
+
     db.commit()
     return blog_post
 
 
-def _update_existing_bp_fields(
+def update_existing_bp_fields(
     *,
     db: Session,
     data: SaveBlogInput,
@@ -114,17 +115,27 @@ def _update_existing_bp_fields(
     return blog_post
 
 
-def _create_new_bp(
+def create_new_bp(
     *,
     db: Session,
     data: SaveBlogInput,
 ) -> db_models.BlogPost:
     """Create a new blog post and add it to the database transaction."""
+    blog_post = set_new_bp_fields(data=data, db=db)
+    db.add(blog_post)
+    return blog_post
+
+
+def set_new_bp_fields(data: SaveBlogInput, db: Session | None = None) -> db_models.BlogPost:
+    """Set fields for a new blog post.
+
+    Can ignore db session if not expecting to add the blog post to the database.
+    """
     html_description = markdown_parser.markdown_to_html(data.description)
     html_content = markdown_parser.markdown_to_html(data.content)
     tags = _get_bp_tags(db=db, tags=data.tags)
     now = datetime.now().astimezone(timezone.utc)
-    blog_post = db_models.BlogPost(
+    return db_models.BlogPost(
         title=data.title,
         slug=blog_utils.get_slug(data.title),
         tags=tags,
@@ -141,14 +152,16 @@ def _create_new_bp(
         likes=0,
         views=0,
     )
-    db.add(blog_post)
-    return blog_post
 
 
-def _get_bp_tags(db: Session, tags: Iterable[str]) -> list[db_models.BlogPostTag]:
+def _get_bp_tags(tags: Iterable[str], db: Session | None = None) -> list[db_models.BlogPostTag]:
     """Get blog post tags from the database or create new ones."""
     return [
-        db.query(db_models.BlogPostTag).filter(db_models.BlogPostTag.tag == tag).first()
+        (
+            db.query(db_models.BlogPostTag).filter(db_models.BlogPostTag.tag == tag).first()
+            if db
+            else None
+        )
         or db_models.BlogPostTag(tag=tag)
         for tag in set(tags)
     ]

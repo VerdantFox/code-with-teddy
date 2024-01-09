@@ -17,7 +17,7 @@
   <!-- Button -->
   <button
     x-ref="toggle"
-    @click="value = ! value"
+    @click="value = ! value{% if click_extras %}{{ click_extras }}{% endif %}"
     type="button"
     role="switch"
     :aria-checked="value"

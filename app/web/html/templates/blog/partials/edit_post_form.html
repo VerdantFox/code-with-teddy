@@ -6,24 +6,32 @@
     action="{{ url_for('html:edit_bp_post', bp_id=request.path_params['bp_id'] ) }}"
   {% endif %}
   class="@container"
+  onsubmit="setFormSubmitting()"
+  hx-target-error="preview"
 >
   {{ render_partial('shared/partials/flash_message.html', message=message) }}
   <div class="flex flex-col gap-6 mb-8">
     {{ render_partial('shared/partials/forms/hidden_field.html', field=form.is_new) }}
-    {{ render_partial('shared/partials/forms/field.html', field=form.title, class="") }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.title, class="", extra_fields={"@input.once": "isDirty = true", "hx-post": url_for('html:edit_bp_live_update'), "hx-trigger": "keyup changed delay:1000ms", "hx-target": "#preview", "hx-swap": "innerHTML"}) }}
     <div
       class="w-full  flex justify-between items-center gap-8 flex-col @2xl:flex-row"
     >
-      {{ render_partial('shared/partials/forms/field.html', field=form.tags, class="grow w-full @2xl:w-fit") }}
+      {{ render_partial('shared/partials/forms/field.html', field=form.tags, class="grow w-full @2xl:w-fit", extra_fields={"@input.once": "isDirty = true", "hx-post": url_for('html:edit_bp_live_update'), "hx-trigger": "keyup changed delay:1000ms", "hx-target": "#preview", "hx-swap": "innerHTML"}) }}
       <div
         class="flex items-end flex-row @2xl:flex-col gap-12 @2xl:gap-2 w-full @2xl:w-fit"
       >
-        {{ render_partial('shared/partials/forms/toggle_field.html', field=form.can_comment) }}
-        {{ render_partial('shared/partials/forms/toggle_field.html', field=form.is_published) }}
+        {{ render_partial('shared/partials/forms/toggle_field.html', field=form.can_comment, click_extras="; isDirty = true") }}
+        {{ render_partial('shared/partials/forms/toggle_field.html', field=form.is_published, click_extras="; isDirty = true") }}
       </div>
     </div>
-    {{ render_partial('shared/partials/forms/field.html', field=form.description, class="") }}
-    {{ render_partial('shared/partials/forms/field.html', field=form.content, extra_fields={"rows": "8"}) }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.description, extra_fields={"@input.once": "isDirty = true"}) }}
+    {{
+      render_partial(
+      'shared/partials/forms/field.html',
+      field=form.content,
+      extra_fields={"rows": "8", "hx-post": url_for('html:edit_bp_live_update'), "hx-trigger": "keyup changed delay:1000ms", "hx-target": "#preview", "hx-swap": "innerHTML", "@input.once": "isDirty = true"}
+      )
+    }}
   </div>
-  {{ render_partial('shared/partials/forms/submit_button.html', text="Submit", class="w-full @2xl:w-min") }}
+  {{ render_partial('shared/partials/forms/submit_button.html', text="Submit", class="w-full @2xl:w-min", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}
 </form>
