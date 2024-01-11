@@ -6,7 +6,6 @@ from fastapi import APIRouter, Request, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import (
-    Form,
     StringField,
     TextAreaField,
     validators,
@@ -21,7 +20,8 @@ from app.web.auth import LoggedInUser, LoggedInUserOptional
 from app.web.html.const import templates
 from app.web.html.flash_messages import FlashCategory, FlashMessage, FormErrorMessage
 from app.web.html.routes.users import LoginForm
-from app.web.html.wtforms_fixes import BooleanField
+from app.web.html.wtform_utils import Form
+from app.web.html.wtform_utils.wtform_fields import BooleanField
 
 # ----------- Routers -----------
 router = APIRouter(tags=["blog"])
@@ -38,13 +38,12 @@ async def list_blog_posts(
     current_user: LoggedInUserOptional,
 ) -> _TemplateResponse:
     """Return the blog list page."""
-    login_form = LoginForm(redirect_url=str(request.url))
     return templates.TemplateResponse(
         "blog/list_posts.html",
         {
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
-            "login_form": login_form,
+            constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
         },
     )
 
@@ -92,7 +91,7 @@ async def create_bp_post(
 ) -> _TemplateResponse | RedirectResponse:
     """Post the blog post create form."""
     form_data = await request.form()
-    form = BlogPostForm(**form_data)
+    form = BlogPostForm.load(form_data)
     if not form.validate():
         return templates.TemplateResponse(
             EDIT_BP_TEMPLATE,
@@ -138,7 +137,11 @@ async def read_blog_post(
     """Return page to read a blog post."""
     return templates.TemplateResponse(
         "blog/read_post.html",
-        {constants.REQUEST: request, constants.CURRENT_USER: current_user},
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
+        },
     )
 
 
@@ -149,14 +152,16 @@ async def edit_bp_get(
 ) -> _TemplateResponse:
     """Return page to edit a blog post."""
     bp = db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id).one()
-    form = BlogPostForm(
-        is_new=False,
-        title=bp.title,
-        tags=", ".join([tag.tag for tag in bp.tags]),
-        can_comment=bp.can_comment,
-        is_published=bp.is_published,
-        description=bp.markdown_description,
-        content=bp.markdown_content,
+    form = BlogPostForm.load(
+        {
+            "is_new": False,
+            "title": bp.title,
+            "tags": ", ".join([tag.tag for tag in bp.tags]),
+            "can_comment": bp.can_comment,
+            "is_published": bp.is_published,
+            "description": bp.markdown_description,
+            "content": bp.markdown_content,
+        }
     )
 
     return templates.TemplateResponse(
@@ -178,7 +183,7 @@ async def edit_bp_post(
     """Return page to edit a blog post."""
     bp = db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id).one()
     form_data = await request.form()
-    form = BlogPostForm(**form_data)
+    form = BlogPostForm.load(form_data)
     if not form.validate():
         return templates.TemplateResponse(
             EDIT_BP_TEMPLATE,
@@ -222,7 +227,7 @@ async def edit_bp_live_update(
 ) -> _TemplateResponse | str:
     """Return page to edit a blog post."""
     form_data = await request.form()
-    form = BlogPostForm(**form_data)
+    form = BlogPostForm.load(form_data)
     if not form.validate():
         return f"Invalid form data. Errors: {form.errors}"
     input_data = blog_handler.SaveBlogInput(**form.data)

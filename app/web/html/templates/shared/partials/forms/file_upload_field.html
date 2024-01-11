@@ -2,6 +2,7 @@
   {% set extra_fields = {} %}
 {% endif %}
 <div class="flex flex-col gap-2 {{ class }}">
-  {{ field.label }}
+  {{ field.label(class='' +  (' text-red-800 dark:text-red-300' if field.errors else '')) }}
   {{ field(class="p-2 rounded-lg border border-grayscale-500 focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white", **extra_fields) }}
+  {{ render_partial('shared/partials/forms/field_errors.html', errors=field.errors) }}
 </div>

@@ -66,6 +66,8 @@ dependencies = [
     "SQLAlchemy",
     # Uvicorn: ASGI server
     "uvicorn[standard]",
+    # werkzeug: WSGI utility library (also useful utilities for our ASGI app)
+    "werkzeug",
     # WTForms: web forms library
     "WTForms",
 ]

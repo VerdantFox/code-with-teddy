@@ -17,11 +17,11 @@ StrPK = Annotated[str, mapped_column(primary_key=True)]
 # String types
 StrUnique = Annotated[str, mapped_column(unique=True)]
 StrIndexedUnique = Annotated[str, mapped_column(unique=True, index=True)]
-StrNullable = Annotated[str, mapped_column(nullable=True)]
-StrNullableIndexed = Annotated[str, mapped_column(nullable=True, index=True)]
+StrNullable = Annotated[str | None, mapped_column(nullable=True)]
+StrNullableIndexed = Annotated[str | None, mapped_column(nullable=True, index=True)]
 
 # Integer types
-IntNullable = Annotated[int, mapped_column(nullable=True)]
+IntNullable = Annotated[int | None, mapped_column(nullable=True)]
 IntIndexed = Annotated[int, mapped_column(index=True)]
 IntIndexedDefaultZero = Annotated[int, mapped_column(index=True, default=0)]
 

@@ -6,14 +6,16 @@ from uuid import uuid4
 import sqlalchemy
 from fastapi import APIRouter, Query, Request, UploadFile, status
 from fastapi.responses import RedirectResponse
+from starlette.datastructures import UploadFile as StarletteUploadFile
 from starlette.templating import _TemplateResponse
 from wtforms import (
     FileField,
-    Form,
+    FormField,
     HiddenField,
     PasswordField,
     SelectField,
     StringField,
+    ValidationError,
     validators,
 )
 
@@ -26,6 +28,7 @@ from app.web import auth, errors
 from app.web.html.const import templates
 from app.web.html.flash_messages import FlashCategory, FlashMessage, FormErrorMessage
 from app.web.html.routes.auth import login_for_access_token
+from app.web.html.wtform_utils import Form
 
 # ----------- Routers -----------
 router = APIRouter(tags=["users"])
@@ -63,7 +66,7 @@ async def login_get(
         login_form.redirect_url.data = redirect_url
     return templates.TemplateResponse(
         LOGIN_TEMPLATE,
-        {constants.REQUEST: request, "login_form": login_form},
+        {constants.REQUEST: request, constants.LOGIN_FORM: login_form},
     )
 
 
@@ -74,14 +77,14 @@ async def login_post(
 ) -> _TemplateResponse | RedirectResponse:
     """Log the user in and redirect to the home page."""
     form_data = await request.form()
-    login_form = LoginForm(**form_data)
+    login_form = LoginForm.load(form_data)
     if not login_form.validate():
         return templates.TemplateResponse(
             "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
-                "message": FormErrorMessage(),
-                "login_form": login_form,
+                constants.MESSAGE: FormErrorMessage(),
+                constants.LOGIN_FORM: login_form,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -96,7 +99,7 @@ async def login_post(
         "users/partials/login_form.html",
         {
             constants.REQUEST: request,
-            "login_form": login_form,
+            constants.LOGIN_FORM: login_form,
         },
         headers={"HX-Redirect": redirect_url},
     )
@@ -112,8 +115,8 @@ async def login_post(
             "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
-                "message": FormErrorMessage(msg=e.detail),
-                "login_form": login_form,
+                constants.MESSAGE: FormErrorMessage(msg=e.detail),
+                constants.LOGIN_FORM: login_form,
             },
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
@@ -168,7 +171,7 @@ async def register_get(
         register_form.redirect_url.data = redirect_url
     return templates.TemplateResponse(
         REGISTER_TEMPLATE,
-        {constants.REQUEST: request, "form": register_form},
+        {constants.REQUEST: request, constants.FORM: register_form},
     )
 
 
@@ -179,14 +182,14 @@ async def register_post(
 ) -> _TemplateResponse | RedirectResponse:
     """Register a new user."""
     form_data = await request.form()
-    register_form = RegisterUserForm(**form_data)
+    register_form = RegisterUserForm.load(form_data)
     if not register_form.validate():
         return templates.TemplateResponse(
             REGISTER_TEMPLATE,
             {
                 constants.REQUEST: request,
-                "message": FormErrorMessage(),
-                "form": register_form,
+                constants.MESSAGE: FormErrorMessage(),
+                constants.FORM: register_form,
             },
         )
     user_model = db_models.User(
@@ -210,8 +213,8 @@ async def register_post(
             REGISTER_TEMPLATE,
             {
                 constants.REQUEST: request,
-                "message": FormErrorMessage(),
-                "form": register_form,
+                constants.MESSAGE: FormErrorMessage(),
+                constants.FORM: register_form,
             },
         )
     db.refresh(user_model)
@@ -252,6 +255,17 @@ file_ext_validator = validators.regexp(
 )
 
 
+def is_allowed_extension(_form: Form, field: FormField) -> None:
+    """Check if the file is of an allowed extension."""
+    if not field.data:
+        return
+    filename = field.data.filename if isinstance(field.data, StarletteUploadFile) else field.data
+    image_ext_regex = re.compile(r"\.(jpg|jpeg|png|webp|svg)$", re.IGNORECASE)
+    if not image_ext_regex.search(filename):
+        msg = "Invalid file extension. Allowed: jpg, jpeg, png, svg, webp"
+        raise ValidationError(msg)
+
+
 class UserSettingsForm(Form):
     """Form for user settings page."""
 
@@ -272,7 +286,7 @@ class UserSettingsForm(Form):
     )
     password: PasswordField = PasswordField(
         "Update Password",
-        validators=[validators.optional(), validators.Length(min=8, max=25)],
+        validators=[validators.Length(min=8, max=25), validators.optional()],
     )
     confirm_password: PasswordField = PasswordField(
         "Confirm Updated Password",
@@ -287,11 +301,15 @@ class UserSettingsForm(Form):
     avatar_url: StringField = StringField(
         "Remote Avatar URL",
         description="https://example.com/avatar.png",
-        validators=[validators.optional(), validators.Length(min=0, max=2000), file_ext_validator],
+        validators=[
+            validators.optional(),
+            validators.Length(min=1, max=2000),
+            is_allowed_extension,
+        ],
     )
     avatar_upload: FileField = FileField(
         "Upload Avatar",
-        validators=[validators.optional(), file_ext_validator],
+        validators=[validators.optional(), is_allowed_extension],
     )
 
 
@@ -309,7 +327,7 @@ async def user_settings_get(
     form.avatar_url.data = current_user.avatar_location
     return templates.TemplateResponse(
         "users/settings.html",
-        {constants.REQUEST: request, "form": form, constants.CURRENT_USER: current_user},
+        {constants.REQUEST: request, constants.FORM: form, constants.CURRENT_USER: current_user},
     )
 
 
@@ -322,26 +340,15 @@ async def user_settings_post(
 ) -> _TemplateResponse | RedirectResponse:
     """Return the user settings page."""
     form_data = await request.form()
-    user_details = {
-        "email": form_data.get("email") or current_user.email,
-        "username": form_data.get("username") or current_user.username,
-        "name": form_data.get("name") or current_user.full_name,
-        "timezone": form_data.get("timezone") or current_user.timezone,
-        "avatar_url": form_data.get("avatar_url") or current_user.avatar_location,
-        "password": form_data.get("password"),
-        "confirm_password": form_data.get("confirm_password"),
-        "avatar_upload": avatar_upload,
-    }
-    form = UserSettingsForm(
-        **user_details,
-    )
+    user_details = dict(form_data) | {"avatar_upload": avatar_upload}
+    form = UserSettingsForm.load(user_details)
     if not form.validate():
         return templates.TemplateResponse(
             "users/settings.html",
             {
                 constants.REQUEST: request,
-                "message": FormErrorMessage(),
-                "form": form,
+                constants.MESSAGE: FormErrorMessage(),
+                constants.FORM: form,
                 constants.CURRENT_USER: current_user,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -361,8 +368,8 @@ async def user_settings_post(
             "users/settings.html",
             {
                 constants.REQUEST: request,
-                "message": FormErrorMessage(),
-                "form": form,
+                constants.MESSAGE: FormErrorMessage(),
+                constants.FORM: form,
                 constants.CURRENT_USER: current_user,
             },
         )
@@ -377,18 +384,14 @@ async def user_settings_post(
     )
 
 
-async def update_user_settings_from_form(form: UserSettingsForm, user: db_models.User) -> None:  # noqa: C901 (too-complex)
+async def update_user_settings_from_form(form: UserSettingsForm, user: db_models.User) -> None:
     """Update a user model from a form."""
     if form.password.data:
         user.password_hash = auth.hash_password(form.password.data)
-    if form.email.data:
-        user.email = form.email.data
-    if form.username.data:
-        user.username = form.username.data
-    if form.name.data:
-        user.full_name = form.name.data
-    if form.timezone.data:
-        user.timezone = form.timezone.data
+    user.email = form.email.data
+    user.username = form.username.data
+    user.full_name = form.name.data
+    user.timezone = form.timezone.data
     avatar_before = user.avatar_location
     if form.avatar_upload.data:
         upload_file = form.avatar_upload.data
@@ -396,5 +399,7 @@ async def update_user_settings_from_form(form: UserSettingsForm, user: db_models
         user.avatar_location = await media_handler.upload_avatar(pic=upload_file, name=name)
     if form.avatar_url.data and not form.avatar_upload.data:
         user.avatar_location = form.avatar_url.data
-    if avatar_before != user.avatar_location:
+    if not form.avatar_url.data and not form.avatar_upload.data:
+        user.avatar_location = None
+    if avatar_before and avatar_before != user.avatar_location:
         media_handler.del_media_from_path_str(avatar_before)

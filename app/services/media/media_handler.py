@@ -1,12 +1,10 @@
 """media_handler: service for handling media files."""
-import os
-import re
-import unicodedata
 from pathlib import Path
 from typing import Any, Protocol
 
 from fastapi import UploadFile
 from PIL import Image
+from werkzeug.utils import secure_filename
 
 from app.web.html.const import STATIC_DIR
 
@@ -64,22 +62,6 @@ def pil_thumbnail(pic: ImageFileProtocol, max_width: int, max_height: int) -> Im
     output_size = (max_width, max_height)
     image.thumbnail(output_size)
     return image
-
-
-def secure_filename(filename: str) -> str:
-    """Pass it a filename and it will return a secure version of it.
-
-    From werkzeug.utils.secure_filename.
-    """
-    filename = unicodedata.normalize("NFKD", filename)
-    filename = filename.encode("ascii", "ignore").decode("ascii")
-
-    for sep in os.sep, os.path.altsep:
-        if sep:
-            filename = filename.replace(sep, "_")
-
-    _filename_ascii_strip_re = re.compile(r"[^A-Za-z0-9_.-]")
-    return str(_filename_ascii_strip_re.sub("", "_".join(filename.split()))).strip("._")
 
 
 def get_suffix(file: UploadFile) -> str:
