@@ -27,15 +27,19 @@
   }
 
   .btn {
-    @apply btn-base px-8 py-4 text-lg rounded-xl;
+    @apply cursor-pointer btn-base px-8 py-4 text-lg rounded-xl;
   }
 
   .btn-sm {
-    @apply btn-base px-4 py-2 text-base rounded-md;
+    @apply cursor-pointer btn-base px-4 py-2 text-base rounded-md;
   }
 
   .btn-filled {
-    @apply text-white bg-primary-700 dark:bg-primary-700 hover:bg-primary-800 active:bg-primary-900 disabled:text-primary-100 disabled:bg-primary-800 disabled:opacity-50 transition-bg-color duration-300;
+    @apply text-white bg-primary-700 bg-primary-700 hover:bg-primary-800 active:bg-primary-900 disabled:text-primary-100 disabled:bg-primary-800 disabled:opacity-50 transition-bg-color duration-300;
+  }
+
+  .btn-filled-danger {
+    @apply text-white bg-pink-700 bg-pink-700 hover:bg-pink-800 active:bg-pink-900 disabled:text-pink-100 disabled:bg-pink-800 disabled:opacity-50 transition-bg-color duration-300;
   }
 
   .btn-outline {

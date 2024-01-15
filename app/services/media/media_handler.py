@@ -1,4 +1,5 @@
 """media_handler: service for handling media files."""
+from enum import Enum
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -14,7 +15,14 @@ for path in (AVATAR_UPLOAD_FOLDER, BLOG_UPLOAD_FOLDER):
     path.mkdir(exist_ok=True)
 
 
-class ImageFileProtocol(Protocol):
+class MediaType(str, Enum):
+    """Media type."""
+
+    IMAGE = "image"
+    VIDEO = "video"
+
+
+class MediaFileProtocol(Protocol):
     """Protocol for image file."""
 
     def seek(self, *args: Any, **kwargs: Any) -> int:
@@ -40,8 +48,66 @@ async def upload_avatar(pic: UploadFile, name: str) -> str:
     return get_path_str_from_static(path)
 
 
+def upload_blog_media(media: UploadFile, name: str) -> tuple[str, str]:
+    """Upload a blog media file.
+
+    Returns
+    -------
+        A tuple of the path string and the media type.
+
+    See `save_media` for more details.
+    """
+    name = secure_filename(f"{name}.{get_suffix(media)}")
+    return save_media(media, name)
+
+
+def save_media(media: UploadFile, name: str) -> tuple[str, str]:
+    """Save a media file.
+
+    Returns
+    -------
+        A tuple of the path string and the media type.
+
+    The path string is a comma-separated list of paths.
+
+    Images save a webp version as well as the original,
+    if the webp version is smaller.
+    """
+    media_type = get_media_type_from_file(media)
+    if media_type == MediaType.IMAGE:
+        return save_image(name, media.file), media_type
+    if media_type == MediaType.VIDEO:
+        return save_video(name, media.file), media_type
+    msg = f"Unknown media type {media_type}"
+    raise ValueError(msg)
+
+
+def save_image(name: str, image_file: MediaFileProtocol) -> str:
+    """Save an image, and its webp version."""
+    og_image_path = BLOG_UPLOAD_FOLDER / name
+    pil_save(
+        pic=image_file,
+        filepath=og_image_path,
+        max_width=1200,
+        max_height=1200,
+        quality=90,
+    )
+    webp_image_path = convert_image(og_image_path)
+    if compare_image_sizes(og_image_path, webp_image_path):
+        webp_image_path.unlink()
+    images = (image for image in (webp_image_path, og_image_path) if image.exists())
+    return ",".join(get_path_str_from_static(image) for image in images)
+
+
+def save_video(name: str, video: MediaFileProtocol) -> str:
+    """Save a video."""
+    video_path = BLOG_UPLOAD_FOLDER / name
+    video_path.write_bytes(video.read())
+    return get_path_str_from_static(video_path)
+
+
 def pil_save(
-    pic: ImageFileProtocol,
+    pic: MediaFileProtocol,
     filepath: Path,
     max_width: int,
     max_height: int,
@@ -56,12 +122,17 @@ def pil_save(
         raise ValueError(msg) from e
 
 
-def pil_thumbnail(pic: ImageFileProtocol, max_width: int, max_height: int) -> Image:
+def pil_thumbnail(pic: MediaFileProtocol, max_width: int, max_height: int) -> Image:
     """Thumbnail with pillow."""
     image = Image.open(pic)
     output_size = (max_width, max_height)
     image.thumbnail(output_size)
     return image
+
+
+def get_media_type_from_file(file: UploadFile) -> MediaType:
+    """Get the media type from a file."""
+    return get_media_type_from_suffix(get_suffix(file))
 
 
 def get_suffix(file: UploadFile) -> str:
@@ -91,3 +162,34 @@ def del_media_from_path_str(path_str: str) -> None:
 def rebuild_path_from_static(path_str: str) -> Path:
     """Rebuild a path from the static directory."""
     return STATIC_DIR / path_str.strip("/\\ ")
+
+
+def get_media_type_from_suffix(suffix: str) -> MediaType:
+    """Get the media type from a suffix string."""
+    suffix = suffix.casefold()
+    if suffix in {"jpg", "jpeg", "png", "gif", "webp", "svg"}:
+        return MediaType.IMAGE
+    if suffix in {"mp4", "webm"}:
+        return MediaType.VIDEO
+    msg = f"Unknown media type for suffix {suffix}"
+    raise ValueError(msg)
+
+
+def convert_image(
+    image_path: Path,
+    format: str = "webp",  # noqa: A002
+    quality: int = 90,
+) -> Path:
+    """Convert an image to an alternate format."""
+    image = Image.open(image_path)
+    image = image.convert("RGBA")
+    new_path = image_path.with_suffix(f".{format}")
+    image.save(new_path, format=format, optimize=True, quality=quality)
+    return new_path
+
+
+def compare_image_sizes(image1: Path, image2: Path) -> bool:
+    """Compare the sizes of two images, returning True if image1 is larger."""
+    image1_size = Path(image1).stat().st_size
+    image2_size = Path(image2).stat().st_size
+    return image1_size < image2_size

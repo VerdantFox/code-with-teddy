@@ -3,8 +3,12 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 from markdown import Markdown
+from markdown.extensions import Extension
+from markdown.extensions.admonition import AdmonitionExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.extra import ExtraExtension
+from markdown.extensions.sane_lists import SaneListExtension
+from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.toc import TocExtension
 from micawber import bootstrap_basic, parse_html
 from micawber.cache import Cache as OEmbedCache
@@ -29,10 +33,16 @@ def markdown_to_html(markdown_content: str) -> HTMLContent:
     Also convert any media URLs into rich media objects such as video
     players or images.
     """
-    highlight = CodeHiliteExtension(linenums=False, css_class="highlight")
-    extras = ExtraExtension()
-    toc = TocExtension(toc_depth=3)
-    md = Markdown(extensions=[highlight, extras, toc])
+    extensions: list[str | Extension] = [
+        CodeHiliteExtension(linenums=False, css_class="highlight"),
+        ExtraExtension(),
+        TocExtension(toc_depth=3),
+        AdmonitionExtension(),
+        SaneListExtension(),
+        SmartyExtension(),
+        "pymdownx.tilde",
+    ]
+    md = Markdown(extensions=extensions)
     assert hasattr(md, "toc")  # noqa: S101 (assert) -- for mypy
     html = md.convert(markdown_content)
     html = update_html(html)

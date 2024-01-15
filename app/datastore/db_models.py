@@ -152,6 +152,12 @@ class BlogPostMedia(Base):
     """Blog post media model.
 
     Might include images or videos.
+
+    Attributes
+    ----------
+        name: The name of the media, given as the title of the HTML tag.
+        locations: The location of the file on the filesystem. If multiple versions
+            of the file are included, they are comma-separated.
     """
 
     __tablename__ = "blog_post_media"
@@ -160,8 +166,12 @@ class BlogPostMedia(Base):
     blog_post_id: Mapped[BlogPostFK | None]
     blog_post: Mapped["BlogPost"] = relationship(back_populates="media")
     name: Mapped[str]
-    location: Mapped[str]
-    extensions: Mapped[str]
+    locations: Mapped[str]
+    media_type: Mapped[str]
+
+    def locations_to_list(self) -> list[str]:
+        """Get the media locations as a list."""
+        return self.locations.split(",")
 
 
 class BlogPostComment(Base):

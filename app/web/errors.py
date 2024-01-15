@@ -20,6 +20,13 @@ class UserNotFoundError(WebError):
     status_code = status.HTTP_404_NOT_FOUND
 
 
+class BlogPostNotFoundError(WebError):
+    """Blog post not found."""
+
+    detail = "Blog post not found"
+    status_code = status.HTTP_404_NOT_FOUND
+
+
 class UserNotAuthenticatedError(WebError):
     """User not authenticated."""
 

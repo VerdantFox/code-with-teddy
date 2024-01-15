@@ -1,0 +1,28 @@
+{% if blog_post and not is_new %}
+  <div id="blog-media" class="mt-32">
+    <h2 class="text-xl font-bold mb-12">Blog Post Media</h2>
+    <form
+      class="@container"
+      id="blog-media-form"
+      hx-encoding="multipart/form-data"
+      hx-post="{{ url_for('html:upload_blog_post_media', bp_id=request.path_params['bp_id'] ) }}"
+      hx-target="#blog-media"
+      hx-swap="outerHTML"
+    >
+      {{ render_partial('shared/partials/flash_message.html', message=message) }}
+      <div class="flex flex-col gap-6 mb-8">
+        <div
+          class="w-full  flex justify-between items-center gap-8 flex-col @2xl:flex-row"
+        >
+          <div class="w-full">
+            {{ render_partial('shared/partials/forms/field.html', field=form.name, class="flex-1 w-full") }}
+            <div class="p-3 hidden @2xl:block"></div>
+          </div>
+          {{ render_partial('shared/partials/forms/file_upload_field.html', field=form.media, class="w-full", hx_form_id="blog-media-form") }}
+        </div>
+      </div>
+      {{ render_partial('shared/partials/forms/submit_button.html', text="Upload", class="w-full @2xl:w-min", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}
+    </form>
+    {{ render_partial('blog/partials/list_post_media.html', request=request, blog_post=blog_post) }}
+  </div>
+{% endif %}

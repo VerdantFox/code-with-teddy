@@ -2,17 +2,17 @@
 
 from logging import getLogger
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Request, UploadFile, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import (
+    FileField,
     StringField,
     TextAreaField,
     validators,
 )
 
 from app import constants
-from app.datastore import db_models
 from app.datastore.database import DBSession
 from app.permissions import Action, requires_permission
 from app.services.blog import blog_handler
@@ -29,7 +29,8 @@ router = APIRouter(tags=["blog"])
 logger = getLogger(__name__)
 BLOG_POST = "blog_post"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
-UPLOAD_MEDIA_TEMPLATE = "blog/upload_media.html"
+UPLOAD_MEDIA_TEMPLATE = "blog/partials/edit_post_media_form.html"
+MEDIA_FORM = "media_form"
 
 
 @router.get("/blog", response_model=None)
@@ -145,13 +146,22 @@ async def read_blog_post(
     )
 
 
+class BlogPostMediaForm(Form):
+    """Form for uploading media for a blog post."""
+
+    name = StringField(
+        "Name (title)", description="A dog dancing", validators=[validators.DataRequired()]
+    )
+    media = FileField("Upload media file", validators=[validators.DataRequired()])
+
+
 @router.get("/blog/{bp_id}/edit", response_model=None)
 @requires_permission(Action.EDIT_BP)
 async def edit_bp_get(
     request: Request, current_user: LoggedInUser, db: DBSession, bp_id: int
 ) -> _TemplateResponse:
     """Return page to edit a blog post."""
-    bp = db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id).one()
+    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     form = BlogPostForm.load(
         {
             "is_new": False,
@@ -170,6 +180,7 @@ async def edit_bp_get(
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
             constants.FORM: form,
+            MEDIA_FORM: BlogPostMediaForm(),
             BLOG_POST: bp,
         },
     )
@@ -181,7 +192,6 @@ async def edit_bp_post(
     request: Request, current_user: LoggedInUser, db: DBSession, bp_id: int
 ) -> _TemplateResponse | RedirectResponse:
     """Return page to edit a blog post."""
-    bp = db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id).one()
     form_data = await request.form()
     form = BlogPostForm.load(form_data)
     if not form.validate():
@@ -195,6 +205,7 @@ async def edit_bp_post(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
+    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     input_data = blog_handler.SaveBlogInput(**form.data, existing_bp=bp)
     response = blog_handler.save_blog_post(db, input_data)
     if not response.success or not response.blog_post:
@@ -244,13 +255,71 @@ async def edit_bp_live_update(
 
 @router.post("/blog/{bp_id}/upload-media", response_model=None)
 @requires_permission(Action.EDIT_BP)
-async def upload_media_for_blog_post(
+async def upload_blog_post_media(
     request: Request,
     current_user: LoggedInUser,
-    bp_id: int,  # noqa: ARG001 (unused-argument)
+    db: DBSession,
+    bp_id: int,
+    media: UploadFile | None = None,
 ) -> _TemplateResponse:
-    """Return page to edit a blog post."""
+    """Upload media for a blog post."""
+    form_data = await request.form()
+    form_data_dict = {
+        "name": form_data["name"],
+        "media": media,
+    }
+    form = BlogPostMediaForm.load(form_data_dict)
+    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
+    if not form.validate():
+        return templates.TemplateResponse(
+            UPLOAD_MEDIA_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                constants.FORM: form,
+                BLOG_POST: bp,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+
+    bp = blog_handler.save_media_for_blog_post(
+        db=db,
+        blog_post=bp,
+        name=form.name.data,
+        media=form.media.data,
+    )
     return templates.TemplateResponse(
         UPLOAD_MEDIA_TEMPLATE,
-        {constants.REQUEST: request, constants.CURRENT_USER: current_user},
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            constants.FORM: BlogPostMediaForm(),
+            BLOG_POST: bp,
+        },
+    )
+
+
+@router.delete("/blog/{bp_id}/upload-media/{media_id}", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def delete_blog_post_media(
+    request: Request,
+    current_user: LoggedInUser,
+    db: DBSession,
+    bp_id: int,
+    media_id: int,
+) -> _TemplateResponse:
+    """Delete a blog post."""
+    bp = blog_handler.delete_media_from_blog_post(
+        db=db,
+        media_id=media_id,
+        bp_id=bp_id,
+    )
+    return templates.TemplateResponse(
+        UPLOAD_MEDIA_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            constants.FORM: BlogPostMediaForm(),
+            BLOG_POST: bp,
+        },
     )

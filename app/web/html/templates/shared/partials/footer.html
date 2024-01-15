@@ -1,5 +1,5 @@
 <footer
-  hx-boost="true"
+  {% if hx_boost != False %}hx-boost="true"{% else %}hx-boost="false"{% endif %}
   class="relative bg-offset-100 dark:bg-grayscale-800 shadow-inner shadow-xl"
 >
   <a

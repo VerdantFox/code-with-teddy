@@ -5,4 +5,15 @@
   {{ field.label(class='' +  (' text-red-800 dark:text-red-300' if field.errors else '')) }}
   {{ field(class="p-2 rounded-lg border border-grayscale-500 focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white", **extra_fields) }}
   {{ render_partial('shared/partials/forms/field_errors.html', errors=field.errors) }}
+  {% if hx_form_id %}
+    <progress id="progress" value="0" max="100" class="invisible"></progress>
+    <script>
+      htmx.on("#{{ hx_form_id }}", "htmx:xhr:progress", function (evt) {
+        htmx
+          .find("#progress")
+          .setAttribute("value", (evt.detail.loaded / evt.detail.total) * 100)
+        document.getElementById("progress").classList.remove("invisible")
+      })
+    </script>
+  {% endif %}
 </div>

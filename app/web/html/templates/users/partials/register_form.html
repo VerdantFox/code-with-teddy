@@ -1,6 +1,6 @@
 <form method="POST" action="{{ url_for('html:register_post' ) }}">
   {{ render_partial('shared/partials/flash_message.html', message=message) }}
-  <div class="grid grid-cols-2 gap-6 max-lg:grid-cols-1 mb-8">
+  <div class="grid grid-cols-2 gap-6 max-lg:grid-cols-1 mb-6">
     {{ form.redirect_url() }}
     {{ render_partial('shared/partials/forms/field.html', field=form.email, class="col-span-2 max-lg:col-span-1") }}
     {{ render_partial('shared/partials/forms/field.html', field=form.username) }}
@@ -9,7 +9,7 @@
     {{ render_partial('shared/partials/forms/field.html', field=form.confirm_password) }}
   </div>
   {{ render_partial('shared/partials/forms/submit_button.html', text="Register", class="max-lg:w-full") }}
-  <p class="mt-8">
+  <p class="mt-12">
     Already have an account?
     <a
       href="{{ url_for('html:login_get') }}{% if form.redirect_url.data %}?next={{ form.redirect_url.data }}{% endif %}"

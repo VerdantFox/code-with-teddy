@@ -5,12 +5,15 @@ from datetime import datetime, timezone
 from logging import getLogger
 
 import sqlalchemy
+from fastapi import UploadFile
 from pydantic import BaseModel
 
 from app.datastore import db_models
 from app.datastore.database import Session
 from app.services.blog import blog_utils, markdown_parser
 from app.services.general import transforms
+from app.services.media import media_handler
+from app.web import errors
 
 logger = getLogger(__name__)
 ERROR_SAVING_BP = "Error saving blog post"
@@ -35,6 +38,14 @@ class SaveBlogResponse(BaseModel, arbitrary_types_allowed=True):
     blog_post: db_models.BlogPost | None = None
     err_msg: str = ERROR_SAVING_BP
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
+
+
+def get_bp_from_id(db: Session, bp_id: int) -> db_models.BlogPost:
+    """Get a blog post from its ID."""
+    try:
+        return db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id).one()
+    except sqlalchemy.exc.NoResultFound as e:
+        raise errors.BlogPostNotFoundError from e
 
 
 def save_blog_post(db: Session, data: SaveBlogInput) -> SaveBlogResponse:
@@ -191,3 +202,63 @@ def _create_bp_save_sqlalchemy_error_response(
         message=msg,
         field_errors=field_errors,
     )
+
+
+def save_media_for_blog_post(
+    db: Session,
+    blog_post: db_models.BlogPost,
+    media: UploadFile,
+    name: str,
+) -> db_models.BlogPost:
+    """Save media for a blog post."""
+    locations_str, media_type = _save_bp_media(
+        name=name, blog_post_slug=blog_post.slug, media=media
+    )
+    return _commit_bp_to_db(
+        db=db,
+        blog_post=blog_post,
+        name=name,
+        locations_str=locations_str,
+        media_type=media_type,
+    )
+
+
+def delete_media_from_blog_post(
+    db: Session,
+    media_id: int,
+    bp_id: int,
+) -> db_models.BlogPost:
+    """Delete media from a blog post."""
+    blog_post = get_bp_from_id(db=db, bp_id=bp_id)
+    media = db.query(db_models.BlogPostMedia).filter(db_models.BlogPostMedia.id == media_id).one()
+    media_locations = media.locations_to_list()
+    for location in media_locations:
+        media_handler.del_media_from_path_str(location)
+    db.delete(media)
+    db.commit()
+    db.refresh(blog_post)
+    return blog_post
+
+
+def _save_bp_media(name: str, blog_post_slug: str, media: UploadFile) -> tuple[str, str]:
+    file_name = f"{blog_utils.get_slug(name)}--{blog_post_slug}"
+    return media_handler.upload_blog_media(
+        media=media,
+        name=file_name,
+    )
+
+
+def _commit_bp_to_db(
+    db: Session, blog_post: db_models.BlogPost, name: str, locations_str: str, media_type: str
+) -> db_models.BlogPost:
+    """Commit a blog post to the database."""
+    bp_media_object = db_models.BlogPostMedia(
+        blog_post_id=blog_post.id,
+        name=name,
+        locations=locations_str,
+        media_type=media_type,
+    )
+    db.add(bp_media_object)
+    db.commit()
+    db.refresh(blog_post)
+    return blog_post

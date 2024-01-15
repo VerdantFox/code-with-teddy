@@ -27,7 +27,7 @@ def main(
             "-b/-nb",
             help="Don't run browser-sync.",
         ),
-    ] = True,
+    ] = False,
 ) -> None:
     """Run the app in development mode."""
     run_tailwind()

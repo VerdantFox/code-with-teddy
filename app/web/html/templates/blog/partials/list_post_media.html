@@ -1,0 +1,64 @@
+{% if blog_post.media %}
+  <h2 class="mt-12 mb-8">Uploaded Media:</h2>
+  {% for media_item in blog_post.media %}
+    <form action="" class="mb-12">
+      <hr class="mb-2" />
+      <span class="block flex flex-col gap-2">
+        <span class="flex gap-6">
+          <button
+            id="delete-image-{{ loop.index }}"
+            type="submit"
+            class="btn-sm btn-filled-danger"
+            hx-delete="{{ url_for('html:delete_blog_post_media', bp_id=request.path_params['bp_id'], media_id=media_item.id ) }}"
+            hx-target="#blog-media"
+            hx-swap="outerHTML"
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            class="btn-sm btn-filled"
+            onclick="copyToClipboard('#media-html-{{ loop.index }}')"
+          >
+            Copy HTML
+          </button>
+        </span>
+        <p class="text-2xl">#{{ loop.index }}. ⬇{{ media_item.name }}⬇</p>
+      </span>
+      <hr class="mb-6" />
+      {% if media_item.media_type == "image" %}
+        <span id="media-html-{{ loop.index }}">
+          <picture>
+            {% set locations = media_item.locations_to_list() %}
+            {% for location in locations[:-1] %}
+              <source
+                srcset="{{ url_for('html:static', path=location) }}"
+                type="image/{{ location.split('.')[-1] }}"
+              />
+            {% endfor %}
+            <img
+              src="{{ url_for('html:static', path=locations[-1]) }}"
+              alt="{{ media_item.name }}"
+              title="{{ media_item.name }}"
+            />
+          </picture>
+        </span>
+      {% elif media_item.media_type == "video" %}
+        <span id="media-html-{{ loop.index }}">
+          <div class="video-box">
+            <video width="80%" muted autoplay loop controls>
+              {% set locations = media_item.locations_to_list() %}
+              {% for location in locations %}
+                <source
+                  src="{{ url_for('html:static', path=location) }}"
+                  type="video/{{ location.split('.')[-1] }}"
+                />
+              {% endfor %}
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </span>
+      {% endif %}
+    </form>
+  {% endfor %}
+{% endif %}

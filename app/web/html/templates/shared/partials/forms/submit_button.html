@@ -3,8 +3,11 @@
 {% endif %}
 <button
   type="submit"
-  class="btn-sm btn-filled mb-6 {{ class }}"
-  {% for key, val in extra_fields.items() %}{{ key }}="{{ val }}"{% endfor %}
+  class="{% if not overwrite_btn_class %}btn-sm btn-filled{% endif %} {{ class }}"
+  {% for key, val in extra_fields.items() %}
+    {{ key }}="{{ val }}"
+  {% endfor %}
+  {% if onsubmit %}onsubmit="{{ onsubmit }}"{% endif %}
 >
   {{ text }}
 </button>

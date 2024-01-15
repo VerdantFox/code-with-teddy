@@ -22,7 +22,7 @@
   {% set active_nav_item = 0 %}
 {% endif %}
 <header
-  hx-boost="true"
+  {% if hx_boost != False %}hx-boost="true"{% else %}hx-boost="false"{% endif %}
   x-data="{
     mobileNavOpen: false,
     selectedNavItem: {{ active_nav_item }},
