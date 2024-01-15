@@ -22,10 +22,11 @@
     function copyToClipboard(selector) {
       event.preventDefault()
       var imageSpan = document.querySelector(selector)
-      var imageHTML = imageSpan.innerHTML
-      imageHTML = imageHTML.replace(/>\s+</g, "><").trim()
+      var mediaHTML = imageSpan.innerHTML
+      mediaHTML = mediaHTML.replace(/>(\s*)(.*?)(\s*)</g, ">$2<").trim()
+
       var textArea = document.createElement("textarea")
-      textArea.textContent = imageHTML
+      textArea.textContent = mediaHTML
       document.body.appendChild(textArea)
       textArea.select()
       document.execCommand("Copy")

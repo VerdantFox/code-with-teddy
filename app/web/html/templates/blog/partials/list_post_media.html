@@ -45,8 +45,8 @@
         </span>
       {% elif media_item.media_type == "video" %}
         <span id="media-html-{{ loop.index }}">
-          <div class="video-box">
-            <video width="80%" muted autoplay loop controls>
+          <div class="flex justify-center content-center">
+            <video class="w-4/5" muted autoplay loop controls>
               {% set locations = media_item.locations_to_list() %}
               {% for location in locations %}
                 <source
