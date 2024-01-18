@@ -76,8 +76,10 @@ def _update_html_links(html_soup: BeautifulSoup) -> None:
 def _update_html_headers(html_soup: BeautifulSoup) -> None:
     """Fix header IDs that don't start alpha to work with scrollspy."""
     for h_tag in html_soup.find_all(re.compile(r"^h[1-6]$")):
-        if h_tag.get("id") and not h_tag["id"][0].isalpha():
-            h_tag["id"] = f"blog-{h_tag['id']}"
+        id_ = h_tag.get("id")
+        if h_tag.get("id") and not id_[0].isalpha():
+            h_tag["id"] = f"blog-{id_}"
+        h_tag["x-intersect"] = f"highlightTocElement('{id_}')"
 
 
 def _update_html_pre_tags(html_soup: BeautifulSoup) -> None:
@@ -109,58 +111,68 @@ def _update_html_images(html_soup: BeautifulSoup) -> None:
 def update_toc(toc: str) -> str:
     """Update the table of contents HTML."""
     toc_soup = BeautifulSoup(toc, HTML_PARSER)
-    toc_class = toc_soup.find("div", {"class": "toc"})
-    update_element_name_and_class(
-        element=toc_class,
+    toc_element = toc_soup.find("div", {"class": "toc"})
+    update_element(
+        element=toc_element,
         name="nav",
-        class_="nav nav-pills flex-column",
+        id_="toc",
+        class_="not-prose",
     )
-    toc_list_outer = toc_class.find("ul")
-    hoist_children_to_parent(toc_list_outer)
-    for li_tag in toc_class.find_all("li"):
-        hoist_children_to_parent(li_tag)
-    for ul_tag in toc_class.find_all("ul"):
-        update_element_name_and_class(
-            element=ul_tag,
-            name="div",
-            class_="flex flex-column",
+    toc_list_outer = toc_element.find("ul")
+    update_element(
+        element=toc_list_outer,
+        class_="flex flex-col gap-4",
+    )
+    for li_tag in toc_list_outer.find_all("li"):
+        update_element(
+            element=li_tag,
+            class_="flex flex-col gap-4",
         )
-        for a_tag in ul_tag.find_all("a"):
-            update_element_name_and_class(
-                element=a_tag,
-                name="a",
-                class_="ml-3 my-1",
-            )
-            update_a_tag_alpha_href(a_tag)
-    for a_tag in toc_class.find_all("a", recursive=False):
-        update_element_name_and_class(
+        a_tag = li_tag.find("a")
+        update_element(
             element=a_tag,
-            name="a",
-            class_="",
+            class_="link px-2 py-1 rounded-lg",
         )
+        ul_tags = li_tag.find_all("ul")
+        for ul_tag in ul_tags:
+            update_element(
+                element=ul_tag,
+                class_="flex flex-col gap-4 ml-6",
+            )
+
         update_a_tag_alpha_href(a_tag)
     # Add title comments and contact sections
     title = BeautifulSoup(
-        '<a class="nav-link" href="#blog-title">Title</a>',
+        '<a class="link" href="#">Title</a>',
         HTML_PARSER,
     )
-    toc_class.insert(0, title)
+    toc_list_outer.insert(0, title)
     about = BeautifulSoup(
-        '<a class="nav-link" href="#about-the-author">About the author</a>',
+        '<a class="link" href="#about-the-author">About the author</a>',
         HTML_PARSER,
     )
     comments = BeautifulSoup(
-        '<a class="nav-link" href="#comments-section">Comments</a>',
+        '<a class="link" href="#comments-section">Comments</a>',
         HTML_PARSER,
     )
-    toc_class.extend([about, comments])
+    toc_list_outer.extend([about, comments])
     return str(toc_soup)
 
 
-def update_element_name_and_class(*, element: BeautifulSoup, name: str, class_: str) -> None:
+def update_element(
+    *,
+    element: BeautifulSoup,
+    name: str | None = None,
+    id_: str | None = None,
+    class_: str | None = None,
+) -> None:
     """Update an element's name and class."""
-    element.name = name
-    element["class"] = class_
+    if name:
+        element.name = name
+    if class_:
+        element["class"] = class_
+    if id_:
+        element["id"] = id_
 
 
 def hoist_children_to_parent(element: Tag) -> list[Tag]:

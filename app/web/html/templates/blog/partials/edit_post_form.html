@@ -35,8 +35,13 @@
   </div>
   <div class="flex gap-6 flex-col @lg:flex-row">
     {{ render_partial('shared/partials/forms/submit_button.html', text="Save", class="w-full @2xl:w-fit", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}
-    {% if not form.is_new.data %}
-      {{ render_partial('shared/partials/forms/submit_button.html', text="Save and view", overwrite_btn_class=True, class="w-full @2xl:w-fit btn-sm btn-outline", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}
+    {% if blog_post and not form.is_new.data %}
+      <a
+        @click="smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"
+        href="{{ url_for('html:read_blog_post', slug=blog_post.slug) }}"
+        class="w-full @2xl:w-fit btn-sm btn-outline"
+        >View Post</a
+      >
     {% endif %}
   </div>
 </form>

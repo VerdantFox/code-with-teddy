@@ -1,6 +1,22 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
 {% set hx_boost = False %}
+{%
+  set admin_extras = [
+  {"href": url_for("html:create_bp_get"),
+  "icon": "hammer",
+  "text": "Create Blog Post"},
+  ]
+%}
+{% if blog_post %}
+  {%
+    set admin_extras = [
+    {"href": url_for("html:read_blog_post", slug=blog_post.slug),
+    "icon": "eye",
+    "text": "Read Blog Post"}
+    ] + admin_extras
+  %}
+{% endif %}
 {% block custom_js %}
   <script>
     var formSubmitting = false
@@ -44,7 +60,7 @@
 
 {% block content %}
   <div class="px-8 my-36">
-    {% if form.is_new %}
+    {% if form.is_new.data %}
       <h1 class="text-center text-5xl font-bold mb-20">Create New Blog Post</h1>
     {% else %}
       <h1 class="text-center text-5xl font-bold mb-24">Edit Blog Post</h1>
@@ -57,7 +73,7 @@
         class="py-8"
       >
         <h2 class="font-bold text-xl mb-12">Edit Blog Post</h2>
-        {{ render_partial('blog/partials/edit_post_form.html', request=request, form=form, message=message) }}
+        {{ render_partial('blog/partials/edit_post_form.html', request=request, form=form, message=message, blog_post=blog_post) }}
         {{ render_partial('blog/partials/edit_post_media_form.html', request=request, is_new=form.is_new.data, form=media_form, message=media_message, blog_post=blog_post) }}
       </div>
       <div>

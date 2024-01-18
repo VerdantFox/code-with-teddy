@@ -16,7 +16,7 @@
     {% endblock custom_js %}
   </head>
   {% if not body_class %}
-    {% set body_class = "text-neutral-700 dark:text-neutral-100 dark:bg-grayscale-900" %}
+    {% set body_class = "text-grayscale-800 dark:text-grayscale-50 dark:bg-grayscale-900" %}
   {% endif %}
   <body class="{{ body_class }}" hx-target-error="body" hx-swap="outerHTML">
     {% include 'shared/partials/refresh_access.html' %}

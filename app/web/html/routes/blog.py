@@ -35,8 +35,7 @@ MEDIA_FORM = "media_form"
 
 @router.get("/blog", response_model=None)
 async def list_blog_posts(
-    request: Request,
-    current_user: LoggedInUserOptional,
+    request: Request, current_user: LoggedInUserOptional
 ) -> _TemplateResponse:
     """Return the blog list page."""
     return templates.TemplateResponse(
@@ -131,17 +130,21 @@ async def create_bp_post(
 
 @router.get("/blog/{slug}", response_model=None)
 async def read_blog_post(
-    request: Request,
-    current_user: LoggedInUserOptional,
-    slug: str,  # noqa: ARG001 (unused-argument)
+    request: Request, current_user: LoggedInUserOptional, db: DBSession, slug: str
 ) -> _TemplateResponse:
-    """Return page to read a blog post."""
+    """Return page to read a blog post.
+
+    NOTE: This route needs to be after the create_bp_get route,
+    otherwise it will match.
+    """
+    bp = blog_handler.get_bp_from_slug(db=db, slug=slug)
     return templates.TemplateResponse(
         "blog/read_post.html",
         {
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
             constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
+            BLOG_POST: bp,
         },
     )
 

@@ -48,6 +48,27 @@ def get_bp_from_id(db: Session, bp_id: int) -> db_models.BlogPost:
         raise errors.BlogPostNotFoundError from e
 
 
+def get_bp_from_slug(db: Session, slug: str) -> db_models.BlogPost:
+    """Get a blog post from its slug."""
+    try:
+        return db.query(db_models.BlogPost).filter(db_models.BlogPost.slug == slug).one()
+    except sqlalchemy.exc.NoResultFound:
+        return _get_bp_from_slug_history(db=db, slug=slug)
+
+
+def _get_bp_from_slug_history(db: Session, slug: str) -> db_models.BlogPost:
+    """Get a blog post from its slug history."""
+    try:
+        return (
+            db.query(db_models.OldBlogPostSlug)
+            .filter(db_models.OldBlogPostSlug.slug == slug)
+            .one()
+            .blog_post
+        )
+    except sqlalchemy.exc.NoResultFound as e:
+        raise errors.BlogPostNotFoundError from e
+
+
 def save_blog_post(db: Session, data: SaveBlogInput) -> SaveBlogResponse:
     """Save a blog post."""
     SaveBlogResponse.model_rebuild()

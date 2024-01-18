@@ -58,6 +58,10 @@
   .tippy-box {
     @apply p-1 bg-white text-grayscale-800 ring-1 ring-inset ring-grayscale-600 dark:bg-grayscale-800 dark:text-white;
   }
+
+  .blog-nav-highlight {
+    @apply bg-primary-800 text-white dark:text-white hover:text-white dark:hover:text-white;
+  }
 }
 
 @layer utilities {

@@ -154,9 +154,6 @@
                 class="group rounded-full  p-1.5 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
                 title="User details"
               >
-                {#
-                {{ render_partial('shared/partials/icons/user-circle.html', class="h-7 w-7 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300") }}
-                #}
                 {{ render_partial('users/partials/avatar.html', class="h-8 w-8 object-cover rounded-full fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300", request=request, current_user=current_user, user_icon='user-circle') }}
               </button>
               {% if current_user.is_authenticated %}

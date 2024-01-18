@@ -1,6 +1,148 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
+{%
+  set admin_extras = [
+  {"href": url_for("html:edit_bp_get", bp_id=blog_post.id),
+  "icon": "pencil",
+  "text": "Edit Blog Post"},
+  {"href": url_for("html:create_bp_get"),
+  "icon": "hammer",
+  "text": "Create Blog Post"},
+  ]
+%}
+
+{% block custom_js %}
+  <script>
+    function highlightTocElement(id) {
+      const navLinks = document.querySelectorAll("#toc a")
+      const highlightedNavLink = document.querySelector(`#toc a[href='#${id}']`)
+      if (!highlightedNavLink) {
+        return
+      }
+      navLinks.forEach((a) => {
+        a.classList.remove("blog-nav-highlight")
+      })
+      highlightedNavLink.classList.add("blog-nav-highlight")
+    }
+  </script>
+{% endblock custom_js %}
+
+<!-- For tailwind -->
+<div class="ml-6 ml-8 flex flex-col gap-4"></div>
 
 {% block content %}
-  {{ render_partial('shared/partials/previous_next_nav.html', previous_page=("Experience", url_for("html:experience"))) }}
+  <div
+    class="bg-offset-200 dark:bg-grayscale-800 border-b-[1.5px] border-grayscale-300 dark:border-grayscale-900"
+  >
+    <header class="section-container pt-44 pb-32">
+      <h1
+        x-intersect="highlightTocElement('')"
+        id="blog-title"
+        class="text-5xl mb-32 font-bold max-w-4xl"
+      >
+        {{ blog_post.title }}
+      </h1>
+      <div class="flex flex-col gap-2 text-xl max-w-xl">
+        {% set created_date = blog_post.created_timestamp.strftime('%B %d, %Y') %}
+        {% set updated_date = blog_post.updated_timestamp.strftime('%B %d, %Y') %}
+        <p>
+          <span>{{ created_date }}</span> /
+          <span>{{ blog_post.read_mins }} min read</span>
+          /
+          <span>
+            <span class="inline-flex items-center gap-1.5">
+              <span>{{ "{:,}".format(blog_post.views) }}</span>
+              {{ render_partial('shared/partials/icons/eye.html', class="h-6 inline-block", title="views") }} </span
+            >,&nbsp;
+            <span class="inline-flex items-center gap-1.5">
+              <span>{{ "{:,}".format(blog_post.likes) }}</span>
+              {{ render_partial('shared/partials/icons/heart.html', class="h-5 inline-block", title="likes") }}</span
+            >,&nbsp;
+            <span class="inline-flex items-center gap-1.5">
+              <span>{{ "{:,}".format(blog_post.comments|length) }}</span>
+              {{ render_partial('shared/partials/icons/chat-circle-text.html', class="h-5 inline-block", title="comments") }}</span
+            >
+          </span>
+        </p>
+        <p>Last Updated: {{ updated_date }}</p>
+        <p class="flex flex-row gap-2 flex-wrap">
+          {% for tag in blog_post.tags %}
+            <a
+              href="#"
+              class="rounded-full py-1 px-4 bg-primary-300 dark:bg-offset-800"
+              >{{ tag.tag }}</a
+            >
+          {% endfor %}
+        </p>
+      </div>
+    </header>
+  </div>
+
+  <section class="">
+    <div class="max-w-[100rem] border-b dark:border-grayscale-900">
+      <div
+        class="grid grid-cols-[minmax(20rem,_1fr)_4fr_minmax(20rem,_1fr)] max-2xl:grid-cols-[minmax(20rem,_1fr)_4fr_minmax(16rem,_1fr)] max-xl:grid-cols-[minmax(20rem,_1fr)_3fr] max-lg:grid-cols-[minmax(14rem,_1fr)_3fr] max-md:grid-cols-1 gap-20 max-xl:gap-12 md:relative "
+      >
+        <!-- Table of Contents -->
+        <div
+          x-data="{ tocOpen: false, allowTocClose: false }"
+          id="toc-outer"
+          class="md:bg-offset-50 md:dark:bg-grayscale-800"
+        >
+          <button
+            x-cloak
+            @click="tocOpen = false; allowTocClose = false"
+            :class="{'hidden': !tocOpen}"
+            class="fixed top-36 right-28 z-50 rounded-full md:hidden"
+          >
+            {{ render_partial('shared/partials/icons/x.html', class="w-6 h-6 fill-grayscale-800 dark:fill-gray-100 hover:fill-primary-700 dark:hover:fill-primary-400 transition") }}
+          </button>
+          <button
+            x-cloak
+            @click="tocOpen = true; allowTocClose = false; setTimeout(()=> {allowTocClose = true}, 10); "
+            :class="{'hidden': tocOpen}"
+            class="md:hidden fixed bottom-6 right-6 btn-sm btn-outline rounded-2xl"
+          >
+            Table of Contents
+          </button>
+          <div
+            x-cloak
+            class="max-md:fixed max-md:top-0 max-md:left-0 max-md:w-full max-md:h-full bg-white/20 dark:bg-grayscale-900/20 backdrop-blur-sm"
+            :class="{'max-md:hidden': !tocOpen}"
+          ></div>
+          <div
+            x-cloak
+            class="pb-8 text-xl max-md:bg-offset-50 max-md:dark:bg-grayscale-800 md:sticky md:top-0 md:h-screen overflow-y-auto px-4
+
+            max-md:z-10 max-md:p-10 max-md:rounded-3xl max-md:shadow-md max-md:fixed max-md:top-1/2 max-md:mt-10 max-md:h-5/6 max-md:w-5/6 max-md:left-1/2 max-md:-translate-x-1/2 max-md:-translate-y-1/2
+            "
+            :class="{'max-md:hidden': !tocOpen}"
+            @click.away="if (allowTocClose) {tocOpen = false; allowTocClose = false}"
+          >
+            <h2 class="text-2xl font-semibold mb-8 md:mt-16">
+              Table of Contents
+            </h2>
+            {{ blog_post.html_toc|safe }}
+          </div>
+        </div>
+        <!-- Article -->
+        <div
+          class="max-w-2xl pt-24 max-xl:pr-10 max-md:px-8 max-md:mx-auto pb-36"
+        >
+          {{ render_partial('blog/partials/post_body.html', request=request, blog_post=blog_post) }}
+        </div>
+
+        <!-- Extras -->
+        <div class="text-xl max-xl:hidden pt-16 pr-8">
+          <div class="sticky top-0 h-screen overflow-auto pb-36">
+            <h2 class="text-2xl font-semibold mb-8 mt-16">extra stuff</h2>
+            <p>
+              asdf asdf asdfasdfas asdfasdf sdf asdfasdf asdfasdfasdfasdfasdfasd
+              asdf asf asdf asdfasdfasdf asdf asd fasdfasfasdfasdf
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 {% endblock content %}
