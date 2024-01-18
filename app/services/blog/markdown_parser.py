@@ -69,6 +69,8 @@ def update_html(html: str) -> str:
 def _update_html_links(html_soup: BeautifulSoup) -> None:
     """Make all links open in new tab."""
     for a_tag in html_soup.find_all("a"):
+        if a_tag.get("href", "").startswith("#"):
+            continue
         a_tag["target"] = "_blank"
         a_tag["rel"] = "noopener noreferrer"
 
@@ -143,16 +145,16 @@ def update_toc(toc: str) -> str:
         update_a_tag_alpha_href(a_tag)
     # Add title comments and contact sections
     title = BeautifulSoup(
-        '<a class="link" href="#">Title</a>',
+        '<a class="link px-2 py-1 rounded-lg" href="#">Title</a>',
         HTML_PARSER,
     )
     toc_list_outer.insert(0, title)
     about = BeautifulSoup(
-        '<a class="link" href="#about-the-author">About the author</a>',
+        '<a class="link px-2 py-1 rounded-lg" href="#about-the-author">About the author</a>',
         HTML_PARSER,
     )
     comments = BeautifulSoup(
-        '<a class="link" href="#comments-section">Comments</a>',
+        '<a class="link px-2 py-1 rounded-lg" href="#comments-section">Comments</a>',
         HTML_PARSER,
     )
     toc_list_outer.extend([about, comments])

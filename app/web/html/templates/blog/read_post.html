@@ -78,7 +78,7 @@
     </header>
   </div>
 
-  <section class="">
+  <div class="">
     <div class="max-w-[100rem] border-b dark:border-grayscale-900">
       <div
         class="grid grid-cols-[minmax(20rem,_1fr)_4fr_minmax(20rem,_1fr)] max-2xl:grid-cols-[minmax(20rem,_1fr)_4fr_minmax(16rem,_1fr)] max-xl:grid-cols-[minmax(20rem,_1fr)_3fr] max-lg:grid-cols-[minmax(14rem,_1fr)_3fr] max-md:grid-cols-1 gap-20 max-xl:gap-12 md:relative "
@@ -125,15 +125,25 @@
             {{ blog_post.html_toc|safe }}
           </div>
         </div>
-        <!-- Article -->
+
+        <!-- Middle section (Article+) -->
         <div
-          class="max-w-2xl pt-24 max-xl:pr-10 max-md:px-8 max-md:mx-auto pb-36"
+          class="max-w-3xl pt-24 max-xl:pr-10 max-md:px-8 max-md:mx-auto pb-36
+
+          @prose prose-2xl prose-ul:list-disc prose-ol:list-decimal prose-li:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:leading-8 prose-a:link prose-a:link-underlined prose-headings:font-semibold prose-code:bg-grayscale-200 dark:prose-code:bg-grayscale-700 prose-code:rounded prose-code:py-0.5 prose-code:px-1 prose-blockquote:border-l-8 prose-blockquote:border-primary-300 dark:prose-blockquote:border-primary-900 prose-blockquote:bg-grayscale-100 dark:prose-blockquote:bg-grayscale-800 prose-blockquote:rounded-r-lg prose-blockquote:pr-4 prose-blockquote:py-0.5"
         >
+          <!-- Blog article -->
           {{ render_partial('blog/partials/post_body.html', request=request, blog_post=blog_post) }}
+
+          <!-- About the author -->
+          {{ render_partial('blog/partials/about_the_author.html', request=request) }}
+
+          <!-- Comments -->
+          {{ render_partial('blog/partials/comments.html', request=request, blog_post=blog_post, liked=liked) }}
         </div>
 
         <!-- Extras -->
-        <div class="text-xl max-xl:hidden pt-16 pr-8">
+        <section class="text-xl max-xl:hidden pt-16 pr-8">
           <div class="sticky top-0 h-screen overflow-auto pb-36">
             <h2 class="text-2xl font-semibold mb-8 mt-16">extra stuff</h2>
             <p>
@@ -141,8 +151,8 @@
               asdf asf asdf asdfasdfasdf asdf asd fasdfasfasdfasdf
             </p>
           </div>
-        </div>
+        </section>
       </div>
     </div>
-  </section>
+  </div>
 {% endblock content %}

@@ -40,10 +40,13 @@ class SaveBlogResponse(BaseModel, arbitrary_types_allowed=True):
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
 
 
-def get_bp_from_id(db: Session, bp_id: int) -> db_models.BlogPost:
+def get_bp_from_id(*, db: Session, bp_id: int, for_update: bool = False) -> db_models.BlogPost:
     """Get a blog post from its ID."""
     try:
-        return db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id).one()
+        query = db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id)
+        if for_update:
+            query = query.with_for_update()
+        return query.one()
     except sqlalchemy.exc.NoResultFound as e:
         raise errors.BlogPostNotFoundError from e
 
@@ -283,3 +286,13 @@ def _commit_bp_to_db(
     db.commit()
     db.refresh(blog_post)
     return blog_post
+
+
+def toggle_blog_post_like(*, db: Session, bp: db_models.BlogPost, like: bool) -> db_models.BlogPost:
+    """Toggle a blog post like."""
+    if like:
+        bp.likes += 1
+    else:
+        bp.likes -= 1
+    db.commit()
+    return bp

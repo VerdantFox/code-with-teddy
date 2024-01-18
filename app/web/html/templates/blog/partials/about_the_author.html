@@ -1,0 +1,57 @@
+<!-- About the author -->
+<section>
+  <h2
+    x-intersect="highlightTocElement('about-the-author')"
+    id="about-the-author"
+  >
+    About the Author
+  </h2>
+  <div class="max-w-sm mx-auto">
+    <picture>
+      <source
+        srcset="
+          {{ url_for('html:static', path='/media/main/blog/about_me.webp') }}
+        "
+        type="image/webp"
+      />
+      <source
+        srcset="
+          {{ url_for('html:static', path='/media/main/blog/about_me.jpg') }}
+        "
+        type="image/jpg"
+      />
+      <img
+        src="{{ url_for('html:static', path='/media/main/blog/about_me.jpg') }}"
+        alt="Teddy Williams (author) smiling with mountains in the background"
+        loading="lazy"
+        class="w-full rounded-lg"
+      />
+    </picture>
+  </div>
+  <p>
+    Hi, my name is Teddy Williams. I'm a software developer with a special love
+    for python programming. 🐍👨‍💻 I have a wide range of programming interests
+    including web development, hobby video game development, IoT, data science
+    and just writing scripts to automate everyday boring tasks. I'd love it if
+    you
+    <a
+      @click="smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"
+      href="{{ url_for('html:list_blog_posts') }}"
+      >check out some of my other posts</a
+    >
+    or
+    <a
+      @click="smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"
+      href="{{ url_for('html:about') }}"
+      >take a look at my portfolio!</a
+    >
+    😃
+  </p>
+  <p>
+    Thanks for reading this post! 💚 If you like the post, let me know by
+    hitting the
+    {{ render_partial('shared/partials/icons/heart.html', class="h-7 inline-block", title="heart/like") }}
+    icon below, and if you have any questions or comments I'd love to hear them
+    in the comments section. Thanks, and happy coding! 🎉
+  </p>
+</section>

@@ -28,9 +28,11 @@ router = APIRouter(tags=["blog"])
 
 logger = getLogger(__name__)
 BLOG_POST = "blog_post"
+LIKED = "liked"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
 UPLOAD_MEDIA_TEMPLATE = "blog/partials/edit_post_media_form.html"
 MEDIA_FORM = "media_form"
+LIKED_POSTS_COOKIE = "liked_posts"  # Sets a cookie with a list of liked posts, by id
 
 
 @router.get("/blog", response_model=None)
@@ -128,6 +130,11 @@ async def create_bp_post(
     )
 
 
+def _get_liked_posts_from_cookie(request: Request) -> set[int]:
+    """Get the liked posts from the cookie."""
+    return {int(id_) for id_ in request.cookies.get(LIKED_POSTS_COOKIE, "").split(",") if id_}
+
+
 @router.get("/blog/{slug}", response_model=None)
 async def read_blog_post(
     request: Request, current_user: LoggedInUserOptional, db: DBSession, slug: str
@@ -138,6 +145,7 @@ async def read_blog_post(
     otherwise it will match.
     """
     bp = blog_handler.get_bp_from_slug(db=db, slug=slug)
+    liked = bp.id in _get_liked_posts_from_cookie(request)
     return templates.TemplateResponse(
         "blog/read_post.html",
         {
@@ -145,8 +153,39 @@ async def read_blog_post(
             constants.CURRENT_USER: current_user,
             constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
             BLOG_POST: bp,
+            LIKED: liked,
         },
     )
+
+
+@router.post("/blog/{bp_id}/like", response_model=None)
+async def like_blog_post(request: Request, db: DBSession, bp_id: int) -> _TemplateResponse:
+    """Like or unlike a blog post and set a cookie to remember it."""
+    with db.begin():
+        bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id, for_update=True)
+        liked_posts = _get_liked_posts_from_cookie(request)
+        liked = bp.id in liked_posts
+        blog_handler.toggle_blog_post_like(db=db, bp=bp, like=not liked)
+    db.refresh(bp)
+
+    response = templates.TemplateResponse(
+        "blog/partials/like_button.html",
+        {
+            constants.REQUEST: request,
+            LIKED: not liked,
+            BLOG_POST: bp,
+        },
+    )
+
+    if liked:
+        liked_posts.remove(bp.id)
+    else:
+        liked_posts.add(bp.id)
+    liked_posts_str = ",".join(str(id_) for id_ in sorted(liked_posts))
+    response.set_cookie(
+        LIKED_POSTS_COOKIE, liked_posts_str, max_age=constants.ONE_YEAR_IN_SECONDS, httponly=True
+    )
+    return response
 
 
 class BlogPostMediaForm(Form):

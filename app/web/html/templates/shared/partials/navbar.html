@@ -105,7 +105,7 @@
                     this.selectedNavItem = this.id
                   },
                 }"
-                @click="selected = !selected; smoothScroll = false; setTimeout(() => smoothScroll = true, 50)"
+                @click="selected = !selected; smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"
                 :class="selected ? 'text-primary-600 dark:text-primary-400' : ''"
                 class="relative block px-3 py-2 hover:text-primary-600 dark:hover:text-primary-400"
                 >{{ nav_item.get("name") }}
