@@ -1,21 +1,17 @@
 """users: HTML routes for users."""
-import re
 from typing import Annotated
 from uuid import uuid4
 
 import sqlalchemy
 from fastapi import APIRouter, Query, Request, UploadFile, status
 from fastapi.responses import RedirectResponse
-from starlette.datastructures import UploadFile as StarletteUploadFile
 from starlette.templating import _TemplateResponse
 from wtforms import (
     FileField,
-    FormField,
     HiddenField,
     PasswordField,
     SelectField,
     StringField,
-    ValidationError,
     validators,
 )
 
@@ -28,7 +24,7 @@ from app.web import auth, errors
 from app.web.html.const import templates
 from app.web.html.flash_messages import FlashCategory, FlashMessage, FormErrorMessage
 from app.web.html.routes.auth import login_for_access_token
-from app.web.html.wtform_utils import Form
+from app.web.html.wtform_utils import Form, custom_validators
 
 # ----------- Routers -----------
 router = APIRouter(tags=["users"])
@@ -248,22 +244,7 @@ async def logout(request: Request) -> RedirectResponse:
     return response
 
 
-file_ext_validator = validators.regexp(
-    r"\.(jpg|jpeg|png|webp|svg)$",
-    re.IGNORECASE,
-    message="Invalid file extension. Allowed: jpg, jpeg, png, svg, webp",
-)
-
-
-def is_allowed_extension(_form: Form, field: FormField) -> None:
-    """Check if the file is of an allowed extension."""
-    if not field.data:
-        return
-    filename = field.data.filename if isinstance(field.data, StarletteUploadFile) else field.data
-    image_ext_regex = re.compile(r"\.(jpg|jpeg|png|webp|svg)$", re.IGNORECASE)
-    if not image_ext_regex.search(filename):
-        msg = "Invalid file extension. Allowed: jpg, jpeg, png, svg, webp"
-        raise ValidationError(msg)
+AVATAR_EXTENSIONS = ["jpg", "jpeg", "png", "svg", "webp"]
 
 
 class UserSettingsForm(Form):
@@ -304,12 +285,15 @@ class UserSettingsForm(Form):
         validators=[
             validators.optional(),
             validators.Length(min=1, max=2000),
-            is_allowed_extension,
+            custom_validators.is_allowed_extension(AVATAR_EXTENSIONS),
         ],
     )
     avatar_upload: FileField = FileField(
         "Upload Avatar",
-        validators=[validators.optional(), is_allowed_extension],
+        validators=[
+            validators.optional(),
+            custom_validators.is_allowed_extension(AVATAR_EXTENSIONS),
+        ],
     )
 
 

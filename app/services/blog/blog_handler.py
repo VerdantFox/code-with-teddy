@@ -3,10 +3,11 @@ from collections import defaultdict
 from collections.abc import Iterable
 from datetime import datetime, timezone
 from logging import getLogger
+from typing import Self
 
 import sqlalchemy
 from fastapi import UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from app.datastore import db_models
 from app.datastore.database import Session
@@ -37,6 +38,34 @@ class SaveBlogResponse(BaseModel, arbitrary_types_allowed=True):
     success: bool = True
     blog_post: db_models.BlogPost | None = None
     err_msg: str = ERROR_SAVING_BP
+    field_errors: defaultdict[str, list[str]] = defaultdict(list)
+
+
+class SaveCommentInput(BaseModel, arbitrary_types_allowed=True):
+    """Input data model for saving a blog post comment."""
+
+    bp_id: int
+    user_id: int | None = None
+    name: str | None = None
+    email: str | None = None
+    content: str
+    parent_id: int | None = None
+
+    @model_validator(mode="after")
+    def check_user_id_or_name(self) -> Self:
+        """Check that either user_id or name are provided."""
+        if not self.user_id and not self.name:
+            msg = "Must provide either user_id or name"
+            raise ValueError(msg)
+        return self
+
+
+class SaveCommentResponse(BaseModel, arbitrary_types_allowed=True):
+    """Response for saving a blog post comment."""
+
+    success: bool = True
+    comment: db_models.BlogPostComment | None = None
+    err_msg: str = "Error saving comment"
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
 
 
@@ -296,3 +325,32 @@ def toggle_blog_post_like(*, db: Session, bp: db_models.BlogPost, like: bool) ->
         bp.likes -= 1
     db.commit()
     return bp
+
+
+def save_new_comment(db: Session, data: SaveCommentInput) -> SaveCommentResponse:
+    """Save a blog post comment."""
+    html_content = generate_comment_html(data.content)
+    comment = db_models.BlogPostComment(
+        blog_post_id=data.bp_id,
+        name=data.name,
+        email=data.email,
+        user_id=data.user_id,
+        md_content=data.content,
+        html_content=html_content,
+        created_timestamp=datetime.now().astimezone(timezone.utc),
+        updated_timestamp=datetime.now().astimezone(timezone.utc),
+        likes=0,
+        parent_id=data.parent_id,
+    )
+    db.add(comment)
+    db.commit()
+    db.refresh(comment)
+    return SaveCommentResponse(success=True, comment=comment)
+
+
+def generate_comment_html(content: str) -> str:
+    """Generate HTML for a comment, with proper sanitization."""
+    sanitized_before = markdown_parser.clean_except_code_blocks(content)
+    html = markdown_parser.markdown_to_html(sanitized_before, update_headers=False).content
+    html = markdown_parser.convert_h_tags(html)
+    return markdown_parser.bleach_comment_html(html)

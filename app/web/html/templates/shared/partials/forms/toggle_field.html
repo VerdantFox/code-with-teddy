@@ -1,34 +1,37 @@
 <!-- Toggle -->
-<div
-  x-data="{ value: {{ field.default.__str__().lower() }} }"
-  class="flex items-center justify-center"
-  x-id="['toggle-label']"
->
-  <input type="hidden" name="{{ field.name }}" :value="value" />
-
-  <!-- Label -->
-  <label
-    @click="$refs.toggle.click(); $refs.toggle.focus()"
-    :id="$id('toggle-label')"
+<div class="flex flex-col gap-2">
+  <div
+    x-data="{ value: {{ field.default.__str__().lower() if field.default else 'false' }} }"
+    class="flex items-center justify-center"
+    x-id="['toggle-label']"
   >
-    {{ field.label.text }}
-  </label>
+    <input type="hidden" name="{{ field.name }}" :value="value" />
 
-  <!-- Button -->
-  <button
-    x-ref="toggle"
-    @click="value = ! value{% if click_extras %}{{ click_extras }}{% endif %}"
-    type="button"
-    role="switch"
-    :aria-checked="value"
-    :aria-labelledby="$id('toggle-label')"
-    :class="value ? 'bg-primary-500 hover:bg-primary-600' : 'bg-grayscale-300 hover:bg-grayscale-400 dark:bg-grayscale-600 hover:dark:bg-gray-500'"
-    class="relative ml-4 inline-flex w-14 rounded-full py-1 transition"
-  >
-    <span
-      :class="value ? 'translate-x-7' : 'translate-x-1'"
-      class="bg-white h-6 w-6 rounded-full transition shadow-md"
-      aria-hidden="true"
-    ></span>
-  </button>
+    <!-- Label -->
+    <label
+      @click="$refs.toggle.click(); $refs.toggle.focus()"
+      :id="$id('toggle-label')"
+    >
+      {{ field.label.text }}
+    </label>
+
+    <!-- Button -->
+    <button
+      x-ref="toggle"
+      @click="value = ! value{% if click_extras %}{{ click_extras }}{% endif %}"
+      type="button"
+      role="switch"
+      :aria-checked="value"
+      :aria-labelledby="$id('toggle-label')"
+      :class="value ? 'bg-primary-500 hover:bg-primary-600' : 'bg-grayscale-300 hover:bg-grayscale-400 dark:bg-grayscale-600 hover:dark:bg-gray-500'"
+      class="relative ml-4 inline-flex w-14 rounded-full py-1 transition"
+    >
+      <span
+        :class="value ? 'translate-x-7' : 'translate-x-1'"
+        class="bg-white h-6 w-6 rounded-full transition shadow-md"
+        aria-hidden="true"
+      ></span>
+    </button>
+  </div>
+  {{ render_partial('shared/partials/forms/field_errors.html', errors=field.errors) }}
 </div>

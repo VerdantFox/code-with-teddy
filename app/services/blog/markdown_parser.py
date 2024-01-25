@@ -1,6 +1,7 @@
 """markdown_parser: service for parsing markdown into HTML."""
 import re
 
+import bleach
 from bs4 import BeautifulSoup, Tag
 from markdown import Markdown
 from markdown.extensions import Extension
@@ -27,7 +28,7 @@ class HTMLContent(BaseModel):
     toc: str
 
 
-def markdown_to_html(markdown_content: str) -> HTMLContent:
+def markdown_to_html(markdown_content: str, *, update_headers: bool = True) -> HTMLContent:
     """Generate HTML representation of the markdown-formatted blog entry.
 
     Also convert any media URLs into rich media objects such as video
@@ -45,7 +46,7 @@ def markdown_to_html(markdown_content: str) -> HTMLContent:
     md = Markdown(extensions=extensions)
     assert hasattr(md, "toc")  # noqa: S101 (assert) -- for mypy
     html = md.convert(markdown_content)
-    html = update_html(html)
+    html = update_html(html, update_headers=update_headers)
     html_with_oembed = parse_html(
         html,
         oembed_providers,
@@ -55,11 +56,12 @@ def markdown_to_html(markdown_content: str) -> HTMLContent:
     return HTMLContent(content=html_with_oembed, toc=update_toc(md.toc))
 
 
-def update_html(html: str) -> str:
+def update_html(html: str, *, update_headers: bool = True) -> str:
     """Update the blog HTML content."""
     html_soup = BeautifulSoup(html, HTML_PARSER)
     _update_html_links(html_soup)
-    _update_html_headers(html_soup)
+    if update_headers:
+        _update_html_headers(html_soup)
     _update_html_pre_tags(html_soup)
     _update_html_code_highlights(html_soup)
     _update_html_images(html_soup)
@@ -154,7 +156,7 @@ def update_toc(toc: str) -> str:
         HTML_PARSER,
     )
     comments = BeautifulSoup(
-        '<a class="link px-2 py-1 rounded-lg" href="#comments-section">Comments</a>',
+        '<a class="link px-2 py-1 rounded-lg" href="#comments">Comments</a>',
         HTML_PARSER,
     )
     toc_list_outer.extend([about, comments])
@@ -195,3 +197,89 @@ def update_a_tag_alpha_href(a_tag: Tag) -> None:
     """
     if a_tag["href"].startswith("#") and not a_tag["href"][1].isalpha():
         a_tag["href"] = f"#blog-{a_tag['href'][1:]}"
+
+
+ALLOWED_TAGS = [
+    "a",
+    "abbr",
+    "acronym",
+    "b",
+    "br",
+    "blockquote",
+    "code",
+    "div",
+    "em",
+    "figure",
+    "figcaption",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "i",
+    "img",
+    "li",
+    "ol",
+    "p",
+    "picture",
+    "pre",
+    "source",
+    "span",
+    "strong",
+    "table",
+    "tbody",
+    "td",
+    "th",
+    "thead",
+    "tr",
+    "ul",
+    "video",
+]
+ALLOWED_COMMENT_ATTRIBUTES = {
+    "*": ["class"],
+    "a": ["href", "title", "target", "rel"],
+    "abbr": ["title"],
+    "acronym": ["title"],
+    "img": ["alt", "src", "loading"],
+    "source": ["src", "srcset", "type"],
+    "pre": ["tabindex"],
+    "video": ["style", "width", "height", "muted", "autoplay", "loop", "controls"],
+}
+
+
+def bleach_comment_html(html: str) -> str:
+    """Bleach the comment HTML to remove any unwanted tags or attributes."""
+    return bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_COMMENT_ATTRIBUTES)
+
+
+def convert_h_tags(html: str) -> str:
+    """Convert h1 tags to h3, h2 to h4, h3 to h5, and h4 and h5 to h6."""
+    html = re.sub(r"<\s*(/?)h5\b[^>]*>", r"<\1h6>", html, flags=re.IGNORECASE)
+    html = re.sub(r"<\s*(/?)h4\b[^>]*>", r"<\1h6>", html, flags=re.IGNORECASE)
+    html = re.sub(r"<\s*(/?)h3\b[^>]*>", r"<\1h5>", html, flags=re.IGNORECASE)
+    html = re.sub(r"<\s*(/?)h2\b[^>]*>", r"<\1h4>", html, flags=re.IGNORECASE)
+    html = re.sub(r"<\s*(/?)h1\b[^>]*>", r"<\1h3>", html, flags=re.IGNORECASE)
+    return html  # noqa: RET504
+
+
+def clean_except_code_blocks(content: str) -> str:
+    """Clean the content, except for code blocks.
+
+    Meant to clean html from comments.
+    """
+    # Extract code blocks
+    code_blocks = re.findall(r"```.*?```", content, re.DOTALL)
+
+    # Replace code blocks with placeholders
+    for i, block in enumerate(code_blocks):
+        content = content.replace(block, f"___CODEBLOCK{i}___")
+
+    # Clean content
+    content = bleach.clean(content)
+
+    # Replace placeholders with code blocks
+    for i, block in enumerate(code_blocks):
+        content = content.replace(f"___CODEBLOCK{i}___", block)
+
+    return content

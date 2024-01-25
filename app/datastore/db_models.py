@@ -182,9 +182,12 @@ class BlogPostComment(Base):
     id: Mapped[IntPK]
     blog_post_id: Mapped[BlogPostFK | None]
     blog_post: Mapped["BlogPost"] = relationship(back_populates="comments")
+    name: Mapped[StrNullable]  # Name of the commenter
+    email: Mapped[StrNullable]  # Email of the commenter
     user_id: Mapped[UsersFk | None]
     user: Mapped["User"] = relationship()
-    content: Mapped[str]
+    md_content: Mapped[str]
+    html_content: Mapped[str]
     created_timestamp: Mapped[DateTimeIndexed]
     updated_timestamp: Mapped[DateTimeIndexed]
     likes: Mapped[IntIndexedDefaultZero]

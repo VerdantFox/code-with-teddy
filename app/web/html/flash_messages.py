@@ -6,6 +6,7 @@ from fastapi import Request
 from pydantic import BaseModel
 
 MESSAGES = "_messages"
+DEFAULT_FORM_ERROR_MESSAGE = "Invalid form field(s). See errors on form."
 
 
 class FlashCategory(str, Enum):
@@ -42,7 +43,7 @@ class FormErrorMessage(FlashMessage):
     be passed to the TemplateResponse.
     """
 
-    msg: str = "Invalid form field(s). See errors on form."
+    msg: str = DEFAULT_FORM_ERROR_MESSAGE
     category: FlashCategory = FlashCategory.ERROR
     timeout: int | None = None
 

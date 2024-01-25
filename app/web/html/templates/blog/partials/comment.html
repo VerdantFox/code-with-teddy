@@ -1,0 +1,34 @@
+<article>
+  <div class="flex gap-2">
+    <div class="flex-shrink-0">
+      <div
+        class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center"
+      >
+        {% if comment.user %}
+          <img
+            src="{{ comment.user.avatar_location }}"
+            alt="{{ comment.user.username }}'s profile picture"
+            class="w-full h-full object-cover"
+          />
+        {% else %}
+          {{ render_partial('shared/partials/icons/user-thin.html') }}
+        {% endif %}
+      </div>
+    </div>
+    <div class="flex flex-col gap-2 mb-10">
+      <div class="not-prose flex flex-row gap-2 items-center">
+        <h3 class="text-xl font-bold">
+          {% if comment.user %}
+            {{ comment.user.name }}
+          {% else %}
+            {{ comment.name }}
+          {% endif %}
+        </h3>
+        <p class="text-lg text-gray-500">
+          {{ comment.created_timestamp.strftime('%B %d, %Y') }}
+        </p>
+      </div>
+      <div class="">{{ comment.html_content | safe }}</div>
+    </div>
+  </div>
+</article>
