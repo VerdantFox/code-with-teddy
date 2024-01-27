@@ -11,7 +11,7 @@
   {% if blog_post.comments %}
     <div class="mt-6 text-lg flex flex-col gap-12 mb-24">
       {% for comment in blog_post.comments %}
-        {{ render_partial('blog/partials/comment.html', request=request, comment=comment) }}
+        {{ render_partial('blog/partials/comment.html', request=request, comment=comment, current_user=current_user) }}
       {% endfor %}
     </div>
   {% endif %}

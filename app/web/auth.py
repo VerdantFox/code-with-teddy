@@ -1,4 +1,5 @@
 """auth: Authentication for the web app."""
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
@@ -34,15 +35,21 @@ TOKEN_EXPIRATION = timedelta(minutes=30)
 async def get_current_user_optional_by_cookie(
     db: DBSession,
     access_token: OptionalCookieDependency = None,
+    guest_id: OptionalCookieDependency = None,
 ) -> db_models.User | web_models.UnauthenticatedUser:
     """Get the current user from the cookie.
 
     Return an UnauthenticatedUser if no access_token is provided.
     """
-    if not access_token:
-        return web_models.UnauthenticatedUser()
-
-    return await get_current_user_required_by_token(db=db, access_token=access_token)
+    if access_token:
+        current_user: db_models.User | web_models.UnauthenticatedUser = (
+            await get_current_user_required_by_token(db=db, access_token=access_token)
+        )
+    else:
+        current_user = web_models.UnauthenticatedUser()
+    guest_id = guest_id or str(uuid.uuid4())
+    current_user.guest_id = guest_id
+    return current_user
 
 
 async def get_current_user_required_by_cookie(

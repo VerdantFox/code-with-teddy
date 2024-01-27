@@ -9,6 +9,7 @@ class AuthUserMixin:
     # non-table fields
     role: Role
     is_authenticated: bool = True
+    guest_id: str = ""
 
     def is_admin(self) -> bool:
         """Determine if the user is an admin."""

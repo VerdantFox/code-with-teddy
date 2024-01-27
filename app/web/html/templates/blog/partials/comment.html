@@ -1,5 +1,5 @@
 {% if comment %}
-  <article>
+  <article class="relative">
     <div
       class="flex gap-2 bg-grayscale-100 dark:bg-grayscale-800 p-8 rounded-lg"
     >
@@ -48,5 +48,30 @@
         <div class="">{{ comment.html_content | safe }}</div>
       </div>
     </div>
+    {% if current_user %}
+      <div class="absolute top-2 right-2">
+        <div class="flex gap-3">
+          <!-- Reply -->
+          <button type="button" class="group" data-tippy-theme="light-border">
+            {{ render_partial('shared/partials/icons/chats.html', title="Reply to comment", class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
+          </button>
+          {% if comment.guest_id == current_user.guest_id or comment.user_id == current_user.id %}
+            <!-- Edit -->
+            <button type="button" class="group" data-tippy-theme="light-border">
+              {{ render_partial('shared/partials/icons/note-pencil.html', title="Edit comment", class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
+            </button>
+            <!-- Delete -->
+            <button
+              type="button"
+              class="group"
+              data-tippy-theme="light-border"
+              hx-click=""
+            >
+              {{ render_partial('shared/partials/icons/trash.html', title="Delete comment", class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
   </article>
 {% endif %}

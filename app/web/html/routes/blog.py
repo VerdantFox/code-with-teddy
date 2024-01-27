@@ -20,6 +20,7 @@ from app.datastore.database import DBSession
 from app.permissions import Action, requires_permission
 from app.services.blog import blog_handler
 from app.web.auth import LoggedInUser, LoggedInUserOptional
+from app.web.html import web_user_handlers
 from app.web.html.const import templates
 from app.web.html.flash_messages import (
     DEFAULT_FORM_ERROR_MESSAGE,
@@ -160,7 +161,7 @@ async def read_blog_post(
     comment_form_class = (
         LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
     )
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "blog/read_post.html",
         {
             constants.REQUEST: request,
@@ -171,6 +172,8 @@ async def read_blog_post(
             COMMENT_FORM: comment_form_class(),
         },
     )
+    web_user_handlers.set_guest_user_id_cookie(guest_id=current_user.guest_id, response=response)
+    return response
 
 
 @router.post("/blog/{bp_id}/like", response_model=None)
@@ -198,7 +201,7 @@ async def like_blog_post(request: Request, db: DBSession, bp_id: int) -> _Templa
         liked_posts.add(bp.id)
     liked_posts_str = ",".join(str(id_) for id_ in sorted(liked_posts))
     response.set_cookie(
-        LIKED_POSTS_COOKIE, liked_posts_str, max_age=constants.ONE_YEAR_IN_SECONDS, httponly=True
+        constants.GUEST_ID, liked_posts_str, max_age=constants.ONE_YEAR_IN_SECONDS, httponly=True
     )
     return response
 
@@ -260,10 +263,10 @@ async def comment_post_preview(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    user_id = current_user.id if current_user.is_authenticated else None
     if current_user.is_authenticated:
         assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
         form_data_dict["name"] = current_user.full_name or current_user.username
+    user_id = current_user.id if current_user.is_authenticated else None
     try:
         input_data = blog_handler.SaveCommentInput(**form_data_dict, user_id=user_id, bp_id=bp_id)
     except ValidationError:
@@ -306,12 +309,14 @@ async def comment_blog_post(
     )
     form = comment_form_class.load(form_data)
     bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
-    user_id = current_user.id if current_user.is_authenticated else None
     if current_user.is_authenticated:
         assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
         form_data_dict["name"] = current_user.full_name or current_user.username
+    user_id = current_user.id if current_user.is_authenticated else None
     try:
-        input_data = blog_handler.SaveCommentInput(**form_data_dict, user_id=user_id, bp_id=bp_id)
+        input_data = blog_handler.SaveCommentInput(
+            **form_data_dict, guest_id=current_user.guest_id, user_id=user_id, bp_id=bp_id
+        )
     except ValidationError:
         return templates.TemplateResponse(
             COMMENTS_TEMPLATE,
@@ -341,10 +346,10 @@ async def comment_blog_post(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    response = blog_handler.save_new_comment(db, input_data)
+    saved_comment_response = blog_handler.save_new_comment(db, input_data)
 
-    if not response.success:
-        for error_field, error_msg in response.field_errors.items():
+    if not saved_comment_response.success:
+        for error_field, error_msg in saved_comment_response.field_errors.items():
             form[error_field].errors.extend(error_msg)
         return templates.TemplateResponse(
             COMMENTS_TEMPLATE,
@@ -352,14 +357,14 @@ async def comment_blog_post(
                 constants.REQUEST: request,
                 constants.CURRENT_USER: current_user,
                 constants.FORM: form,
-                constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
+                constants.MESSAGE: FormErrorMessage(msg=saved_comment_response.err_msg),
                 BLOG_POST: bp,
                 "comment_preview": comment,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     db.refresh(bp)
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         COMMENTS_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -368,6 +373,8 @@ async def comment_blog_post(
             BLOG_POST: bp,
         },
     )
+    web_user_handlers.set_guest_user_id_cookie(guest_id=current_user.guest_id, response=response)
+    return response
 
 
 class BlogPostMediaForm(Form):

@@ -184,6 +184,7 @@ class BlogPostComment(Base):
     blog_post: Mapped["BlogPost"] = relationship(back_populates="comments")
     name: Mapped[StrNullable]  # Name of the commenter
     email: Mapped[StrNullable]  # Email of the commenter
+    guest_id: Mapped[StrNullable]  # Guest ID of the commenter
     user_id: Mapped[UsersFk | None]
     user: Mapped["User"] = relationship()
     md_content: Mapped[str]

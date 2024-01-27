@@ -24,9 +24,6 @@ class CurrentUser(BaseModel, mixins.AuthUserMixin):
     id: int
     email: EmailStr
     username: ft.Min3Field
-    first_name: ft.Min3Field
-    last_name: ft.Min3Field
-    phone_number: ft.Min3Field | None = None
 
 
 class Token(BaseModel):

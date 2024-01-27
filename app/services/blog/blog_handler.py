@@ -45,6 +45,7 @@ class SaveCommentInput(BaseModel, arbitrary_types_allowed=True):
     """Input data model for saving a blog post comment."""
 
     bp_id: int
+    guest_id: str | None = None
     user_id: int | None = None
     name: str | None = None
     email: str | None = None
@@ -345,6 +346,7 @@ def generate_comment(data: SaveCommentInput) -> db_models.BlogPostComment:
         name=data.name,
         email=data.email,
         user_id=data.user_id,
+        guest_id=data.guest_id,
         md_content=data.content,
         html_content=html_content,
         created_timestamp=datetime.now().astimezone(timezone.utc),
