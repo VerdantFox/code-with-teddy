@@ -137,6 +137,7 @@ def update_toc(toc: str) -> str:
             element=a_tag,
             class_="link px-2 py-1 rounded-lg",
         )
+        a_tag["@click"] = "tocOpen = false; allowTocClose = false;"
         ul_tags = li_tag.find_all("ul")
         for ul_tag in ul_tags:
             update_element(
@@ -147,16 +148,28 @@ def update_toc(toc: str) -> str:
         update_a_tag_alpha_href(a_tag)
     # Add title comments and contact sections
     title = BeautifulSoup(
-        '<a class="link px-2 py-1 rounded-lg" href="#">Title</a>',
+        (
+            '<a class="link px-2 py-1 rounded-lg"'
+            ' @click="tocOpen = false; allowTocClose = false;"'
+            ' href="#">Title</a>'
+        ),
         HTML_PARSER,
     )
     toc_list_outer.insert(0, title)
     about = BeautifulSoup(
-        '<a class="link px-2 py-1 rounded-lg" href="#about-the-author">About the author</a>',
+        (
+            '<a class="link px-2 py-1 rounded-lg"'
+            ' @click="tocOpen = false; allowTocClose = false;"'
+            ' href="#about-the-author">About the author</a>'
+        ),
         HTML_PARSER,
     )
     comments = BeautifulSoup(
-        '<a class="link px-2 py-1 rounded-lg" href="#comments">Comments</a>',
+        (
+            '<a class="link px-2 py-1 rounded-lg"'
+            ' @click="tocOpen = false; allowTocClose = false;"'
+            ' href="#comments">Comments</a>'
+        ),
         HTML_PARSER,
     )
     toc_list_outer.extend([about, comments])

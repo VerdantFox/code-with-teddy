@@ -62,6 +62,11 @@
   .blog-nav-highlight {
     @apply bg-primary-800 text-white dark:text-white hover:text-white dark:hover:text-white;
   }
+
+  /* This is a triple-backtick code block in a comments section of a blog post */
+  #comments-section div.highlight.not-prose {
+    @apply border-2 border-grayscale-300 dark:border-grayscale-600 bg-white dark:bg-grayscale-900;
+  }
 }
 
 @layer utilities {

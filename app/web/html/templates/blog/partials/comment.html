@@ -1,34 +1,52 @@
-<article>
-  <div class="flex gap-2">
-    <div class="flex-shrink-0">
-      <div
-        class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center"
-      >
-        {% if comment.user %}
-          <img
-            src="{{ comment.user.avatar_location }}"
-            alt="{{ comment.user.username }}'s profile picture"
-            class="w-full h-full object-cover"
-          />
-        {% else %}
-          {{ render_partial('shared/partials/icons/user-thin.html') }}
-        {% endif %}
+{% if comment %}
+  <article>
+    <div
+      class="flex gap-2 bg-grayscale-100 dark:bg-grayscale-800 p-8 rounded-lg"
+    >
+      <div class="flex flex-col gap-2 block w-full">
+        <div class="not-prose flex flex-row gap-2 items-center">
+          <div class="max-sm:hidden">
+            <div
+              class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center"
+            >
+              {% if comment.user and comment.user.avatar_location %}
+                <img
+                  {% if comment.user.avatar_location.startswith('/') %}
+                    src="{{ url_for('html:static', path=comment.user.avatar_location) }}"
+                  {% else %}
+                    src="{{ comment.user.avatar_location }}"
+                  {% endif %}
+                  alt="{{ comment.user.full_name or comment.user.username }}'s profile picture"
+                  class="w-full h-full object-cover"
+                />
+              {% elif comment_user %}
+                <img
+                  {% if comment_user.avatar_location.startswith('/') %}
+                    src="{{ url_for('html:static', path=comment_user.avatar_location) }}"
+                  {% else %}
+                    src="{{ comment_user.avatar_location }}"
+                  {% endif %}
+                  alt="{{ comment_user.full_name or comment_user.username }}'s profile picture"
+                  class="w-full h-full object-cover"
+                />
+              {% else %}
+                {{ render_partial('shared/partials/icons/user-thin.html') }}
+              {% endif %}
+            </div>
+          </div>
+          <h3 class="text-xl font-bold">
+            {% if comment.user %}
+              {{ comment.user.full_name or comment.user.username }}
+            {% else %}
+              {{ comment.name }}
+            {% endif %}
+          </h3>
+          <p class="text-lg text-grayscale-600 dark:text-grayscale-400">
+            {{ comment.created_timestamp.strftime('%B %d, %Y') }}
+          </p>
+        </div>
+        <div class="">{{ comment.html_content | safe }}</div>
       </div>
     </div>
-    <div class="flex flex-col gap-2 mb-10">
-      <div class="not-prose flex flex-row gap-2 items-center">
-        <h3 class="text-xl font-bold">
-          {% if comment.user %}
-            {{ comment.user.name }}
-          {% else %}
-            {{ comment.name }}
-          {% endif %}
-        </h3>
-        <p class="text-lg text-gray-500">
-          {{ comment.created_timestamp.strftime('%B %d, %Y') }}
-        </p>
-      </div>
-      <div class="">{{ comment.html_content | safe }}</div>
-    </div>
-  </div>
-</article>
+  </article>
+{% endif %}

@@ -49,7 +49,7 @@
       >
         {{ blog_post.title }}
       </h1>
-      <div class="flex flex-col gap-2 text-xl max-w-xl">
+      <div class="flex flex-col gap-2 text-xl max-xs:text-lg max-w-xl">
         {% set created_date = blog_post.created_timestamp.strftime('%B %d, %Y') %}
         {% set updated_date = blog_post.updated_timestamp.strftime('%B %d, %Y') %}
         <p>
@@ -71,7 +71,7 @@
             >
           </span>
         </p>
-        <p>Last Updated: {{ updated_date }}</p>
+        <p class="max-xs:text-lg">Last Updated: {{ updated_date }}</p>
         <p class="flex flex-row gap-2 flex-wrap">
           {% for tag in blog_post.tags %}
             <a
@@ -85,17 +85,16 @@
     </header>
   </div>
 
-  <div class="">
+  <div
+    x-data="{ tocOpen: false, allowTocClose: false }"
+    class="break-words text-wrap"
+  >
     <div class="max-w-[100rem] border-b dark:border-grayscale-900">
       <div
         class="grid grid-cols-[minmax(20rem,_1fr)_4fr_minmax(20rem,_1fr)] max-2xl:grid-cols-[minmax(20rem,_1fr)_4fr_minmax(16rem,_1fr)] max-xl:grid-cols-[minmax(20rem,_1fr)_3fr] max-lg:grid-cols-[minmax(14rem,_1fr)_3fr] max-md:grid-cols-1 gap-20 max-xl:gap-12 md:relative "
       >
         <!-- Table of Contents -->
-        <div
-          x-data="{ tocOpen: false, allowTocClose: false }"
-          id="toc-outer"
-          class="md:bg-offset-50 md:dark:bg-grayscale-800"
-        >
+        <div id="toc-outer" class="md:bg-offset-50 md:dark:bg-grayscale-800">
           <button
             x-cloak
             @click="tocOpen = false; allowTocClose = false"
@@ -103,14 +102,6 @@
             class="fixed top-36 right-28 z-50 rounded-full md:hidden"
           >
             {{ render_partial('shared/partials/icons/x.html', class="w-6 h-6 fill-grayscale-800 dark:fill-gray-100 hover:fill-primary-700 dark:hover:fill-primary-400 transition") }}
-          </button>
-          <button
-            x-cloak
-            @click="tocOpen = true; allowTocClose = false; setTimeout(()=> {allowTocClose = true}, 10); "
-            :class="{'hidden': tocOpen}"
-            class="md:hidden fixed bottom-6 right-6 btn-sm btn-outline rounded-2xl"
-          >
-            Table of Contents
           </button>
           <div
             x-cloak
@@ -135,7 +126,7 @@
 
         <!-- Middle section (Article+) -->
         <div
-          class="max-w-3xl pt-24 max-xl:pr-10 max-md:px-8 max-md:mx-auto pb-36
+          class="max-w-3xl pt-24 max-xl:pr-10 max-md:px-8 max-md:mx-auto pb-36 overflow-x-hidden max-sm:max-w-full
 
           @prose prose-2xl prose-h4:text-2xl prose-ul:list-disc prose-ol:list-decimal prose-li:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:leading-8 prose-a:link prose-a:link-underlined prose-headings:font-semibold prose-code:bg-grayscale-200 dark:prose-code:bg-grayscale-700 prose-code:rounded prose-code:py-0.5 prose-code:px-1 prose-blockquote:border-l-8 prose-blockquote:border-primary-300 dark:prose-blockquote:border-primary-900 prose-blockquote:bg-grayscale-100 dark:prose-blockquote:bg-grayscale-800 prose-blockquote:rounded-r-lg prose-blockquote:pr-4 prose-blockquote:py-0.5"
         >
@@ -146,7 +137,7 @@
           {{ render_partial('blog/partials/about_the_author.html', request=request) }}
 
           <!-- Comments -->
-          {{ render_partial('blog/partials/comments.html', request=request, blog_post=blog_post, liked=liked, comment_form=comment_form) }}
+          {{ render_partial('blog/partials/comments.html', request=request, current_user=current_user, blog_post=blog_post, liked=liked, comment_form=comment_form) }}
         </div>
 
         <!-- Extras -->
@@ -161,5 +152,13 @@
         </section>
       </div>
     </div>
+    <button
+      x-cloak
+      @click="tocOpen = true; allowTocClose = false; setTimeout(()=> {allowTocClose = true}, 10);"
+      :class="{'hidden': tocOpen}"
+      class="md:hidden sticky bottom-0 left-full -translate-x-4 -translate-y-4 btn-sm btn-outline rounded-2xl z-10"
+    >
+      Table of Contents
+    </button>
   </div>
 {% endblock content %}

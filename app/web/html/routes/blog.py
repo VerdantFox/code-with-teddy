@@ -4,6 +4,7 @@ from logging import getLogger
 
 from fastapi import APIRouter, Request, UploadFile, status
 from fastapi.responses import RedirectResponse
+from pydantic import ValidationError
 from starlette.templating import _TemplateResponse
 from wtforms import (
     EmailField,
@@ -38,7 +39,7 @@ BLOG_POST = "blog_post"
 LIKED = "liked"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
 UPLOAD_MEDIA_TEMPLATE = "blog/partials/edit_post_media_form.html"
-COMMENT_TEMPLATE = "blog/partials/comments.html"
+COMMENTS_TEMPLATE = "blog/partials/comments.html"
 MEDIA_FORM = "media_form"
 COMMENT_FORM = "comment_form"
 LIKED_POSTS_COOKIE = "liked_posts"  # Sets a cookie with a list of liked posts, by id
@@ -155,6 +156,9 @@ async def read_blog_post(
     """
     bp = blog_handler.get_bp_from_slug(db=db, slug=slug)
     liked = bp.id in _get_liked_posts_from_cookie(request)
+    comment_form_class = (
+        LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
+    )
     return templates.TemplateResponse(
         "blog/read_post.html",
         {
@@ -163,7 +167,7 @@ async def read_blog_post(
             constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
             BLOG_POST: bp,
             LIKED: liked,
-            COMMENT_FORM: CommentForm(),
+            COMMENT_FORM: comment_form_class(),
         },
     )
 
@@ -198,8 +202,18 @@ async def like_blog_post(request: Request, db: DBSession, bp_id: int) -> _Templa
     return response
 
 
-class CommentForm(Form):
-    """Form for creating a comment."""
+class LoggedInCommentForm(Form):
+    """Form for creating a comment when logged in."""
+
+    content = TextAreaField(
+        "Comment (markdown enabled)",
+        description="Comment (2000 characters max, markdown enabled)",
+        validators=[validators.DataRequired(), validators.Length(min=1, max=2000)],
+    )
+
+
+class NotLoggedInCommentForm(LoggedInCommentForm):
+    """Form for creating a comment when not logged in."""
 
     check_me = HiddenField("Honey Pot Field", validators=[custom_validators.is_value(value="")])
     not_robot = BooleanField(
@@ -217,11 +231,6 @@ class CommentForm(Form):
         description="awesome@email.com",
         validators=[validators.Optional(), validators.Email()],
     )
-    content = TextAreaField(
-        "Comment (markdown enabled)",
-        description="Comment (2000 characters max, markdown enabled)",
-        validators=[validators.DataRequired(), validators.Length(min=1, max=2000)],
-    )
 
 
 @router.post("/blog/{bp_id}/comment-preview", response_model=None)
@@ -230,29 +239,54 @@ async def comment_post_preview(
 ) -> _TemplateResponse:
     """Preview a comment."""
     form_data = await request.form()
-    form = CommentForm.load(form_data)
+
+    comment_form_class = (
+        LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
+    )
+    form = comment_form_class.load(form_data)
     form.validate()
     bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     if form.content.errors:
         return templates.TemplateResponse(
-            COMMENT_TEMPLATE,
+            COMMENTS_TEMPLATE,
             {
                 constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
                 COMMENT_FORM: form,
                 constants.MESSAGE: FormErrorMessage(),
                 BLOG_POST: bp,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    comment_preview = blog_handler.generate_comment_html(form.content.data)
+    user_id = current_user.id if current_user.is_authenticated else None
+    try:
+        input_data = blog_handler.SaveCommentInput(**form.data, user_id=user_id, bp_id=bp_id)
+    except ValidationError:
+        return templates.TemplateResponse(
+            COMMENTS_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                COMMENT_FORM: form,
+                constants.MESSAGE: FormErrorMessage(),
+                BLOG_POST: bp,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    comment = blog_handler.generate_comment(input_data)
+    if current_user.is_authenticated:
+        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
+        comment.name = current_user.full_name or current_user.username
+
     return templates.TemplateResponse(
-        "blog/partials/comment_preview.html",
+        "blog/partials/comment.html",
         {
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
             COMMENT_FORM: form,
             BLOG_POST: bp,
-            "comment_preview": comment_preview,
+            "comment_user": current_user if current_user.is_authenticated else None,
+            "comment": comment,
         },
     )
 
@@ -263,32 +297,39 @@ async def comment_blog_post(
 ) -> _TemplateResponse:
     """Comment on a blog post."""
     form_data = await request.form()
-    form = CommentForm.load(form_data)
+
+    comment_form_class = (
+        LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
+    )
+    form = comment_form_class.load(form_data)
     bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     if not form.validate():
         form_error_msg = (
             "No robots allowed!" if form.check_me.errors else DEFAULT_FORM_ERROR_MESSAGE
         )
         return templates.TemplateResponse(
-            COMMENT_TEMPLATE,
+            COMMENTS_TEMPLATE,
             {
                 constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
                 COMMENT_FORM: form,
                 constants.MESSAGE: FormErrorMessage(msg=form_error_msg),
                 BLOG_POST: bp,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    input_data = blog_handler.SaveCommentInput(**form.data, bp_id=bp_id)
+    user_id = current_user.id if current_user.is_authenticated else None
+    input_data = blog_handler.SaveCommentInput(**form.data, user_id=user_id, bp_id=bp_id)
     response = blog_handler.save_new_comment(db, input_data)
 
     if not response.success:
         for error_field, error_msg in response.field_errors.items():
             form[error_field].errors.extend(error_msg)
         return templates.TemplateResponse(
-            COMMENT_TEMPLATE,
+            COMMENTS_TEMPLATE,
             {
                 constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
                 constants.FORM: form,
                 constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
                 BLOG_POST: bp,
@@ -297,11 +338,11 @@ async def comment_blog_post(
         )
     db.refresh(bp)
     return templates.TemplateResponse(
-        COMMENT_TEMPLATE,
+        COMMENTS_TEMPLATE,
         {
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
-            COMMENT_FORM: CommentForm(),
+            COMMENT_FORM: comment_form_class(),
             BLOG_POST: bp,
         },
     )

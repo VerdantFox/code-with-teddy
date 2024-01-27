@@ -85,6 +85,7 @@ def get_bp_from_slug(db: Session, slug: str) -> db_models.BlogPost:
     try:
         return db.query(db_models.BlogPost).filter(db_models.BlogPost.slug == slug).one()
     except sqlalchemy.exc.NoResultFound:
+        # FIXME: This maybe should raise an error that redirects to the new slug
         return _get_bp_from_slug_history(db=db, slug=slug)
 
 
@@ -329,8 +330,17 @@ def toggle_blog_post_like(*, db: Session, bp: db_models.BlogPost, like: bool) ->
 
 def save_new_comment(db: Session, data: SaveCommentInput) -> SaveCommentResponse:
     """Save a blog post comment."""
+    comment = generate_comment(data=data)
+    db.add(comment)
+    db.commit()
+    db.refresh(comment)
+    return SaveCommentResponse(success=True, comment=comment)
+
+
+def generate_comment(data: SaveCommentInput) -> db_models.BlogPostComment:
+    """Generate a blog post comment."""
     html_content = generate_comment_html(data.content)
-    comment = db_models.BlogPostComment(
+    return db_models.BlogPostComment(
         blog_post_id=data.bp_id,
         name=data.name,
         email=data.email,
@@ -342,10 +352,6 @@ def save_new_comment(db: Session, data: SaveCommentInput) -> SaveCommentResponse
         likes=0,
         parent_id=data.parent_id,
     )
-    db.add(comment)
-    db.commit()
-    db.refresh(comment)
-    return SaveCommentResponse(success=True, comment=comment)
 
 
 def generate_comment_html(content: str) -> str:
