@@ -1,7 +1,10 @@
+{% if not extra_fields %}
+  {% set extra_fields = {} %}
+{% endif %}
 <!-- Toggle -->
 <div class="flex flex-col gap-2">
   <div
-    x-data="{ value: {{ field.default.__str__().lower() if field.default else 'false' }} }"
+    x-data="{ value: {{ field.data.__str__().lower() if field.data else 'false' }} }"
     class="flex items-center justify-center"
     x-id="['toggle-label']"
   >
@@ -18,6 +21,7 @@
     <!-- Button -->
     <button
       x-ref="toggle"
+      x-cloak="true"
       @click="value = ! value{% if click_extras %}{{ click_extras }}{% endif %}"
       type="button"
       role="switch"
@@ -25,6 +29,9 @@
       :aria-labelledby="$id('toggle-label')"
       :class="value ? 'bg-primary-500 hover:bg-primary-600' : 'bg-grayscale-300 hover:bg-grayscale-400 dark:bg-grayscale-600 hover:dark:bg-gray-500'"
       class="relative ml-4 inline-flex w-14 rounded-full py-1 transition"
+      {% for key, val in extra_fields.items() %}
+        {{ key }}="{{ val }}"
+      {% endfor %}
     >
       <span
         :class="value ? 'translate-x-7' : 'translate-x-1'"

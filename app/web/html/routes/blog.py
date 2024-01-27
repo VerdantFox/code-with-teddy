@@ -40,6 +40,7 @@ LIKED = "liked"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
 UPLOAD_MEDIA_TEMPLATE = "blog/partials/edit_post_media_form.html"
 COMMENTS_TEMPLATE = "blog/partials/comments.html"
+COMMENT_FORM_TEMPLATE = "blog/partials/comment_form.html"
 MEDIA_FORM = "media_form"
 COMMENT_FORM = "comment_form"
 LIKED_POSTS_COOKIE = "liked_posts"  # Sets a cookie with a list of liked posts, by id
@@ -239,6 +240,7 @@ async def comment_post_preview(
 ) -> _TemplateResponse:
     """Preview a comment."""
     form_data = await request.form()
+    form_data_dict = dict(form_data)
 
     comment_form_class = (
         LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
@@ -248,7 +250,7 @@ async def comment_post_preview(
     bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     if form.content.errors:
         return templates.TemplateResponse(
-            COMMENTS_TEMPLATE,
+            COMMENT_FORM_TEMPLATE,
             {
                 constants.REQUEST: request,
                 constants.CURRENT_USER: current_user,
@@ -259,8 +261,57 @@ async def comment_post_preview(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     user_id = current_user.id if current_user.is_authenticated else None
+    if current_user.is_authenticated:
+        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
+        form_data_dict["name"] = current_user.full_name or current_user.username
     try:
-        input_data = blog_handler.SaveCommentInput(**form.data, user_id=user_id, bp_id=bp_id)
+        input_data = blog_handler.SaveCommentInput(**form_data_dict, user_id=user_id, bp_id=bp_id)
+    except ValidationError:
+        return templates.TemplateResponse(
+            COMMENT_FORM_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                COMMENT_FORM: form,
+                constants.MESSAGE: FormErrorMessage(),
+                BLOG_POST: bp,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    comment = blog_handler.generate_comment(input_data)
+    return templates.TemplateResponse(
+        COMMENT_FORM_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            COMMENT_FORM: form,
+            BLOG_POST: bp,
+            "comment_user": current_user if current_user.is_authenticated else None,
+            "comment_preview": comment,
+            constants.MESSAGE: FormErrorMessage() if form.errors else None,
+        },
+    )
+
+
+@router.post("/blog/{bp_id}/comment", response_model=None)
+async def comment_blog_post(
+    request: Request, db: DBSession, bp_id: int, current_user: LoggedInUserOptional
+) -> _TemplateResponse:
+    """Comment on a blog post."""
+    form_data = await request.form()
+    form_data_dict = dict(form_data)
+
+    comment_form_class = (
+        LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
+    )
+    form = comment_form_class.load(form_data)
+    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
+    user_id = current_user.id if current_user.is_authenticated else None
+    if current_user.is_authenticated:
+        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
+        form_data_dict["name"] = current_user.full_name or current_user.username
+    try:
+        input_data = blog_handler.SaveCommentInput(**form_data_dict, user_id=user_id, bp_id=bp_id)
     except ValidationError:
         return templates.TemplateResponse(
             COMMENTS_TEMPLATE,
@@ -274,35 +325,6 @@ async def comment_post_preview(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     comment = blog_handler.generate_comment(input_data)
-    if current_user.is_authenticated:
-        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
-        comment.name = current_user.full_name or current_user.username
-
-    return templates.TemplateResponse(
-        "blog/partials/comment.html",
-        {
-            constants.REQUEST: request,
-            constants.CURRENT_USER: current_user,
-            COMMENT_FORM: form,
-            BLOG_POST: bp,
-            "comment_user": current_user if current_user.is_authenticated else None,
-            "comment": comment,
-        },
-    )
-
-
-@router.post("/blog/{bp_id}/comment", response_model=None)
-async def comment_blog_post(
-    request: Request, db: DBSession, bp_id: int, current_user: LoggedInUserOptional
-) -> _TemplateResponse:
-    """Comment on a blog post."""
-    form_data = await request.form()
-
-    comment_form_class = (
-        LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
-    )
-    form = comment_form_class.load(form_data)
-    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     if not form.validate():
         form_error_msg = (
             "No robots allowed!" if form.check_me.errors else DEFAULT_FORM_ERROR_MESSAGE
@@ -315,11 +337,10 @@ async def comment_blog_post(
                 COMMENT_FORM: form,
                 constants.MESSAGE: FormErrorMessage(msg=form_error_msg),
                 BLOG_POST: bp,
+                "comment_preview": comment,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    user_id = current_user.id if current_user.is_authenticated else None
-    input_data = blog_handler.SaveCommentInput(**form.data, user_id=user_id, bp_id=bp_id)
     response = blog_handler.save_new_comment(db, input_data)
 
     if not response.success:
@@ -333,6 +354,7 @@ async def comment_blog_post(
                 constants.FORM: form,
                 constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
                 BLOG_POST: bp,
+                "comment_preview": comment,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )

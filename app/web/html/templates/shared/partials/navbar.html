@@ -29,7 +29,6 @@
     showNav: true,
     lastScroll: 9999999999,
     navAtTop: window.pageYOffset < 30,
-    loginModalOpen: false,
   }"
   class="pointer-events-none z-40 w-full relative"
   @scroll.window="let currentScroll = window.pageYOffset;
@@ -241,7 +240,7 @@
                       role="menuitem"
                       tabindex="-1"
                       id="user-menu-item-0"
-                      @click="loginModalOpen = true; console.log(loginModalOpen)"
+                      @click="loginModalOpen = true"
                     >
                       <span>
                         {{ render_partial('shared/partials/icons/sign-in.html', class="h-5 w-5") }}

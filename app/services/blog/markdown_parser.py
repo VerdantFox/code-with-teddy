@@ -99,12 +99,16 @@ def _update_html_code_highlights(html_soup: BeautifulSoup) -> None:
 
 
 def _update_html_images(html_soup: BeautifulSoup) -> None:
-    """Make all image paragraphs centered for captions.
+    """Add classes to all images.
 
-    Was also adding loading="lazy" to images, but it made table of contents
-    jump to wrong places until the images were properly loaded.
+    - Make all images centered.
+    - Make all image paragraphs centered for captions.
+    - Make all images rounded.
+    - Make all images lazy loaded.
     """
     for img in html_soup.find_all("img"):
+        img["class"] = "rounded-lg"
+        img["loading"] = "lazy"
         if img.parent.name != "p":
             continue
         img.parent["class"] = "text-center"
