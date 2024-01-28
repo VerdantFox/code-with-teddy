@@ -2,6 +2,7 @@
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import datetime, timezone
+from http import HTTPStatus
 from logging import getLogger
 from typing import Self
 
@@ -15,6 +16,7 @@ from app.services.blog import blog_utils, markdown_parser
 from app.services.general import transforms
 from app.services.media import media_handler
 from app.web import errors
+from app.web.web_models import UnauthenticatedUser
 
 logger = getLogger(__name__)
 ERROR_SAVING_BP = "Error saving blog post"
@@ -38,6 +40,7 @@ class SaveBlogResponse(BaseModel, arbitrary_types_allowed=True):
     success: bool = True
     blog_post: db_models.BlogPost | None = None
     err_msg: str = ERROR_SAVING_BP
+    status_code: HTTPStatus = HTTPStatus.OK
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
 
 
@@ -67,6 +70,7 @@ class SaveCommentResponse(BaseModel, arbitrary_types_allowed=True):
     success: bool = True
     comment: db_models.BlogPostComment | None = None
     err_msg: str = "Error saving comment"
+    status_code: HTTPStatus = HTTPStatus.OK
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
 
 
@@ -362,3 +366,36 @@ def generate_comment_html(content: str) -> str:
     html = markdown_parser.markdown_to_html(sanitized_before, update_headers=False).content
     html = markdown_parser.convert_h_tags(html)
     return markdown_parser.bleach_comment_html(html)
+
+
+def delete_comment(
+    db: Session, comment_id: int, current_user: db_models.User | UnauthenticatedUser
+) -> SaveCommentResponse:
+    """Delete a blog post comment."""
+    comment = get_comment_from_id(db=db, comment_id=comment_id)
+    if not (
+        comment.user_id == current_user.id
+        or comment.guest_id == current_user.guest_id
+        or current_user.is_admin
+    ):
+        return SaveCommentResponse(
+            success=False,
+            err_msg="You do not have permission to delete this comment.",
+            status_code=HTTPStatus.FORBIDDEN,
+            comment=comment,
+        )
+    db.delete(comment)
+    db.commit()
+    return SaveCommentResponse(success=True)
+
+
+def get_comment_from_id(db: Session, comment_id: int) -> db_models.BlogPostComment:
+    """Get a comment from its ID."""
+    try:
+        return (
+            db.query(db_models.BlogPostComment)
+            .filter(db_models.BlogPostComment.id == comment_id)
+            .one()
+        )
+    except sqlalchemy.exc.NoResultFound as e:
+        raise errors.BlogPostCommentNotFoundError from e

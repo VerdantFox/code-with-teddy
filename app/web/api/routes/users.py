@@ -27,7 +27,7 @@ async def get_users(
 ) -> list[db_models.User]:
     """Get users, filtering on the desired fields."""
     query = db.query(db_models.User)
-    if not current_user.is_admin():
+    if not current_user.is_admin:
         query = query.filter(db_models.User.id == current_user.id)
     return cast(list[db_models.User], query.all())
 
@@ -162,7 +162,7 @@ def _get_user_by_id(
 ) -> db_models.User:
     """Get a user by id."""
     query = db.query(db_models.User).filter(db_models.User.id == user_id)
-    if not current_user.is_admin():
+    if not current_user.is_admin:
         query = query.filter(db_models.User.id == current_user.id)
     if user_model := query.first():
         return user_model

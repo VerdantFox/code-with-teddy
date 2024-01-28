@@ -27,6 +27,13 @@ class BlogPostNotFoundError(WebError):
     status_code = status.HTTP_404_NOT_FOUND
 
 
+class BlogPostCommentNotFoundError(WebError):
+    """Blog post comment not found."""
+
+    detail = "Blog post comment not found"
+    status_code = status.HTTP_404_NOT_FOUND
+
+
 class UserNotAuthenticatedError(WebError):
     """User not authenticated."""
 

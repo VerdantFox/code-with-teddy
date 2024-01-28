@@ -11,5 +11,5 @@
       }
     ]
   },
-  "ignoreFiles": ["app/web/html/static/css/tailwind-styles.css"]
+  "ignoreFiles": ["**/tailwind-styles.css", "**/libraries/**"]
 }

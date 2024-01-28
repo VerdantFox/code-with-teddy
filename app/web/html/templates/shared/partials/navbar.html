@@ -174,7 +174,7 @@
                       >{{ current_user.username }}</span
                     >
                   </p>
-                  {% if current_user.is_admin() %}
+                  {% if current_user.is_admin %}
                     {% for extra in admin_extras %}
                       {# admin_extras format [{'href': '/example', 'icon': 'user-gear', 'text': 'Do a thing'}] #}
                       <a

@@ -13,6 +13,8 @@
 
 {% block custom_js %}
   <script>
+    // Highlight the table of contents element that corresponds to the current
+    // scroll position
     function highlightTocElement(id) {
       const navLinks = document.querySelectorAll("#toc a")
       const highlightedNavLink = document.querySelector(`#toc a[href='#${id}']`)
@@ -23,6 +25,27 @@
         a.classList.remove("blog-nav-highlight")
       })
       highlightedNavLink.classList.add("blog-nav-highlight")
+    }
+
+    function addConfirmEventListener(id) {
+      const el = document.getElementById(id)
+      if (!el) {
+        return
+      }
+      // Confirm before proceeding with an htmx request
+      el.addEventListener("htmx:confirm", function (e) {
+        e.preventDefault()
+        Swal.fire({
+          title: "Proceed?",
+          text: e.detail.question,
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+        }).then(function (result) {
+          if (result.isConfirmed) {
+            e.detail.issueRequest(true) // use true to skip window.confirm
+          }
+        })
+      })
     }
   </script>
 {% endblock custom_js %}

@@ -3,7 +3,7 @@
 from logging import getLogger
 
 from fastapi import APIRouter, Request, UploadFile, status
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 from starlette.templating import _TemplateResponse
 from wtforms import (
@@ -41,6 +41,7 @@ LIKED = "liked"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
 UPLOAD_MEDIA_TEMPLATE = "blog/partials/edit_post_media_form.html"
 COMMENTS_TEMPLATE = "blog/partials/comments.html"
+COMMENT_TEMPLATE = "blog/partials/comment.html"
 COMMENT_FORM_TEMPLATE = "blog/partials/comment_form.html"
 MEDIA_FORM = "media_form"
 COMMENT_FORM = "comment_form"
@@ -375,6 +376,30 @@ async def comment_blog_post(
     )
     web_user_handlers.set_guest_user_id_cookie(guest_id=current_user.guest_id, response=response)
     return response
+
+
+@router.delete("/blog/comment/{comment_id}", response_model=None)
+def delete_comment(
+    request: Request,
+    db: DBSession,
+    comment_id: int,
+    current_user: LoggedInUserOptional,
+) -> _TemplateResponse | HTMLResponse:
+    """Delete a comment."""
+    response = blog_handler.delete_comment(db=db, comment_id=comment_id, current_user=current_user)
+    if not response.success:
+        return templates.TemplateResponse(
+            COMMENT_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
+                "comment": response.comment,
+            },
+            status_code=response.status_code,
+        )
+    content = '<p class="text-red-500">Comment deleted!</p>'
+    return HTMLResponse(content, status_code=status.HTTP_200_OK)
 
 
 class BlogPostMediaForm(Form):

@@ -11,6 +11,7 @@ class AuthUserMixin:
     is_authenticated: bool = True
     guest_id: str = ""
 
+    @property
     def is_admin(self) -> bool:
         """Determine if the user is an admin."""
         return self.role == Role.ADMIN
