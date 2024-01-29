@@ -6,9 +6,9 @@
     hx-swap="outerHTML"
   >
     {% if liked %}
-      {{ render_partial('shared/partials/icons/heart-filled.html', class="h-14 inline-block fill-offset-600 dark:fill-offset-400", title="Like") }}
+      {{ render_partial('shared/partials/icons/heart-filled.html', class="h-12 w-12 inline-block fill-offset-600 dark:fill-offset-400", title="Like") }}
     {% else %}
-      {{ render_partial('shared/partials/icons/heart-bold.html', class="h-14 inline-block", title="Like") }}
+      {{ render_partial('shared/partials/icons/heart-bold.html', class="h-12 w-12 inline-block", title="Like") }}
     {% endif %}
   </button>
   ({{ "{:,}".format(blog_post.likes) }})

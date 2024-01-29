@@ -202,7 +202,7 @@ async def like_blog_post(request: Request, db: DBSession, bp_id: int) -> _Templa
         liked_posts.add(bp.id)
     liked_posts_str = ",".join(str(id_) for id_ in sorted(liked_posts))
     response.set_cookie(
-        constants.GUEST_ID, liked_posts_str, max_age=constants.ONE_YEAR_IN_SECONDS, httponly=True
+        LIKED_POSTS_COOKIE, liked_posts_str, max_age=constants.ONE_YEAR_IN_SECONDS, httponly=True
     )
     return response
 
