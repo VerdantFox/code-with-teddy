@@ -117,3 +117,11 @@
   clip: rect(1px 1px 1px 1px); /* IE 7+ only support clip without commas */
   clip: rect(1px, 1px, 1px, 1px); /* All other browsers */
 }
+
+/* SweetAlert  2 overwrites */
+div.swal2-popup {
+  @apply dark:bg-grayscale-800 text-grayscale-800 dark:text-white;
+}
+button.swal2-confirm.swal2-styled {
+  @apply border-0 border-transparent   bg-primary-600 dark:bg-primary-800 ring-[3px] ring-transparent focus:ring-primary-500 focus-visible:ring-primary-500 dark:focus:ring-primary-700 dark:focus-visible:ring-primary-700 !important;
+}

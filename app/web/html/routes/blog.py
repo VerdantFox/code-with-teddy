@@ -398,7 +398,7 @@ def delete_comment(
             },
             status_code=response.status_code,
         )
-    content = '<p class="text-red-500">Comment deleted!</p>'
+    content = '<p class="text-red-700 dark:text-red-500">Comment deleted!</p>'
     return HTMLResponse(content, status_code=status.HTTP_200_OK)
 
 

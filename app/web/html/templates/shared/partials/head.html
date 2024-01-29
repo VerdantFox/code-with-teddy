@@ -5,13 +5,15 @@
   href="https://fonts.bunny.net/css?family=roboto:400,500,700"
   rel="stylesheet"
 />
-<link
-  rel="stylesheet"
-  href="{{ url_for('html:static', path='css/tailwind-styles.css') }}?{{ static_version }}"
-/>
+<!-- External CSS libraries (loaded from our code) -->
 <link
   rel="stylesheet"
   href="{{ url_for('html:static', path='css/libraries/bundled.css') }}?{{ libraries_static_version }}"
+/>
+<!-- Custom Tailwind CSS -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('html:static', path='css/tailwind-styles.css') }}?{{ static_version }}"
 />
 
 <!-- External JavaScript Libraries (loaded from our code) -->
