@@ -8,7 +8,7 @@
   class="mb-16"
 >
   <div id="swap-success"></div>
-  {{ render_partial('shared/partials/flash_message.html', message=message) }}
+  {{ render_partial('shared/partials/forms/top_error.html', message=message) }}
   <div class="flex flex-col gap-6 mb-6">
     {{ login_form.redirect_url() }}
     {{ render_partial('shared/partials/forms/field.html', field=login_form.username_or_email) }}

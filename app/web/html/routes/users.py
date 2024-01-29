@@ -111,14 +111,14 @@ async def login_post(
             "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
-                constants.MESSAGE: FormErrorMessage(msg=e.detail),
+                constants.MESSAGE: FormErrorMessage(text=e.detail),
                 constants.LOGIN_FORM: login_form,
             },
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
 
     FlashMessage(
-        msg="You are logged in!",
+        title="You are logged in!",
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return response
@@ -215,7 +215,8 @@ async def register_post(
         )
     db.refresh(user_model)
     FlashMessage(
-        msg=f"User {user_model.username} created!",
+        title="Registration successful!",
+        msg=f"username: {user_model.username}",
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return RedirectResponse(
@@ -238,8 +239,8 @@ async def logout(request: Request) -> RedirectResponse:
     )
     response.delete_cookie(key="access_token", httponly=True)
     FlashMessage(
-        msg="You are logged out!",
-        category=FlashCategory.SUCCESS,
+        title="You are logged out!",
+        category=FlashCategory.INFO,
     ).flash(request)
     return response
 
@@ -360,7 +361,7 @@ async def user_settings_post(
     db.refresh(current_user)
 
     FlashMessage(
-        msg="Settings updated!",
+        title="Settings updated!",
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return RedirectResponse(

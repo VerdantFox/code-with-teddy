@@ -32,7 +32,7 @@
       hx-target-error="#comments-section"
       hx-swap="outerHTML"
     >
-      {{ render_partial('shared/partials/flash_message.html', message=message) }}
+      {{ render_partial('shared/partials/forms/top_error.html', message=message) }}
       {% if not current_user.is_authenticated %}
         {{ render_partial('shared/partials/forms/hidden_field.html', field=comment_form.check_me) }}
       {% endif %}

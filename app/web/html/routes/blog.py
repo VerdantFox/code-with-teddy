@@ -129,12 +129,12 @@ async def create_bp_post(
                 constants.REQUEST: request,
                 constants.CURRENT_USER: current_user,
                 constants.FORM: form,
-                constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
+                constants.MESSAGE: FormErrorMessage(text=response.err_msg),
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     FlashMessage(
-        msg="Blog Post Saved!",
+        title="Blog Post Saved!",
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return RedirectResponse(
@@ -341,7 +341,7 @@ async def comment_blog_post(
                 constants.REQUEST: request,
                 constants.CURRENT_USER: current_user,
                 COMMENT_FORM: form,
-                constants.MESSAGE: FormErrorMessage(msg=form_error_msg),
+                constants.MESSAGE: FormErrorMessage(text=form_error_msg),
                 BLOG_POST: bp,
                 "comment_preview": comment,
             },
@@ -358,7 +358,7 @@ async def comment_blog_post(
                 constants.REQUEST: request,
                 constants.CURRENT_USER: current_user,
                 constants.FORM: form,
-                constants.MESSAGE: FormErrorMessage(msg=saved_comment_response.err_msg),
+                constants.MESSAGE: FormErrorMessage(text=saved_comment_response.err_msg),
                 BLOG_POST: bp,
                 "comment_preview": comment,
             },
@@ -393,7 +393,7 @@ def delete_comment(
             {
                 constants.REQUEST: request,
                 constants.CURRENT_USER: current_user,
-                constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
+                constants.MESSAGE: FormErrorMessage(text=response.err_msg),
                 "comment": response.comment,
             },
             status_code=response.status_code,
@@ -481,12 +481,12 @@ async def edit_bp_post(
                 constants.REQUEST: request,
                 constants.CURRENT_USER: current_user,
                 constants.FORM: form,
-                constants.MESSAGE: FormErrorMessage(msg=response.err_msg),
+                constants.MESSAGE: FormErrorMessage(text=response.err_msg),
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     FlashMessage(
-        msg="Blog Post Updated!",
+        title="Blog Post Updated!",
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return RedirectResponse(

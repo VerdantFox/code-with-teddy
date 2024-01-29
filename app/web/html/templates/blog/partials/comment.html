@@ -46,7 +46,7 @@
           </p>
         </div>
         <div class="">{{ comment.html_content | safe }}</div>
-        {% if message %}{{ render_partial('shared/partials/flash_message.html', message=message) }}{% endif %}
+        {% if message %}{{ render_partial('shared/partials/forms/top_error.html', message=message) }}{% endif %}
       </div>
     </div>
     {% if current_user %}

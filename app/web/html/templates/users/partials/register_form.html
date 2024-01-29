@@ -1,5 +1,5 @@
 <form method="POST" action="{{ url_for('html:register_post' ) }}">
-  {{ render_partial('shared/partials/flash_message.html', message=message) }}
+  {{ render_partial('shared/partials/forms/top_error.html', message=message) }}
   <div class="grid grid-cols-2 gap-6 max-lg:grid-cols-1 mb-6">
     {{ form.redirect_url() }}
     {{ render_partial('shared/partials/forms/field.html', field=form.email, class="col-span-2 max-lg:col-span-1") }}

@@ -125,3 +125,14 @@ div.swal2-popup {
 button.swal2-confirm.swal2-styled {
   @apply border-0 border-transparent   bg-primary-600 dark:bg-primary-800 ring-[3px] ring-transparent focus:ring-primary-500 focus-visible:ring-primary-500 dark:focus:ring-primary-700 dark:focus-visible:ring-primary-700 !important;
 }
+
+/* Simple-notify overwrites */
+.notify {
+  @apply dark:bg-grayscale-800;
+}
+.notify__title {
+  @apply dark:text-white;
+}
+.notify__text {
+  @apply dark:text-white;
+}

@@ -27,7 +27,8 @@ def register_error_handlers(app: FastAPI) -> None:
         )
         response.delete_cookie(key="access_token", httponly=True)
         FlashMessage(
-            msg="Login session expired. Please log in again.",
+            title="Login expired",
+            text="Please log in again.",
             category=FlashCategory.WARNING,
         ).flash(request)
         return response
@@ -38,7 +39,8 @@ def register_error_handlers(app: FastAPI) -> None:
         _error: errors.UserNotAuthenticatedError,
     ) -> RedirectResponse:
         FlashMessage(
-            msg="Please log in to use that service.",
+            title="Not logged in",
+            text="Please log in to use that service.",
             category=FlashCategory.ERROR,
         ).flash(request)
         return RedirectResponse(

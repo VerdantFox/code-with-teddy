@@ -24,7 +24,8 @@ class FlashCategory(str, Enum):
 class FlashMessage(BaseModel):
     """Message to be flashed to the user."""
 
-    msg: str
+    title: str | None = None
+    text: str | None = None
     category: FlashCategory = FlashCategory.INFO
     timeout: int | None = 5
 
@@ -43,7 +44,7 @@ class FormErrorMessage(FlashMessage):
     be passed to the TemplateResponse.
     """
 
-    msg: str = DEFAULT_FORM_ERROR_MESSAGE
+    text: str = DEFAULT_FORM_ERROR_MESSAGE
     category: FlashCategory = FlashCategory.ERROR
     timeout: int | None = None
 
