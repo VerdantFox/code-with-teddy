@@ -51,5 +51,5 @@ class FormErrorMessage(FlashMessage):
 
 def get_flashed_messages(request: Request) -> list[FlashMessage]:
     """Get flashed messages from the session."""
-    message = cast(list[dict], request.session.pop(MESSAGES, []))
-    return [FlashMessage(**msg) for msg in message]
+    messages = cast(list[dict], request.session.pop(MESSAGES, []))
+    return [FlashMessage(**msg) for msg in messages]

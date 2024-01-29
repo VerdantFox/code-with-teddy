@@ -3,7 +3,7 @@
 from logging import getLogger
 
 from fastapi import APIRouter, Request, UploadFile, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 from starlette.templating import _TemplateResponse
 from wtforms import (
@@ -46,6 +46,7 @@ COMMENT_FORM_TEMPLATE = "blog/partials/comment_form.html"
 MEDIA_FORM = "media_form"
 COMMENT_FORM = "comment_form"
 LIKED_POSTS_COOKIE = "liked_posts"  # Sets a cookie with a list of liked posts, by id
+ERROR_SAVING_COMMENT = "Error saving comment"
 
 
 @router.get("/blog", response_model=None)
@@ -310,6 +311,7 @@ async def comment_blog_post(
     )
     form = comment_form_class.load(form_data)
     bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
+    liked = bp.id in _get_liked_posts_from_cookie(request)
     if current_user.is_authenticated:
         assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
         form_data_dict["name"] = current_user.full_name or current_user.username
@@ -319,6 +321,10 @@ async def comment_blog_post(
             **form_data_dict, guest_id=current_user.guest_id, user_id=user_id, bp_id=bp_id
         )
     except ValidationError:
+        FlashMessage(
+            title=ERROR_SAVING_COMMENT,
+            category=FlashCategory.ERROR,
+        ).flash(request)
         return templates.TemplateResponse(
             COMMENTS_TEMPLATE,
             {
@@ -327,6 +333,7 @@ async def comment_blog_post(
                 COMMENT_FORM: form,
                 constants.MESSAGE: FormErrorMessage(),
                 BLOG_POST: bp,
+                LIKED: liked,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -335,6 +342,11 @@ async def comment_blog_post(
         form_error_msg = (
             "No robots allowed!" if form.check_me.errors else DEFAULT_FORM_ERROR_MESSAGE
         )
+        FlashMessage(
+            title=ERROR_SAVING_COMMENT,
+            text=form_error_msg,
+            category=FlashCategory.ERROR,
+        ).flash(request)
         return templates.TemplateResponse(
             COMMENTS_TEMPLATE,
             {
@@ -344,6 +356,7 @@ async def comment_blog_post(
                 constants.MESSAGE: FormErrorMessage(text=form_error_msg),
                 BLOG_POST: bp,
                 "comment_preview": comment,
+                LIKED: liked,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -352,6 +365,11 @@ async def comment_blog_post(
     if not saved_comment_response.success:
         for error_field, error_msg in saved_comment_response.field_errors.items():
             form[error_field].errors.extend(error_msg)
+        FlashMessage(
+            title=ERROR_SAVING_COMMENT,
+            text=saved_comment_response.err_msg,
+            category=FlashCategory.ERROR,
+        ).flash(request)
         return templates.TemplateResponse(
             COMMENTS_TEMPLATE,
             {
@@ -361,10 +379,16 @@ async def comment_blog_post(
                 constants.MESSAGE: FormErrorMessage(text=saved_comment_response.err_msg),
                 BLOG_POST: bp,
                 "comment_preview": comment,
+                LIKED: liked,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     db.refresh(bp)
+    FlashMessage(
+        title="Comment saved!",
+        text="Find it above the form.",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
     response = templates.TemplateResponse(
         COMMENTS_TEMPLATE,
         {
@@ -372,6 +396,7 @@ async def comment_blog_post(
             constants.CURRENT_USER: current_user,
             COMMENT_FORM: comment_form_class(),
             BLOG_POST: bp,
+            LIKED: liked,
         },
     )
     web_user_handlers.set_guest_user_id_cookie(guest_id=current_user.guest_id, response=response)
@@ -384,10 +409,15 @@ def delete_comment(
     db: DBSession,
     comment_id: int,
     current_user: LoggedInUserOptional,
-) -> _TemplateResponse | HTMLResponse:
+) -> _TemplateResponse:
     """Delete a comment."""
     response = blog_handler.delete_comment(db=db, comment_id=comment_id, current_user=current_user)
     if not response.success:
+        FlashMessage(
+            title="Error deleting comment",
+            text=response.err_msg,
+            category=FlashCategory.ERROR,
+        ).flash(request)
         return templates.TemplateResponse(
             COMMENT_TEMPLATE,
             {
@@ -398,8 +428,13 @@ def delete_comment(
             },
             status_code=response.status_code,
         )
-    content = '<p class="text-red-700 dark:text-red-500">Comment deleted!</p>'
-    return HTMLResponse(content, status_code=status.HTTP_200_OK)
+    FlashMessage(
+        title="Comment deleted",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    return templates.TemplateResponse(
+        "blog/partials/comment_deleted.html", {constants.REQUEST: request}
+    )
 
 
 class BlogPostMediaForm(Form):

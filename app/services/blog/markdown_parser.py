@@ -83,7 +83,7 @@ def _update_html_headers(html_soup: BeautifulSoup) -> None:
         id_ = h_tag.get("id")
         if h_tag.get("id") and not id_[0].isalpha():
             h_tag["id"] = f"blog-{id_}"
-        h_tag["x-intersect"] = f"highlightTocElement('{id_}')"
+        h_tag["x-intersect"] = f"highlightTocElement('{_update_intersect_id(id_)}')"
 
 
 def _update_html_pre_tags(html_soup: BeautifulSoup) -> None:
@@ -214,6 +214,11 @@ def update_a_tag_alpha_href(a_tag: Tag) -> None:
     """
     if a_tag["href"].startswith("#") and not a_tag["href"][1].isalpha():
         a_tag["href"] = f"#blog-{a_tag['href'][1:]}"
+
+
+def _update_intersect_id(id_: str) -> str:
+    """Update the intersect ID to the blog- prefixed ID."""
+    return id_ if id_[0].isalpha() else f"blog-{id_}"
 
 
 ALLOWED_TAGS = [

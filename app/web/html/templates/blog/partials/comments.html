@@ -18,3 +18,4 @@
 
   {{ render_partial('blog/partials/comment_form.html', request=request, blog_post=blog_post, comment_form=comment_form, comment_preview=comment_preview, message=message, current_user=current_user) }}
 </section>
+{{ render_partial('shared/partials/flash_messages.html', request=request) }}
