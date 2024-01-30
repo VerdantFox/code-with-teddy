@@ -3,7 +3,7 @@ function pushNotify(title, text = "", status = "success", autotimeout = 3000) {
     status: status,
     title: title,
     text: text,
-    effect: "fade",
+    effect: "slide", // slide, fade
     speed: 500,
     customClass: "",
     customIcon: "",
