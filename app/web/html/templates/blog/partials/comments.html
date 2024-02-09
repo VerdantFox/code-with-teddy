@@ -1,9 +1,27 @@
 <section id="comments-section">
   <div
-    class="flex max-sm:flex-col gap-4 mb-2 my-16 text-5xl font-bold not-prose pb-2 border-b border-grayscale-900 dark:border-white"
+    class="flex flex-col flex-wrap max-xs:items-start gap-4 mb-2 my-16 not-prose pb-2 border-b border-grayscale-900 dark:border-white"
   >
-    {{ render_partial('blog/partials/like_button.html', request=request, blog_post=blog_post, liked=liked) }}
-    <h2 id="comments" x-intersect="highlightTocElement('comments')">
+    <span class="flex items-center gap-3">
+      {{ render_partial('blog/partials/like_button.html', request=request, blog_post=blog_post, liked=liked) }}
+      <span class="text-nowrap text-3xl">
+        <span>&middot;</span>
+        <button
+          class="px-3 py-1 border-2 border-grayscale-300 dark:border-grayscale-100 rounded-full hover:bg-grayscale-100 active:bg-grayscale-200 dark:hover:bg-grayscale-700 dark:active:bg-grayscale-600 transition duration-300"
+          title="Copy blog article link to clipboard"
+          @click="$clipboard('{{ request.url }}'); pushNotify('Blog article link Copied!')"
+        >
+          {{ render_partial('shared/partials/icons/link-simple.html', class="h-7 w-7 inline-block ") }}
+          share
+        </button>
+      </span>
+    </span>
+
+    <h2
+      id="comments"
+      class="text-nowrap text-5xl font-bold"
+      x-intersect="highlightTocElement('comments')"
+    >
       Comments ({{ blog_post.comments|length }})
     </h2>
   </div>

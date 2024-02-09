@@ -1,4 +1,5 @@
 """markdown_parser: service for parsing markdown into HTML."""
+# TODO: Consider using markdown-it for parsing markdown to HTML.
 import re
 
 import bleach
@@ -41,7 +42,8 @@ def markdown_to_html(markdown_content: str, *, update_headers: bool = True) -> H
         AdmonitionExtension(),
         SaneListExtension(),
         SmartyExtension(),
-        "pymdownx.tilde",
+        "pymdownx.tilde",  # ~~Strikethrough~~
+        "pymdownx.mark",  # ==Mark== (highlight)
     ]
     md = Markdown(extensions=extensions)
     assert hasattr(md, "toc")  # noqa: S101 (assert) -- for mypy

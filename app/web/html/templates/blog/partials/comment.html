@@ -1,5 +1,9 @@
 {% if comment %}
-  <article id="comment-{{ comment.id }}" class="relative">
+  {% set comment_id = comment.id or "base" %}
+  <article
+    id="comment-{{ comment_id }}"
+    class="relative transition-all duration-500"
+  >
     <div
       class="flex gap-2 bg-grayscale-100 dark:bg-grayscale-800 p-8 rounded-lg"
     >
@@ -9,7 +13,7 @@
             <div
               class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center"
             >
-              {% if comment.user and comment.user.avatar_location %}
+              {% if (comment.user and comment.user.avatar_location) %}
                 <img
                   {% if comment.user.avatar_location.startswith('/') %}
                     src="{{ url_for('html:static', path=comment.user.avatar_location) }}"
@@ -30,7 +34,7 @@
                   class="w-full h-full object-cover"
                 />
               {% else %}
-                {{ render_partial('shared/partials/icons/user-thin.html') }}
+                {{ render_partial('shared/partials/icons/user.html') }}
               {% endif %}
             </div>
           </div>
@@ -44,6 +48,11 @@
           <p class="text-lg text-grayscale-600 dark:text-grayscale-400">
             {{ comment.created_timestamp.strftime('%B %d, %Y') }}
           </p>
+          {% if is_preview %}
+            <p class="text-sm text-offset-600 dark:text-offset-400">
+              &mdash;(comment preview)
+            </p>
+          {% endif %}
         </div>
         <div class="">{{ comment.html_content | safe }}</div>
         {% if message %}{{ render_partial('shared/partials/forms/top_error.html', message=message) }}{% endif %}
@@ -54,26 +63,33 @@
         <div class="flex gap-3">
           <!-- Reply -->
           <button type="button" class="group" data-tippy-theme="light-border">
-            {{ render_partial('shared/partials/icons/chats.html', title="Reply to comment", class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
+            {{ render_partial('shared/partials/icons/chats.html', title="Reply to comment", class="h-7 w-7 icon-btn") }}
           </button>
           {% if current_user.is_admin or comment.guest_id == current_user.guest_id or comment.user_id == current_user.id %}
             <!-- Edit -->
-            <button type="button" class="group" data-tippy-theme="light-border">
-              {{ render_partial('shared/partials/icons/note-pencil.html', title="Edit comment", class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
+            <button
+              type="button"
+              class="group"
+              hx-get="{{ url_for('html:comment_edit_get', comment_id=comment.id) }}"
+              hx-target="#comment-{{ comment.id }}"
+              hx-target-error="#comment-{{ comment.id }}"
+              hx-swap="outerHTML"
+              data-tippy-theme="light-border"
+            >
+              {{ render_partial('shared/partials/icons/note-pencil.html', title="Edit comment", class="h-7 w-7 icon-btn") }}
             </button>
             <!-- Delete -->
             <button
               id="delete-comment-btn-{{ comment.id }}"
               type="button"
               class="group"
-              data-tippy-theme="light-border"
               hx-delete="{{ url_for('html:delete_comment', comment_id=comment.id) }}"
               hx-target="#comment-{{ comment.id }}"
               hx-target-error="#comment-{{ comment.id }}"
               hx-swap="outerHTML"
               hx-confirm="Delete the comment?"
             >
-              {{ render_partial('shared/partials/icons/trash.html', title="Delete comment", class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
+              {{ render_partial('shared/partials/icons/trash.html', title="Delete comment", class="h-7 w-7 icon-btn") }}
             </button>
             <script>
               addConfirmEventListener("delete-comment-btn-{{ comment.id }}")

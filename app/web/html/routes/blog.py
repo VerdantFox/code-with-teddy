@@ -3,7 +3,7 @@
 from logging import getLogger
 
 from fastapi import APIRouter, Request, UploadFile, status
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 from starlette.templating import _TemplateResponse
 from wtforms import (
@@ -218,6 +218,16 @@ class LoggedInCommentForm(Form):
     )
 
 
+class EditCommentForm(LoggedInCommentForm):
+    """Form for editing a comment when logged in."""
+
+    name = StringField(
+        "Display name",
+        description="Anonymous Cat... (100 chars max)",
+        validators=[validators.Optional(), validators.Length(min=1, max=100)],
+    )
+
+
 class NotLoggedInCommentForm(LoggedInCommentForm):
     """Form for creating a comment when not logged in."""
 
@@ -239,10 +249,56 @@ class NotLoggedInCommentForm(LoggedInCommentForm):
     )
 
 
+@router.get("/blog/get-comment/{comment_id}", response_model=None)
+async def get_comment(
+    request: Request, db: DBSession, comment_id: int, current_user: LoggedInUserOptional
+) -> _TemplateResponse:
+    """Return a comment. Called when canceling a comment edit."""
+    comment = blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
+    return templates.TemplateResponse(
+        COMMENT_TEMPLATE,
+        {constants.REQUEST: request, constants.CURRENT_USER: current_user, "comment": comment},
+    )
+
+
+@router.get("/blog/comment/{comment_id}", response_model=None)
+async def comment_edit_get(
+    request: Request, db: DBSession, comment_id: int, current_user: LoggedInUserOptional
+) -> _TemplateResponse:
+    """Return page partial to edit a comment."""
+    comment = blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
+    if not blog_handler.can_edit_comment(current_user=current_user, comment=comment):
+        return templates.TemplateResponse(
+            COMMENT_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                constants.MESSAGE: FormErrorMessage(text="You can't edit this comment."),
+                "comment": comment,
+            },
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+    name = comment.name or comment.user.full_name
+    form = NotLoggedInCommentForm.load({"name": name, "content": comment.md_content})
+    return templates.TemplateResponse(
+        COMMENT_FORM_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            COMMENT_FORM: form,
+            BLOG_POST: comment.blog_post,
+            "is_edit": True,
+            "comment_preview": comment,
+            "comment_form_id": f"comment-form-{comment.id}",
+            "preview_comment_id": f"preview-comment-{comment.id}",
+        },
+    )
+
+
 @router.post("/blog/{bp_id}/comment-preview", response_model=None)
 async def comment_post_preview(
-    request: Request, db: DBSession, bp_id: int, current_user: LoggedInUserOptional
-) -> _TemplateResponse:
+    request: Request, bp_id: int, current_user: LoggedInUserOptional
+) -> _TemplateResponse | HTMLResponse:
     """Preview a comment."""
     form_data = await request.form()
     form_data_dict = dict(form_data)
@@ -252,19 +308,8 @@ async def comment_post_preview(
     )
     form = comment_form_class.load(form_data)
     form.validate()
-    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     if form.content.errors:
-        return templates.TemplateResponse(
-            COMMENT_FORM_TEMPLATE,
-            {
-                constants.REQUEST: request,
-                constants.CURRENT_USER: current_user,
-                COMMENT_FORM: form,
-                constants.MESSAGE: FormErrorMessage(),
-                BLOG_POST: bp,
-            },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        )
+        return HTMLResponse()
     if current_user.is_authenticated:
         assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
         form_data_dict["name"] = current_user.full_name or current_user.username
@@ -272,28 +317,16 @@ async def comment_post_preview(
     try:
         input_data = blog_handler.SaveCommentInput(**form_data_dict, user_id=user_id, bp_id=bp_id)
     except ValidationError:
-        return templates.TemplateResponse(
-            COMMENT_FORM_TEMPLATE,
-            {
-                constants.REQUEST: request,
-                constants.CURRENT_USER: current_user,
-                COMMENT_FORM: form,
-                constants.MESSAGE: FormErrorMessage(),
-                BLOG_POST: bp,
-            },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        )
+        return HTMLResponse()
     comment = blog_handler.generate_comment(input_data)
     return templates.TemplateResponse(
-        COMMENT_FORM_TEMPLATE,
+        COMMENT_TEMPLATE,
         {
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
-            COMMENT_FORM: form,
-            BLOG_POST: bp,
+            "comment": comment,
             "comment_user": current_user if current_user.is_authenticated else None,
-            "comment_preview": comment,
-            constants.MESSAGE: FormErrorMessage() if form.errors else None,
+            "is_preview": True,
         },
     )
 
@@ -401,6 +434,81 @@ async def comment_blog_post(
     )
     web_user_handlers.set_guest_user_id_cookie(guest_id=current_user.guest_id, response=response)
     return response
+
+
+@router.post("/blog/comment/{comment_id}", response_model=None)
+async def edit_comment(
+    request: Request,
+    db: DBSession,
+    comment_id: int,
+    current_user: LoggedInUserOptional,
+) -> _TemplateResponse:
+    """Edit a comment."""
+    comment = blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
+    if not blog_handler.can_edit_comment(current_user=current_user, comment=comment):
+        FlashMessage(
+            title="Error editing comment",
+            text="You don't have permission to edit this comment.",
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        return templates.TemplateResponse(
+            COMMENT_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                "comment": comment,
+            },
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    form_data = await request.form()
+    md_content = form_data.get("content")
+    if not (md_content and isinstance(md_content, str)):
+        FlashMessage(
+            title="Error editing comment",
+            text="No content provided.",
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        return templates.TemplateResponse(
+            COMMENT_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                "comment": comment,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    try:
+        comment = blog_handler.update_existing_comment(
+            db=db, comment=comment, md_content=md_content
+        )
+    except Exception:
+        logger.exception("Error updating comment")
+        FlashMessage(
+            title="Error updating comment",
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        return templates.TemplateResponse(
+            COMMENT_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                "comment": comment,
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+    FlashMessage(
+        title="Comment updated!",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    return templates.TemplateResponse(
+        COMMENT_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            "comment": comment,
+        },
+    )
 
 
 @router.delete("/blog/comment/{comment_id}", response_model=None)

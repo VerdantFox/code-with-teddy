@@ -342,6 +342,19 @@ def save_new_comment(db: Session, data: SaveCommentInput) -> SaveCommentResponse
     return SaveCommentResponse(success=True, comment=comment)
 
 
+def update_existing_comment(
+    db: Session, comment: db_models.BlogPostComment, md_content: str
+) -> db_models.BlogPostComment:
+    """Update an existing blog post comment."""
+    html_content = generate_comment_html(md_content)
+    comment.md_content = md_content
+    comment.html_content = html_content
+    comment.updated_timestamp = datetime.now().astimezone(timezone.utc)
+    db.commit()
+    db.refresh(comment)
+    return comment
+
+
 def generate_comment(data: SaveCommentInput) -> db_models.BlogPostComment:
     """Generate a blog post comment."""
     html_content = generate_comment_html(data.content)
@@ -373,11 +386,7 @@ def delete_comment(
 ) -> SaveCommentResponse:
     """Delete a blog post comment."""
     comment = get_comment_from_id(db=db, comment_id=comment_id)
-    if not (
-        comment.user_id == current_user.id
-        or comment.guest_id == current_user.guest_id
-        or current_user.is_admin
-    ):
+    if not can_edit_comment(comment=comment, current_user=current_user):
         return SaveCommentResponse(
             success=False,
             err_msg="You do not have permission to delete this comment.",
@@ -387,6 +396,17 @@ def delete_comment(
     db.delete(comment)
     db.commit()
     return SaveCommentResponse(success=True)
+
+
+def can_edit_comment(
+    comment: db_models.BlogPostComment, current_user: db_models.User | UnauthenticatedUser
+) -> bool:
+    """Check if a user can edit this comment."""
+    return (
+        comment.user_id == current_user.id
+        or comment.guest_id == current_user.guest_id
+        or current_user.is_admin
+    )
 
 
 def get_comment_from_id(db: Session, comment_id: int) -> db_models.BlogPostComment:
