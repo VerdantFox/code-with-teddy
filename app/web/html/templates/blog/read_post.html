@@ -80,17 +80,17 @@
           <span>{{ blog_post.read_mins }} min read</span>
           /
           <span>
-            <span class="inline-flex items-center gap-1.5">
+            <span class="inline-flex items-center gap-1">
               <span>{{ "{:,}".format(blog_post.views) }}</span>
-              {{ render_partial('shared/partials/icons/eye.html', class="h-6 inline-block", title="views") }} </span
+              {{ render_partial('shared/partials/icons/eye.html', class="h-6 w-6 inline-block", title="views") }} </span
             >,&nbsp;
-            <span class="inline-flex items-center gap-1.5">
+            <span class="inline-flex items-center gap-1">
               <span>{{ "{:,}".format(blog_post.likes) }}</span>
-              {{ render_partial('shared/partials/icons/heart.html', class="h-5 inline-block", title="likes") }}</span
+              {{ render_partial('shared/partials/icons/heart.html', class="h-5 w-5 inline-block", title="likes") }}</span
             >,&nbsp;
-            <span class="inline-flex items-center gap-1.5">
+            <span class="inline-flex items-center gap-1">
               <span>{{ "{:,}".format(blog_post.comments|length) }}</span>
-              {{ render_partial('shared/partials/icons/chat-circle-text.html', class="h-5 inline-block", title="comments") }}</span
+              {{ render_partial('shared/partials/icons/chat-circle-text.html', class="h-5 w-5 inline-block", title="comments") }}</span
             >
           </span>
         </p>

@@ -15,7 +15,7 @@ from app.datastore.database import Session
 from app.services.blog import blog_utils, markdown_parser
 from app.services.general import transforms
 from app.services.media import media_handler
-from app.web import errors
+from app.web import errors, web_models
 from app.web.web_models import UnauthenticatedUser
 
 logger = getLogger(__name__)
@@ -343,13 +343,18 @@ def save_new_comment(db: Session, data: SaveCommentInput) -> SaveCommentResponse
 
 
 def update_existing_comment(
-    db: Session, comment: db_models.BlogPostComment, md_content: str
+    db: Session,
+    current_user: db_models.User | web_models.UnauthenticatedUser,
+    comment: db_models.BlogPostComment,
+    md_content: str,
 ) -> db_models.BlogPostComment:
     """Update an existing blog post comment."""
     html_content = generate_comment_html(md_content)
     comment.md_content = md_content
     comment.html_content = html_content
     comment.updated_timestamp = datetime.now().astimezone(timezone.utc)
+    if current_user.is_authenticated:
+        comment.user_id = current_user.id
     db.commit()
     db.refresh(comment)
     return comment
@@ -358,6 +363,7 @@ def update_existing_comment(
 def generate_comment(data: SaveCommentInput) -> db_models.BlogPostComment:
     """Generate a blog post comment."""
     html_content = generate_comment_html(data.content)
+    now = datetime.now().astimezone(timezone.utc)
     return db_models.BlogPostComment(
         blog_post_id=data.bp_id,
         name=data.name,
@@ -366,8 +372,8 @@ def generate_comment(data: SaveCommentInput) -> db_models.BlogPostComment:
         guest_id=data.guest_id,
         md_content=data.content,
         html_content=html_content,
-        created_timestamp=datetime.now().astimezone(timezone.utc),
-        updated_timestamp=datetime.now().astimezone(timezone.utc),
+        created_timestamp=now,
+        updated_timestamp=now,
         likes=0,
         parent_id=data.parent_id,
     )
@@ -386,7 +392,7 @@ def delete_comment(
 ) -> SaveCommentResponse:
     """Delete a blog post comment."""
     comment = get_comment_from_id(db=db, comment_id=comment_id)
-    if not can_edit_comment(comment=comment, current_user=current_user):
+    if not can_delete_comment(comment=comment, current_user=current_user):
         return SaveCommentResponse(
             success=False,
             err_msg="You do not have permission to delete this comment.",
@@ -402,6 +408,13 @@ def can_edit_comment(
     comment: db_models.BlogPostComment, current_user: db_models.User | UnauthenticatedUser
 ) -> bool:
     """Check if a user can edit this comment."""
+    return comment.user_id == current_user.id or comment.guest_id == current_user.guest_id
+
+
+def can_delete_comment(
+    comment: db_models.BlogPostComment, current_user: db_models.User | UnauthenticatedUser
+) -> bool:
+    """Check if a user can delete this comment. Allows admin to delete any comment."""
     return (
         comment.user_id == current_user.id
         or comment.guest_id == current_user.guest_id

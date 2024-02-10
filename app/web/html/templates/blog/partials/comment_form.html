@@ -6,7 +6,12 @@
   {% set preview_comment_id = "base-preview-comment" %}
 {% endif %}
 {% set preview_comment_id_css = "#" + preview_comment_id %}
-<div id="{{ comment_form_id }}" class="htmx-fade-out-300ms htmx-fade-in-300ms">
+<div
+  id="{{ comment_form_id }}"
+  class="htmx-fade-out-300ms htmx-fade-in-300ms {% if is_edit %}
+    border-y-2 border-grayscale-200 dark:border-grayscale-700 py-8
+  {% endif %}"
+>
   <div class="not-prose">
     {% if is_edit %}
       <h3 class="text-4xl font-bold mb-8">Editing comment</h3>
@@ -22,7 +27,7 @@
         class="link link-underlined"
         >See this markdown cheat sheet for ideas</a
       >.
-      {% if not current_user.is_authenticated %}
+      {% if not (is_edit or current_user.is_authenticated) %}
         Comment as a guest with the below form, or
         <button class="link link-underlined" @click="loginModalOpen = true">
           log in

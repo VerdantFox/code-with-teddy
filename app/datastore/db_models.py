@@ -118,7 +118,9 @@ class BlogPost(Base):
     updated_timestamp: Mapped[DateTimeIndexed]
     likes: Mapped[IntIndexed]
     views: Mapped[IntIndexed]
-    comments: Mapped[list["BlogPostComment"]] = relationship(back_populates="blog_post")
+    comments: Mapped[list["BlogPostComment"]] = relationship(
+        back_populates="blog_post", order_by="asc(BlogPostComment.created_timestamp)"
+    )
 
     ts_vector: Mapped[TSVector] = mapped_column(
         TSVector(),

@@ -2,7 +2,9 @@
   {% set comment_id = comment.id or "base" %}
   <article
     id="comment-{{ comment_id }}"
-    class="relative htmx-fade-out-300ms htmx-fade-in-300ms"
+    class="relative htmx-fade-out-300ms htmx-fade-in-300ms{% if is_preview %}
+      ring-2 ring-offset-500 rounded-lg
+    {% endif %}"
   >
     <div
       class="flex gap-2 bg-grayscale-100 dark:bg-grayscale-800 p-8 rounded-lg"
@@ -13,7 +15,7 @@
             <div
               class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center"
             >
-              {% if (comment.user and comment.user.avatar_location) %}
+              {% if comment.user and comment.user.avatar_location %}
                 <img
                   {% if comment.user.avatar_location.startswith('/') %}
                     src="{{ url_for('html:static', path=comment.user.avatar_location) }}"
@@ -23,7 +25,7 @@
                   alt="{{ comment.user.full_name or comment.user.username }}'s profile picture"
                   class="w-full h-full object-cover"
                 />
-              {% elif comment_user %}
+              {% elif comment_user and comment_user.avatar_location %}
                 <img
                   {% if comment_user.avatar_location.startswith('/') %}
                     src="{{ url_for('html:static', path=comment_user.avatar_location) }}"
@@ -45,12 +47,21 @@
               {{ comment.name }}
             {% endif %}
           </h3>
-          <p class="text-lg text-grayscale-600 dark:text-grayscale-400">
+          <p
+            class="text-lg text-grayscale-600 dark:text-grayscale-400"
+            {# Convert the python UTC datetime object to the users local timezone #}
+            x-data="{utctime: '{{ comment.created_timestamp.isoformat().removesuffix('+00:00') }}Z'}"
+            x-text="new Date(utctime).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })"
+          >
             {{ comment.created_timestamp.strftime('%B %d, %Y') }}
           </p>
           {% if is_preview %}
             <p class="text-sm text-offset-600 dark:text-offset-400">
-              &mdash;(comment preview)
+              &mdash;(preview)
+            </p>
+          {% elif comment.created_timestamp != comment.updated_timestamp %}
+            <p class="text-sm text-grayscale-600 dark:text-grayscale-400">
+              edited
             </p>
           {% endif %}
         </div>
@@ -65,7 +76,7 @@
           <button type="button" class="group" data-tippy-theme="light-border">
             {{ render_partial('shared/partials/icons/chats.html', title="Reply to comment", class="h-7 w-7 icon-btn") }}
           </button>
-          {% if current_user.is_admin or comment.guest_id == current_user.guest_id or comment.user_id == current_user.id %}
+          {% if comment.guest_id == current_user.guest_id or comment.user_id == current_user.id %}
             <!-- Edit -->
             <button
               type="button"
@@ -78,6 +89,8 @@
             >
               {{ render_partial('shared/partials/icons/note-pencil.html', title="Edit comment", class="h-7 w-7 icon-btn") }}
             </button>
+          {% endif %}
+          {% if current_user.is_admin or comment.guest_id == current_user.guest_id or comment.user_id == current_user.id %}
             <!-- Delete -->
             <button
               id="delete-comment-btn-{{ comment.id }}"

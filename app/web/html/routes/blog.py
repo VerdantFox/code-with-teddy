@@ -480,7 +480,7 @@ async def edit_comment(
         )
     try:
         comment = blog_handler.update_existing_comment(
-            db=db, comment=comment, md_content=md_content
+            db=db, comment=comment, md_content=md_content, current_user=current_user
         )
     except Exception:
         logger.exception("Error updating comment")
