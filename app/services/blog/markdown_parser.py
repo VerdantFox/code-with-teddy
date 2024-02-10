@@ -244,6 +244,7 @@ ALLOWED_TAGS = [
     "i",
     "img",
     "li",
+    "mark",
     "ol",
     "p",
     "picture",
@@ -287,22 +288,28 @@ def convert_h_tags(html: str) -> str:
     return html  # noqa: RET504
 
 
-def clean_except_code_blocks(content: str) -> str:
-    """Clean the content, except for code blocks.
+def clean_with_exceptions(content: str) -> str:
+    """Clean the content, with some exceptions.
 
     Meant to clean html from comments.
     """
+    nefarious_strings = ("___CODEBLOCK", "___BLOCKQUOTE___")
+    if any(nefarious in content for nefarious in nefarious_strings):
+        return bleach.clean(content)
+
     # Extract code blocks
     code_blocks = re.findall(r"```.*?```", content, re.DOTALL)
 
-    # Replace code blocks with placeholders
+    # Replace exceptions with placeholders
     for i, block in enumerate(code_blocks):
         content = content.replace(block, f"___CODEBLOCK{i}___")
+    content = re.sub(r"^> ", "___BLOCKQUOTE___", content, flags=re.MULTILINE)
 
     # Clean content
     content = bleach.clean(content)
 
-    # Replace placeholders with code blocks
+    # Replace placeholders with their values
+    content = content.replace("___BLOCKQUOTE___", "> ")
     for i, block in enumerate(code_blocks):
         content = content.replace(f"___CODEBLOCK{i}___", block)
 

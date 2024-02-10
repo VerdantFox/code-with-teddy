@@ -381,7 +381,7 @@ def generate_comment(data: SaveCommentInput) -> db_models.BlogPostComment:
 
 def generate_comment_html(content: str) -> str:
     """Generate HTML for a comment, with proper sanitization."""
-    sanitized_before = markdown_parser.clean_except_code_blocks(content)
+    sanitized_before = markdown_parser.clean_with_exceptions(content)
     html = markdown_parser.markdown_to_html(sanitized_before, update_headers=False).content
     html = markdown_parser.convert_h_tags(html)
     return markdown_parser.bleach_comment_html(html)
