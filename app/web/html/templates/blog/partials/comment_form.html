@@ -6,7 +6,7 @@
   {% set preview_comment_id = "base-preview-comment" %}
 {% endif %}
 {% set preview_comment_id_css = "#" + preview_comment_id %}
-<div id="{{ comment_form_id }}">
+<div id="{{ comment_form_id }}" class="htmx-fade-out-300ms htmx-fade-in-300ms">
   <div class="not-prose">
     {% if is_edit %}
       <h3 class="text-4xl font-bold mb-8">Editing comment</h3>
@@ -41,7 +41,7 @@
         hx-post="{{ url_for('html:comment_blog_post', bp_id=blog_post.id) }}"
         hx-target="#comments-section" hx-target-error="#comments-section"
       {% endif %}
-      hx-swap="outerHTML"
+      hx-swap="outerHTML swap:300ms"
     >
       {{ render_partial('shared/partials/forms/top_error.html', message=message) }}
       {% if is_edit %}
@@ -63,7 +63,7 @@
         {% else %}
           <div class="flex max-md:flex-col gap-6">
             {# Comment form name field #}
-            {{ render_partial('shared/partials/forms/field.html', class="flex-1", field=comment_form.name, extra_fields={"hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:1000ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML"}) }}
+            {{ render_partial('shared/partials/forms/field.html', class="flex-1", field=comment_form.name, extra_fields={"hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:1000ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:300ms"}) }}
             {# Comment form not robot field #}
             {{ render_partial('shared/partials/forms/toggle_field.html', field=comment_form.not_robot) }}
           </div>
@@ -71,7 +71,7 @@
           {{ render_partial('shared/partials/forms/field.html', field=comment_form.email) }}
         {% endif %}
         {# Comment form content field #}
-        {{ render_partial('shared/partials/forms/field.html', field=comment_form.content, extra_fields={"rows": "5", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:1000ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML"}) }}
+        {{ render_partial('shared/partials/forms/field.html', field=comment_form.content, extra_fields={"rows": "5", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:1000ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:300ms"}) }}
       </div>
       <div class="flex items-center gap-4">
         {# Submit button #}
@@ -83,7 +83,7 @@
             hx-get="{{ url_for('html:get_comment', comment_id=comment_preview.id) }}"
             hx-target="#{{ comment_form_id }}"
             hx-target-error="#{{ comment_form_id }}"
-            hx-swap="outerHTML"
+            hx-swap="outerHTML swap:300ms"
           >
             Cancel
           </button>
@@ -92,7 +92,10 @@
     </form>
   </div>
   {{ comment_preview_id }}
-  <div id="{{ preview_comment_id }}" class="mt-12 text-lg">
+  <div
+    id="{{ preview_comment_id }}"
+    class="mt-12 text-lg htmx-fade-out-300ms htmx-fade-in-300ms"
+  >
     {# <div id="comment-preview" class="mt-12 text-lg"> #}
     {% if comment_preview %}
       {{ render_partial('blog/partials/comment.html', request=request, comment=comment_preview, is_preview=True) }}

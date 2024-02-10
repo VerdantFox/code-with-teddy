@@ -2,7 +2,7 @@
   {% set comment_id = comment.id or "base" %}
   <article
     id="comment-{{ comment_id }}"
-    class="relative transition-all duration-500"
+    class="relative htmx-fade-out-300ms htmx-fade-in-300ms"
   >
     <div
       class="flex gap-2 bg-grayscale-100 dark:bg-grayscale-800 p-8 rounded-lg"
@@ -58,7 +58,7 @@
         {% if message %}{{ render_partial('shared/partials/forms/top_error.html', message=message) }}{% endif %}
       </div>
     </div>
-    {% if current_user %}
+    {% if current_user and not is_preview %}
       <div class="absolute top-2 right-2">
         <div class="flex gap-3">
           <!-- Reply -->
@@ -73,7 +73,7 @@
               hx-get="{{ url_for('html:comment_edit_get', comment_id=comment.id) }}"
               hx-target="#comment-{{ comment.id }}"
               hx-target-error="#comment-{{ comment.id }}"
-              hx-swap="outerHTML"
+              hx-swap="outerHTML swap:300ms"
               data-tippy-theme="light-border"
             >
               {{ render_partial('shared/partials/icons/note-pencil.html', title="Edit comment", class="h-7 w-7 icon-btn") }}
@@ -86,7 +86,7 @@
               hx-delete="{{ url_for('html:delete_comment', comment_id=comment.id) }}"
               hx-target="#comment-{{ comment.id }}"
               hx-target-error="#comment-{{ comment.id }}"
-              hx-swap="outerHTML"
+              hx-swap="outerHTML swap:300ms"
               hx-confirm="Delete the comment?"
             >
               {{ render_partial('shared/partials/icons/trash.html', title="Delete comment", class="h-7 w-7 icon-btn") }}

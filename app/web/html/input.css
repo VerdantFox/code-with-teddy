@@ -141,3 +141,39 @@ button.swal2-confirm.swal2-styled {
 .notify__text {
   @apply dark:text-white;
 }
+
+/* HTMX transitions */
+.htmx-fade-out-1s.htmx-swapping {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+.htmx-fade-out-500ms.htmx-swapping {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+.htmx-fade-out-300ms.htmx-swapping {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+.htmx-fade-in-1s.htmx-added {
+  opacity: 0;
+}
+.htmx-fade-in-1s {
+  opacity: 1;
+  transition: opacity 1s ease-out;
+}
+.htmx-fade-in-500ms.htmx-added {
+  opacity: 0;
+}
+.htmx-fade-in-500ms {
+  opacity: 1;
+  transition: opacity 1s ease-out;
+}
+.htmx-fade-in-300ms.htmx-added {
+  opacity: 0;
+}
+.htmx-fade-in-300ms {
+  opacity: 1;
+  transition: opacity 1s ease-out;
+}
