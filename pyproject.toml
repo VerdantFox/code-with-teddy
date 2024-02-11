@@ -242,6 +242,7 @@ unfixable = [
 "scripts/*" = [
     "FBT003",  # boolean-positional-value-in-call (needed for typer default arg)
     "S101",    # use of assert
+    "S311",    # random-not-for-cryptography
 ]
 "scripts/alembic.py" = ["S603"] # subprocess-without-shell-equals-true
 

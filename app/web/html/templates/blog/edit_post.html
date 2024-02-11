@@ -48,6 +48,17 @@
       document.execCommand("Copy")
       document.body.removeChild(textArea)
     }
+
+    function setThumbnailImage() {
+      const imgPreview = document.getElementById("thumbnail-image")
+      const remoteFile = document.getElementById("{{ form.thumbnail_url.id }}")
+      if (remoteFile.value) {
+        imgPreview.innerHTML =
+          '<img src="' +
+          remoteFile.value +
+          '" class="object-cover max-w-lg max-h-36" />'
+      }
+    }
   </script>
 {% endblock custom_js %}
 

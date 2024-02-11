@@ -4,7 +4,7 @@ tags: testing, pytest, python
 
 ## Introduction
 
-PYTEST_IMAGE
+<picture><img src="http://localhost:8000/static/media/local/blog/pytest-logo.png" alt="Pytest logo" title="Pytest logo"></picture>
 
 Are you a python developer looking to improve your testing abilities with
 pytest? Me too! So I've put together a list of 9 tips and tricks I've

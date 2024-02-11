@@ -56,3 +56,36 @@ def strip_markdown(md: str) -> str:
     md = md.replace("#", "")
     # Replace white space with single space and return
     return " ".join(md.split())
+
+
+# ------------ Blog Post Parts ------------
+def get_bp_introduction(content: str) -> str:
+    """Get the introduction of the blog post."""
+    if re_match := re.search(r"## Introduction\n\n(.*?)(?=\n##)", content, re.DOTALL):
+        return re_match[1]
+    msg = "No introduction found in the blog post content."
+    raise ValueError(msg)
+
+
+def get_bp_tags(content: str) -> list[str]:
+    """Get the tags of the blog post."""
+    if re_match := re.search(r"tags: (.*)\n", content):
+        return re_match[1].split(", ")
+    msg = "No tags found in the blog post content."
+    raise ValueError(msg)
+
+
+def get_bp_title(content: str) -> str:
+    """Get the title of the blog post."""
+    if re_match := re.search(r"# (.*)\n", content):
+        return re_match[1]
+    msg = "No title found in the blog post content."
+    raise ValueError(msg)
+
+
+def get_bp_content(content: str) -> str:
+    """Get the content of the blog post."""
+    if re_match := re.search(r"## Introduction\n\n(.*$)", content, re.DOTALL):
+        return re_match[1]
+    msg = "No content found in the blog post content."
+    raise ValueError(msg)

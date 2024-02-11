@@ -33,6 +33,20 @@
       )
     }}
   </div>
+  {% if blog_post and not form.is_new.data %}
+    <div class="mb-12">
+      <div
+        id="thumbnail-image"
+        class="flex items-center justify-center mx-auto mb-12"
+      >
+        {{ render_partial('blog/partials/thumbnail.html', class="max-w-lg max-h-48", request=request, blog_post=blog_post) }}
+      </div>
+      <div class="">
+        {{ render_partial('shared/partials/forms/field.html', field=form.thumbnail_url, class="w-full", extra_fields={"@change":"setThumbnailImage()", "@input.once": "isDirty = true"}) }}
+      </div>
+    </div>
+  {% endif %}
+
   <div class="flex gap-6 flex-col @lg:flex-row">
     {{ render_partial('shared/partials/forms/submit_button.html', text="Save", class="w-full @2xl:w-fit", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}
     {% if blog_post and not form.is_new.data %}

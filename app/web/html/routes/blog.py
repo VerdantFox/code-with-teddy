@@ -84,6 +84,14 @@ class BlogPostForm(Form):
         description="Markdown content (the whole blog post)",
         validators=[validators.Length(min=1)],
     )
+    thumbnail_url: StringField = StringField(
+        "Thumbnail URL",
+        description="https://example.com/thumbnail.png",
+        validators=[
+            validators.optional(),
+            validators.Length(min=1, max=2000),
+        ],
+    )
 
 
 @router.get("/blog/create", response_model=None)
@@ -578,6 +586,7 @@ async def edit_bp_get(
             "is_published": bp.is_published,
             "description": bp.markdown_description,
             "content": bp.markdown_content,
+            "thumbnail_url": bp.thumbnail_location or "",
         }
     )
 

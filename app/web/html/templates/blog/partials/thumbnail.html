@@ -1,0 +1,15 @@
+{% if blog_post and blog_post.thumbnail_location %}
+  <img
+    {% if blog_post.thumbnail_location.startswith('/') %}
+      src="{{ url_for('html:static', path=blog_post.thumbnail_location) }}"
+    {% else %}
+      src="{{ blog_post.thumbnail_location }}"
+    {% endif %}
+    alt="{{ blog_post.title }} Thumbnail"
+    {% if class %}
+      class="{{ class }}"
+    {% endif %}
+  />
+{% else %}
+  {{ render_partial('shared/partials/icons/image.html', class="w-36 h-36") }}
+{% endif %}

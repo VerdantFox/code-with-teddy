@@ -3,7 +3,7 @@
 {% endif %}
 <div class="flex flex-col gap-2 {{ class }}">
   {{ field.label(class='' +  (' text-red-800 dark:text-red-300' if field.errors else '')) }}
-  {{ field(class="p-2 rounded-lg border border-grayscale-500 focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white", **extra_fields) }}
+  {{ field(class="p-2 rounded-lg border border-grayscale-500 focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white cursor-pointer file:border-0 file:cursor-pointer file:px-2 file:py-0.5 file:mr-3 file:text-lg file:rounded-lg file:text-white file:bg-primary-700 file:bg-primary-700 file:hover:bg-primary-800 file:active:bg-primary-900 file:disabled:text-primary-100 file:disabled:bg-primary-800 file:disabled:opacity-50 file:transition-bg-color file:duration-300", **extra_fields) }}
   {{ render_partial('shared/partials/forms/field_errors.html', errors=field.errors) }}
   {% if hx_form_id %}
     <progress id="progress" value="0" max="100" class="invisible"></progress>

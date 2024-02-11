@@ -183,7 +183,7 @@ MIGRATION_HELP = (
 )
 
 
-cli_app = typer.Typer(add_completion=False)
+cli_app = typer.Typer(add_completion=False, pretty_exceptions_enable=False)
 
 
 @cli_app.command()

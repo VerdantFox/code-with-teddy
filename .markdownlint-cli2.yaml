@@ -3,4 +3,4 @@
 
 config:
   line-length: false
-ignores: ["test_data/"]
+ignores: ["tests/data/"]

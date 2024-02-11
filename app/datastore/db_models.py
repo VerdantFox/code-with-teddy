@@ -38,12 +38,14 @@ DateTimeIndexed = Annotated[datetime, mapped_column(index=True)]
 # ForeignKey types
 UsersFk = Annotated[int, mapped_column(ForeignKey("users.id"), index=True)]
 BlogPostFK = Annotated[int, mapped_column(ForeignKey("blog_posts.id"), index=True)]
+CommentFK = Annotated[int, mapped_column(ForeignKey("blog_post_comments.id"), index=True)]
 
 
 class TSVector(sa.types.TypeDecorator):
     """Vector type for PostgreSQL full-text search."""
 
     impl = TSVECTOR
+    cache_ok = True
 
 
 class Base(DeclarativeBase):
@@ -101,11 +103,14 @@ class BlogPost(Base):
     slug: Mapped[StrIndexedUnique]
     old_slugs: Mapped[list["OldBlogPostSlug"]] = relationship(back_populates="blog_post")
     tags: Mapped[list["BlogPostTag"]] = relationship(
-        secondary="blog_tags_associations", back_populates="blog_posts"
+        secondary="blog_tags_associations",
+        back_populates="blog_posts",
+        order_by="asc(BlogPostTag.tag)",
     )
     read_mins: Mapped[IntNullable]
     is_published: Mapped[BoolDefaultFalse]
     can_comment: Mapped[BoolDefaultTrue]
+    thumbnail_location: Mapped[StrNullable]
 
     markdown_description: Mapped[str]
     markdown_content: Mapped[str]
@@ -194,4 +199,7 @@ class BlogPostComment(Base):
     created_timestamp: Mapped[DateTimeIndexed]
     updated_timestamp: Mapped[DateTimeIndexed]
     likes: Mapped[IntIndexedDefaultZero]
-    parent_id: Mapped[IntNullable]
+    parent_id: Mapped[CommentFK | None]
+    # replies: Mapped[list["BlogPostComment"]] = relationship(
+    #     "BlogPostComment", backref="parent", remote_side=[id]
+    # )  # noqa: ERA001,RUF100

@@ -73,10 +73,15 @@
         {{ blog_post.title }}
       </h1>
       <div class="flex flex-col gap-2 text-xl max-xs:text-lg max-w-xl">
-        {% set created_date = blog_post.created_timestamp.strftime('%B %d, %Y') %}
-        {% set updated_date = blog_post.updated_timestamp.strftime('%B %d, %Y') %}
         <p>
-          <span>{{ created_date }}</span> /
+          <span
+            {# Convert the python UTC datetime object to the users local timezone #}
+            x-data="{utctime: '{{ blog_post.created_timestamp.isoformat().removesuffix('+00:00') }}Z'}"
+            x-text="new Date(utctime).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })"
+          >
+            {{ blog_post.created_timestamp.strftime('%B %d, %Y') }}
+          </span>
+          /
           <span>{{ blog_post.read_mins }} min read</span>
           /
           <span>
@@ -94,7 +99,17 @@
             >
           </span>
         </p>
-        <p class="max-xs:text-lg">Last Updated: {{ updated_date }}</p>
+
+        <p class="max-xs:text-lg">
+          Last Updated:
+          <span
+            {# Convert the python UTC datetime object to the users local timezone #}
+            x-data="{utctime: '{{ blog_post.updated_timestamp.isoformat().removesuffix('+00:00') }}Z'}"
+            x-text="new Date(utctime).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })"
+          >
+            {{ blog_post.updated_timestamp.strftime('%B %d, %Y') }}
+          </span>
+        </p>
         <p class="flex flex-row gap-2 flex-wrap">
           {% for tag in blog_post.tags %}
             <a

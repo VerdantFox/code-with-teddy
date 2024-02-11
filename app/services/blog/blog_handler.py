@@ -32,6 +32,7 @@ class SaveBlogInput(BaseModel, arbitrary_types_allowed=True):
     is_published: transforms.CoercedBool
     description: str
     content: str
+    thumbnail_url: str | None = None
 
 
 class SaveBlogResponse(BaseModel, arbitrary_types_allowed=True):
@@ -181,6 +182,8 @@ def update_existing_bp_fields(
         blog_post.html_content = html_content.content
         blog_post.html_toc = html_content.toc
         blog_post.read_mins = blog_utils.calc_read_mins(data.content)
+    if blog_post.thumbnail_location != data.thumbnail_url:
+        blog_post.thumbnail_location = data.thumbnail_url
     blog_post.updated_timestamp = datetime.now().astimezone(timezone.utc)
     return blog_post
 
