@@ -276,13 +276,26 @@ def save_media_for_blog_post(
     locations_str, media_type = _save_bp_media(
         name=name, blog_post_slug=blog_post.slug, media=media
     )
-    return _commit_bp_to_db(
+    return _commit_media_to_db(
         db=db,
         blog_post=blog_post,
         name=name,
         locations_str=locations_str,
         media_type=media_type,
     )
+
+
+def reorder_media_for_blog_post(
+    db: Session,
+    media_id: int,
+    bp_id: int,
+    position: int | None,
+) -> db_models.BlogPost:
+    """Reorder media for a blog post."""
+    media = db.query(db_models.BlogPostMedia).filter(db_models.BlogPostMedia.id == media_id).one()
+    media.position = position
+    db.commit()
+    return get_bp_from_id(db=db, bp_id=bp_id)
 
 
 def delete_media_from_blog_post(
@@ -310,15 +323,16 @@ def _save_bp_media(name: str, blog_post_slug: str, media: UploadFile) -> tuple[s
     )
 
 
-def _commit_bp_to_db(
+def _commit_media_to_db(
     db: Session, blog_post: db_models.BlogPost, name: str, locations_str: str, media_type: str
 ) -> db_models.BlogPost:
-    """Commit a blog post to the database."""
+    """Commit a blog post media to the database."""
     bp_media_object = db_models.BlogPostMedia(
         blog_post_id=blog_post.id,
         name=name,
         locations=locations_str,
         media_type=media_type,
+        created_timestamp=datetime.now().astimezone(timezone.utc),
     )
     db.add(bp_media_object)
     db.commit()

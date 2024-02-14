@@ -40,6 +40,8 @@ BLOG_POST = "blog_post"
 LIKED = "liked"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
 UPLOAD_MEDIA_TEMPLATE = "blog/partials/edit_post_media_form.html"
+LIST_MEDIA_TEMPLATE = "blog/partials/list_post_media.html"
+FLASH_ERRORS_TEMPLATE = "shared/partials/flash_error_messages.html"
 COMMENTS_TEMPLATE = "blog/partials/comments.html"
 COMMENT_TEMPLATE = "blog/partials/comment.html"
 COMMENT_FORM_TEMPLATE = "blog/partials/comment_form.html"
@@ -710,6 +712,49 @@ async def upload_blog_post_media(
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
             constants.FORM: BlogPostMediaForm(),
+            BLOG_POST: bp,
+        },
+    )
+
+
+@router.patch("/blog/{bp_id}/reorder-media/{media_id}", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def reorder_bp_media(
+    request: Request,
+    current_user: LoggedInUser,
+    db: DBSession,
+    bp_id: int,
+    media_id: int,
+) -> _TemplateResponse:
+    """Update media position number."""
+    form_data = await request.form()
+    position_str = form_data.get("position", "")
+    if position_str == "":
+        position = None
+    elif str(position_str).removeprefix("-").isdigit():
+        position = int(str(position_str))
+    else:
+        FlashMessage(
+            title="Error reordering media",
+            text="Invalid position",
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        return templates.TemplateResponse(
+            FLASH_ERRORS_TEMPLATE,
+            {constants.REQUEST: request},
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    bp = blog_handler.reorder_media_for_blog_post(
+        db=db,
+        media_id=media_id,
+        bp_id=bp_id,
+        position=position,
+    )
+    return templates.TemplateResponse(
+        LIST_MEDIA_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
             BLOG_POST: bp,
         },
     )

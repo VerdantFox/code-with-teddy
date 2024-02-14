@@ -1,15 +1,22 @@
 {% if blog_post.media %}
-  <h2 class="mt-12 mb-8">Uploaded Media:</h2>
-  {% for media_item in blog_post.media %}
-    <form action="" class="mb-12">
-      <hr class="mb-2" />
-      <span class="block flex flex-col gap-2">
+  <div
+    id="blog-media"
+    class="htmx-fade-out-300ms htmx-fade-in-1s"
+    x-data="{expandMedia: $persist(true)}"
+  >
+    <div class="flex items-center gap-8">
+      <h2 class="mt-12 mb-8 text-2xl">Uploaded Media:</h2>
+      {{ render_partial('blog/partials/toggle_show_media.html') }}
+    </div>
+    {% for media_item in blog_post.media %}
+      <hr x-show="expandMedia" x-transition.duration.500ms />
+      <span class="block flex flex-col gap-2 mt-2">
         <span class="flex gap-6">
           <button
             id="delete-image-{{ loop.index }}"
             type="submit"
             class="btn-sm btn-filled-danger"
-            hx-delete="{{ url_for('html:delete_blog_post_media', bp_id=request.path_params['bp_id'], media_id=media_item.id ) }}"
+            hx-delete="{{ url_for('html:delete_blog_post_media', bp_id=blog_post.id, media_id=media_item.id ) }}"
             hx-target="#blog-media"
             hx-swap="outerHTML"
           >
@@ -22,12 +29,40 @@
           >
             Copy HTML
           </button>
+          <form
+            hx-patch="{{ url_for('html:reorder_bp_media', bp_id=blog_post.id, media_id=media_item.id ) }}"
+            hx-target="#blog-media"
+            hx-target-error="#flash-errors"
+            hx-swap="outerHTML swap:300ms"
+          >
+            <input
+              id="media-position-{{ loop.index }}"
+              name="position"
+              class="flex-shrink w-24 rounded-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400"
+              type="number"
+              value="{{ media_item.position }}"
+              placeholder="Order"
+              hx-patch="{{ url_for('html:reorder_bp_media', bp_id=blog_post.id, media_id=media_item.id ) }}"
+              hx-target="#blog-media"
+              hx-target-error="#flash-errors"
+              hx-swap="outerHTML swap:300ms"
+            />
+          </form>
         </span>
-        <p class="text-2xl">#{{ loop.index }}. ⬇{{ media_item.name }}⬇</p>
+        <p class="text-2xl">
+          #{{ loop.index }}.
+          <span x-show="expandMedia" x-transition.duration.500ms>⬇</span>
+          {{ media_item.name }}
+          <span x-show="expandMedia" x-transition.duration.500ms>⬇</span>
+        </p>
       </span>
       <hr class="mb-6" />
       {% if media_item.media_type == "image" %}
-        <span id="media-html-{{ loop.index }}">
+        <span
+          id="media-html-{{ loop.index }}"
+          x-show="expandMedia"
+          x-transition.duration.500ms
+        >
           <picture>
             {% set locations = media_item.locations_to_list() %}
             {% for location in locations[:-1] %}
@@ -44,7 +79,11 @@
           </picture>
         </span>
       {% elif media_item.media_type == "video" %}
-        <span id="media-html-{{ loop.index }}">
+        <span
+          id="media-html-{{ loop.index }}"
+          x-show="expandMedia"
+          x-transition.duration.500ms
+        >
           <div class="flex justify-center content-center">
             <video class="w-4/5" muted autoplay loop controls>
               {% set locations = media_item.locations_to_list() %}
@@ -59,6 +98,7 @@
           </div>
         </span>
       {% endif %}
-    </form>
-  {% endfor %}
+    {% endfor %}
+    <div id="flash-errors"></div>
+  </div>
 {% endif %}

@@ -118,7 +118,10 @@ class BlogPost(Base):
     html_content: Mapped[str]
     html_toc: Mapped[str]
 
-    media: Mapped[list["BlogPostMedia"]] = relationship(back_populates="blog_post")
+    media: Mapped[list["BlogPostMedia"]] = relationship(
+        back_populates="blog_post",
+        order_by="asc(BlogPostMedia.position), asc(BlogPostMedia.created_timestamp)",
+    )
     created_timestamp: Mapped[DateTimeIndexed]
     updated_timestamp: Mapped[DateTimeIndexed]
     likes: Mapped[IntIndexed]
@@ -175,6 +178,8 @@ class BlogPostMedia(Base):
     name: Mapped[str]
     locations: Mapped[str]
     media_type: Mapped[str]
+    position: Mapped[int | None]
+    created_timestamp: Mapped[DateTimeIndexed]
 
     def locations_to_list(self) -> list[str]:
         """Get the media locations as a list."""
