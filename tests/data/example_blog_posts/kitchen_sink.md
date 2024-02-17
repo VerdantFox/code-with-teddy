@@ -4,6 +4,8 @@ tags: all, the, things
 
 ## Introduction
 
+<picture><source srcset="http://localhost:8000/static/media/blog/kitch-sink--kitchen-sink.webp" type="image/webp"><img src="http://localhost:8000/static/media/blog/kitch-sink--kitchen-sink.jpeg" alt="Kitch sink" title="Kitch sink" width="1200" height="1168"></picture>
+
 Odit similique voluptate. Modi dolor qui assumenda. Et quis doloribus molestiae quia consectetur deserunt. Hic non rem qui. Enim eaque delectus odio non quia et aperiam. Aut consequatur mollitia.
 
 Sint neque in qui eum. Ut eos vel. Aperiam qui magni et. Voluptas quo quisquam fugit sequi officia.

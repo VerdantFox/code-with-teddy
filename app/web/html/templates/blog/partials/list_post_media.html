@@ -6,7 +6,7 @@
   >
     <div class="flex items-center gap-8">
       <h2 class="mt-12 mb-8 text-2xl">Uploaded Media:</h2>
-      {{ render_partial('blog/partials/toggle_show_media.html') }}
+      {{ render_partial('shared/partials/forms/alpine_toggle.html', label="Expand Media", var="expandMedia") }}
     </div>
     {% for media_item in blog_post.media %}
       <hr x-show="expandMedia" x-transition.duration.500ms />
@@ -25,7 +25,7 @@
           <button
             type="button"
             class="btn-sm btn-filled"
-            onclick="copyToClipboard('#media-html-{{ loop.index }}')"
+            onclick="copyElementToClipboard('#media-html-{{ loop.index }}')"
           >
             Copy HTML
           </button>
@@ -100,5 +100,9 @@
       {% endif %}
     {% endfor %}
     <div id="flash-errors"></div>
+    <script>
+      // Set the width and height of all media elements
+      setAllMediaWidthHeight()
+    </script>
   </div>
 {% endif %}

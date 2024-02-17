@@ -75,6 +75,23 @@ class SaveCommentResponse(BaseModel, arbitrary_types_allowed=True):
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
 
 
+def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
+    db: Session,
+    *,
+    can_see_unpublished: bool = False,
+    order_by_field: str = "created_timestamp",
+    asc: bool = False,
+    limit: int = 20,
+    offset: int = 0,
+) -> list[db_models.BlogPost]:
+    """Get blog posts."""
+    query = db.query(db_models.BlogPost)
+    if not can_see_unpublished:
+        query = query.filter(db_models.BlogPost.is_published.is_(True))
+    order_by = getattr(getattr(db_models.BlogPost, order_by_field), "asc" if asc else "desc")
+    return query.order_by(order_by()).limit(limit).offset(offset).all()
+
+
 def get_bp_from_id(*, db: Session, bp_id: int, for_update: bool = False) -> db_models.BlogPost:
     """Get a blog post from its ID."""
     try:

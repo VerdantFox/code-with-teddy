@@ -35,20 +35,6 @@
       return confirmationMessage //Gecko + Webkit, Safari, Chrome etc.
     }
 
-    function copyToClipboard(selector) {
-      event.preventDefault()
-      var imageSpan = document.querySelector(selector)
-      var mediaHTML = imageSpan.innerHTML
-      mediaHTML = mediaHTML.replace(/>(\s*)(.*?)(\s*)</g, ">$2<").trim()
-
-      var textArea = document.createElement("textarea")
-      textArea.textContent = mediaHTML
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand("Copy")
-      document.body.removeChild(textArea)
-    }
-
     function setThumbnailImage() {
       const imgPreview = document.getElementById("thumbnail-image")
       const remoteFile = document.getElementById("{{ form.thumbnail_url.id }}")

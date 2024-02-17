@@ -34,5 +34,7 @@
     </main>
     {% include "shared/partials/footer.html" %}
   </body>
-  {% include "shared/partials/after_body.html" %}
+  <script src="{{ url_for('html:static', path='js/custom/script_end.js') }}?{{ static_version }}"></script>
+  {% block custom_js_end %}
+  {% endblock custom_js_end %}
 </html>

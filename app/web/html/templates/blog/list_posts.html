@@ -9,7 +9,7 @@
 %}
 {% block content %}
   <section>
-    <div class="section-container py-64">
+    <div class="section-container pt-64 pb-36">
       <h1 class="text-5xl font-bold mb-20">Code Chronicles</h1>
       <p class="text-2xl max-w-3xl mb-10">
         In the dim glow of my computer screen, after hours of wrestling with a
@@ -19,14 +19,128 @@
         behind the code.
       </p>
       <p class="text-2xl max-w-3xl">
-        In this blog, I write about my experiences and journey as a software
-        developer, about coding topics that I've struggled with in the hopes
-        that you don't have to, and about things I've learned that I think are
-        awesome. This space is a melting pot of tutorials, discussions on tools,
-        and explorations of intriguing software development concepts. My goal is
-        to create a space where you can discover solutions, glean insights, and
-        perhaps find a spark of inspiration.
+        I write about my experiences and journey as a software developer, about
+        coding topics that I've struggled with in the hopes that you don't have
+        to, and about things I've learned that I think are awesome. This space
+        is a melting pot of tutorials, discussions on tools, and explorations of
+        intriguing software development concepts. Enjoy!
       </p>
+    </div>
+  </section>
+
+  <section class="section-container mb-48" x-data="{compact: $persist(false)}">
+    <div :class="compact ? '' : 'max-w-3xl'">
+      <div class="mb-12">
+        <form id="search-form"></form>
+        <div>
+          {{ render_partial('shared/partials/forms/alpine_toggle.html', label="Compact view", var="compact") }}
+        </div>
+      </div>
+      <div
+        id="blog-post-list"
+        :class="compact ? 'gap-12' : 'gap-36'"
+        class="flex flex-col transition duration-500"
+      >
+        {% for blog_post in blog_posts %}
+          <article class="flex gap-16 items-center">
+            <div
+              x-cloak
+              x-show="compact"
+              x-transition:enter.delay.500ms
+              class="w-40 max-md:w-32 max-sm:hidden flex-shrink-0"
+            >
+              {% if blog_post.thumbnail_location %}
+                <img
+                  src="{{ blog_post.thumbnail_location }}"
+                  alt="{{ blog_post.title }}"
+                  class=""
+                />
+              {% else %}
+                {{ render_partial('blog/partials/thumbnail.html', class="w-full", request=request, blog_post=blog_post) }}
+              {% endif %}
+            </div>
+            <div>
+              <h2 class="text-4xl font-bold mb-5 link">
+                <a
+                  href="{{ url_for('html:read_blog_post', slug=blog_post.slug) }}"
+                  >{{ blog_post.title }}</a
+                >
+              </h2>
+              <div
+                :class="compact ? '' : 'mb-16'"
+                class="flex flex-col gap-2 text-xl max-xs:text-lg max-w-xl"
+              >
+                <p>
+                  <span
+                    {# Convert the python UTC datetime object to the users local timezone #}
+                    x-data="{utctime: '{{ blog_post.created_timestamp.isoformat().removesuffix('+00:00') }}Z'}"
+                    x-text="new Date(utctime).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })"
+                  >
+                    {{ blog_post.created_timestamp.strftime('%B %d, %Y') }}
+                  </span>
+                  /
+                  <span>{{ blog_post.read_mins }} min read</span>
+                  /
+                  <span>
+                    <span class="inline-flex items-center gap-1">
+                      <span>{{ "{:,}".format(blog_post.views) }}</span>
+                      {{ render_partial('shared/partials/icons/eye.html', class="h-6 w-6 inline-block", title="views") }} </span
+                    >,&nbsp;
+                    <span class="inline-flex items-center gap-1">
+                      <span>{{ "{:,}".format(blog_post.likes) }}</span>
+                      {{ render_partial('shared/partials/icons/heart.html', class="h-5 w-5 inline-block", title="likes") }}</span
+                    >,&nbsp;
+                    <span class="inline-flex items-center gap-1">
+                      <span
+                        >{{ "{:,}".format(blog_post.comments|length) }}</span
+                      >
+                      {{ render_partial('shared/partials/icons/chat-circle-text.html', class="h-5 w-5 inline-block", title="comments") }}</span
+                    >
+                  </span>
+                </p>
+
+                <p
+                  class="max-xs:text-lg"
+                  x-cloak
+                  x-show="!compact"
+                  x-transition.duration.500ms
+                >
+                  Last Updated:
+                  <span
+                    {# Convert the python UTC datetime object to the users local timezone #}
+                    x-data="{utctime: '{{ blog_post.updated_timestamp.isoformat().removesuffix('+00:00') }}Z'}"
+                    x-text="new Date(utctime).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })"
+                  >
+                    {{ blog_post.updated_timestamp.strftime('%B %d, %Y') }}
+                  </span>
+                </p>
+                <p
+                  class="flex flex-row gap-2 flex-wrap"
+                  x-cloak
+                  x-show="!compact"
+                  x-transition.duration.500ms
+                >
+                  {% for tag in blog_post.tags %}
+                    <a
+                      href="#"
+                      class="rounded-full py-1 px-4 bg-primary-300 dark:bg-offset-800"
+                      >{{ tag.tag }}</a
+                    >
+                  {% endfor %}
+                </p>
+              </div>
+              <div
+                x-cloak
+                x-show="!compact"
+                x-transition.duration.500ms
+                class="@prose prose-2xl prose-ul:list-disc prose-ol:list-decimal prose-li:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:leading-8 prose-a:link prose-a:link-underlined prose-headings:font-semibold prose-code:bg-grayscale-200 dark:prose-code:bg-grayscale-700 prose-code:rounded prose-code:py-0.5 prose-code:px-1 prose-blockquote:border-l-8 prose-blockquote:border-primary-300 dark:prose-blockquote:border-primary-900 prose-blockquote:bg-grayscale-100 dark:prose-blockquote:bg-grayscale-800 prose-blockquote:rounded-r-lg prose-blockquote:pr-4 prose-blockquote:py-0.5"
+              >
+                {{ blog_post.html_description | safe }}
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
     </div>
   </section>
 

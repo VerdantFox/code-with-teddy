@@ -37,6 +37,7 @@ router = APIRouter(tags=["blog"])
 
 logger = getLogger(__name__)
 BLOG_POST = "blog_post"
+BLOG_POSTS = "blog_posts"
 LIKED = "liked"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
 UPLOAD_MEDIA_TEMPLATE = "blog/partials/edit_post_media_form.html"
@@ -53,15 +54,24 @@ ERROR_SAVING_COMMENT = "Error saving comment"
 
 @router.get("/blog", response_model=None)
 async def list_blog_posts(
-    request: Request, current_user: LoggedInUserOptional
+    request: Request, current_user: LoggedInUserOptional, db: DBSession
 ) -> _TemplateResponse:
     """Return the blog list page."""
+    blog_posts = blog_handler.get_blog_posts(
+        db=db,
+        can_see_unpublished=current_user.has_permission(Action.READ_UNPUBLISHED_BP),
+        order_by_field="created_timestamp",
+        asc=False,
+        limit=20,
+        offset=0,
+    )
     return templates.TemplateResponse(
         "blog/list_posts.html",
         {
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
             constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
+            BLOG_POSTS: blog_posts,
         },
     )
 
