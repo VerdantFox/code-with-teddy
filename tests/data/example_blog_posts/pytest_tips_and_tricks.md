@@ -1,5 +1,6 @@
 # 9 pytest tips and tricks to take your tests to the next level
 
+thumbnail: <http://localhost:8000/static/media/local/blog/pytest-logo.png>
 tags: testing, pytest, python
 
 ## Introduction

@@ -108,10 +108,6 @@ class PopulateDB:
     def _populate_blog_posts(self) -> None:
         """Populate the blog_posts table."""
         self.blog_posts = [self.bp_from_path(bp_path) for bp_path in EXAMPLE_BP_DIR.iterdir()]
-        # for blog_post in self.blog_posts:
-        #     self.session.add(blog_post)
-        #     self.session.commit()
-        #     self.session.refresh(blog_post)
 
     def populate(self) -> None:
         """Populate the database with dummy data."""
@@ -125,6 +121,7 @@ class PopulateDB:
         md_content = blog_utils.get_bp_content(file_content)
         md_description = blog_utils.get_bp_introduction(file_content)
         tags = blog_utils.get_bp_tags(file_content)
+        thumbnail_url = blog_utils.get_bp_thumbnail(file_content)
         data = blog_handler.SaveBlogInput(
             title=title,
             tags=tags,
@@ -132,52 +129,26 @@ class PopulateDB:
             can_comment=True,
             description=md_description,
             content=md_content,
+            thumbnail_url=thumbnail_url,
         )
         response = blog_handler.save_blog_post(db=self.session, data=data)
         if not response.blog_post:
             err_msg = f"Failed to save blog post: {response.err_msg}"
             raise ValueError(err_msg)
         blog_post = response.blog_post
-        # blog_post.comments = self._populate_comments(blog_post)
+        # blog_post.comments = self._populate_comments(blog_post) # noqa: ERA001
         blog_post.likes = random.randint(0, 100)
         blog_post.views = random.randint(0, 10_000)
+        blog_post.created_timestamp = LAST_MONTH + timedelta(
+            days=random.randint(1, 15), hours=random.randint(1, 23)
+        )
+        blog_post.updated_timestamp = blog_post.created_timestamp + timedelta(
+            days=random.randint(0, 10), hours=random.randint(0, 23)
+        )
+
         self.session.commit()
         self.session.refresh(blog_post)
         return blog_post
-
-
-# def bp_from_path(blog_post_path: Path) -> db_models.BlogPost:
-#     """Generate a blog post from a Path."""
-#     file_content = blog_post_path.read_text()
-#     title = blog_utils.get_bp_title(file_content)
-#     slug = blog_utils.get_slug(title)
-#     publish_date = LAST_MONTH + timedelta(days=random.randint(1, 15), hours=random.randint(1, 23))
-#     last_modified_date = publish_date + timedelta(
-#         days=random.randint(0, 10), hours=random.randint(0, 23)
-#     )
-#     content = blog_utils.get_bp_content(file_content)
-#     html_content = markdown_parser.markdown_to_html(file_content)
-#     description = blog_utils.get_bp_introduction(file_content)
-#     html_description = markdown_parser.markdown_to_html(description)
-#     tags = blog_utils.get_bp_tags(file_content)
-#     breakpoint()
-#     return db_models.BlogPost(
-#         title=title,
-#         slug=slug,
-#         tags=tags,
-#         is_published=True,
-#         can_comment=True,
-#         read_mins=blog_utils.calc_read_mins(content),
-#         markdown_description=description,
-#         markdown_content=content,
-#         html_description=html_description.content,
-#         html_content=html_content.content,
-#         html_toc=html_content.toc,
-#         created_timestamp=publish_date,
-#         updated_timestamp=last_modified_date,
-#         likes=random.randint(0, 100),
-#         views=random.randint(0, 100),
-#     )
 
 
 if __name__ == "__main__":

@@ -241,6 +241,7 @@ def set_new_bp_fields(data: SaveBlogInput, db: Session | None = None) -> db_mode
         updated_timestamp=now,
         likes=0,
         views=0,
+        thumbnail_location=data.thumbnail_url,
     )
 
 

@@ -75,6 +75,13 @@ def get_bp_tags(content: str) -> list[str]:
     raise ValueError(msg)
 
 
+def get_bp_thumbnail(content: str) -> str | None:
+    """Get the thumbnail of the blog post."""
+    if re_match := re.search(r"thumbnail:\s(.*)\n", content):
+        return re_match[1].strip(" <>")
+    return None
+
+
 def get_bp_title(content: str) -> str:
     """Get the title of the blog post."""
     if re_match := re.search(r"# (.*)\n", content):

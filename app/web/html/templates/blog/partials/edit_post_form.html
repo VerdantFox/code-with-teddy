@@ -35,11 +35,8 @@
   </div>
   {% if blog_post and not form.is_new.data %}
     <div class="mb-12">
-      <div
-        id="thumbnail-image"
-        class="flex items-center justify-center mx-auto mb-12"
-      >
-        {{ render_partial('blog/partials/thumbnail.html', class="max-w-lg max-h-48", request=request, blog_post=blog_post) }}
+      <div id="thumbnail-image" class="w-40 mx-auto mb-4">
+        {{ render_partial('blog/partials/thumbnail.html', class="w-full", request=request, blog_post=blog_post) }}
       </div>
       <div class="">
         {{ render_partial('shared/partials/forms/field.html', field=form.thumbnail_url, class="w-full", extra_fields={"@change":"setThumbnailImage()", "@input.once": "isDirty = true"}) }}

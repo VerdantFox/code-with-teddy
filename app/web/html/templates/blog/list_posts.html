@@ -49,15 +49,11 @@
               x-transition:enter.delay.500ms
               class="w-40 max-md:w-32 max-sm:hidden flex-shrink-0"
             >
-              {% if blog_post.thumbnail_location %}
-                <img
-                  src="{{ blog_post.thumbnail_location }}"
-                  alt="{{ blog_post.title }}"
-                  class=""
-                />
-              {% else %}
+              <a
+                href="{{ url_for('html:read_blog_post', slug=blog_post.slug) }}"
+              >
                 {{ render_partial('blog/partials/thumbnail.html', class="w-full", request=request, blog_post=blog_post) }}
-              {% endif %}
+              </a>
             </div>
             <div>
               <h2 class="text-4xl font-bold mb-5 link">
