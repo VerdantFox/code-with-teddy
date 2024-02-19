@@ -1,0 +1,51 @@
+<form
+  id="search-form"
+  x-data="{advancedOpen: $persist(false)}"
+  hx-get="{{ url_for('html:list_blog_posts') }}"
+  hx-target="#blog-post-list"
+  hx-target-error="#search-form"
+  hx-swap="morph swap:500ms"
+  hx-push-url="true"
+  class="htmx-fade-out-150ms htmx-fade-in-300ms"
+>
+  <div class="mb-12">
+    <div class="flex gap-4 sm:items-center max-sm:flex-col max-w-3xl">
+      <div class="flex rounded-lg flex-1">
+        <button
+          type="submit"
+          class="px-3 py-1 btn-filled rounded-l-lg"
+          title="Search"
+        >
+          {{ render_partial('shared/partials/icons/magnifying-glass.html', class="h-6 w-6 inline-block") }}
+        </button>
+        {{ render_partial('shared/partials/forms/field.html', field=form.search, hide_label=True, field_class="focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400", class="w-full z-10") }}
+        <button
+          type="button"
+          class="px-3 py-1 border-l-0 btn-outline dark:border-gray-500 dark:hover:bg-offset-950 rounded-r-lg"
+          title="Advanced"
+          @click="advancedOpen = !advancedOpen"
+        >
+          Advanced
+        </button>
+      </div>
+      <div>
+        {{ render_partial('shared/partials/forms/alpine_toggle.html', label="Compact view", var="compact") }}
+      </div>
+    </div>
+  </div>
+  <div
+    x-cloak
+    x-show="advancedOpen"
+    x-transition
+    id="advanced-search"
+    class="mb-24 flex flex-col gap-6 max-w-3xl"
+  >
+    {{ render_partial('shared/partials/forms/field.html', field=form.tags) }}
+    <div class="flex items-center gap-8">
+      {{ render_partial('shared/partials/forms/field.html', field=form.results_per_page) }}
+      {{ render_partial('shared/partials/forms/field.html', field=form.order_by) }}
+      {{ render_partial('shared/partials/forms/toggle_field.html', field=form.asc) }}
+    </div>
+  </div>
+  {{ render_partial('shared/partials/flash_messages.html', request=request) }}
+</form>

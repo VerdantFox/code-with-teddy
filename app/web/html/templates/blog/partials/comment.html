@@ -2,7 +2,7 @@
   {% set comment_id = comment.id or "base" %}
   <article
     id="comment-{{ comment_id }}"
-    class="relative htmx-fade-out-300ms htmx-fade-in-300ms{% if is_preview %}
+    class="relative htmx-fade-out-150ms htmx-fade-in-300ms{% if is_preview %}
       ring-2 ring-offset-500 rounded-lg
     {% endif %}"
   >
@@ -84,7 +84,7 @@
               hx-get="{{ url_for('html:comment_edit_get', comment_id=comment.id) }}"
               hx-target="#comment-{{ comment.id }}"
               hx-target-error="#comment-{{ comment.id }}"
-              hx-swap="outerHTML swap:300ms"
+              hx-swap="outerHTML swap:150ms settle:300ms"
               data-tippy-theme="light-border"
             >
               {{ render_partial('shared/partials/icons/note-pencil.html', title="Edit comment", class="h-7 w-7 icon-btn") }}
@@ -99,7 +99,7 @@
               hx-delete="{{ url_for('html:delete_comment', comment_id=comment.id) }}"
               hx-target="#comment-{{ comment.id }}"
               hx-target-error="#comment-{{ comment.id }}"
-              hx-swap="outerHTML swap:300ms"
+              hx-swap="outerHTML swap:150ms settle:300ms"
               hx-confirm="Delete the comment?"
             >
               {{ render_partial('shared/partials/icons/trash.html', title="Delete comment", class="h-7 w-7 icon-btn") }}

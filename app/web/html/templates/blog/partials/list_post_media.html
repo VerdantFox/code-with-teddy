@@ -1,7 +1,7 @@
 {% if blog_post.media %}
   <div
     id="blog-media"
-    class="htmx-fade-out-300ms htmx-fade-in-1s"
+    class="htmx-fade-out-150ms htmx-fade-in-300ms"
     x-data="{expandMedia: $persist(true)}"
   >
     <div class="flex items-center gap-8">
@@ -18,7 +18,7 @@
             class="btn-sm btn-filled-danger"
             hx-delete="{{ url_for('html:delete_blog_post_media', bp_id=blog_post.id, media_id=media_item.id ) }}"
             hx-target="#blog-media"
-            hx-swap="outerHTML"
+            hx-swap="outerHTML swap:150ms settle:300ms"
           >
             Delete
           </button>
@@ -33,7 +33,7 @@
             hx-patch="{{ url_for('html:reorder_bp_media', bp_id=blog_post.id, media_id=media_item.id ) }}"
             hx-target="#blog-media"
             hx-target-error="#flash-errors"
-            hx-swap="outerHTML swap:300ms"
+            hx-swap="outerHTML swap:150ms settle:300ms"
           >
             <input
               id="media-position-{{ loop.index }}"
@@ -45,7 +45,7 @@
               hx-patch="{{ url_for('html:reorder_bp_media', bp_id=blog_post.id, media_id=media_item.id ) }}"
               hx-target="#blog-media"
               hx-target-error="#flash-errors"
-              hx-swap="outerHTML swap:300ms"
+              hx-swap="outerHTML swap:150ms settle:300ms"
             />
           </form>
         </span>

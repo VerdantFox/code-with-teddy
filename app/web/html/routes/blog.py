@@ -10,6 +10,8 @@ from wtforms import (
     EmailField,
     FileField,
     HiddenField,
+    IntegerField,
+    SelectField,
     StringField,
     TextAreaField,
     validators,
@@ -39,6 +41,9 @@ logger = getLogger(__name__)
 BLOG_POST = "blog_post"
 BLOG_POSTS = "blog_posts"
 LIKED = "liked"
+LIST_POSTS_FULL_TEMPLATE = "blog/list_posts.html"
+LIST_POSTS_FORM_TEMPLATE = "blog/partials/list_posts_form.html"
+LISTED_POSTS_TEMPLATE = "blog/partials/listed_posts.html"
 EDIT_BP_TEMPLATE = "blog/edit_post.html"
 UPLOAD_MEDIA_TEMPLATE = "blog/partials/edit_post_media_form.html"
 LIST_MEDIA_TEMPLATE = "blog/partials/list_post_media.html"
@@ -52,26 +57,86 @@ LIKED_POSTS_COOKIE = "liked_posts"  # Sets a cookie with a list of liked posts, 
 ERROR_SAVING_COMMENT = "Error saving comment"
 
 
+class SearchForm(Form):
+    """Form for searching blog posts."""
+
+    search = StringField(
+        "Search", description="Search blog posts", validators=[validators.optional()]
+    )
+    # Advanced search fields
+    tags = StringField(
+        "Tags (comma separated)",
+        description="python, fastapi, web",
+        validators=[validators.optional()],
+    )
+    order_by = SelectField(
+        "Order by",
+        choices=[
+            ("created_timestamp", "Published date"),
+            ("title", "Title"),
+            ("read_mins", "Read time"),
+            ("views", "Views"),
+            ("likes", "Likes"),
+        ],
+        default="created_timestamp",
+    )
+    asc = BooleanField("Ascending", default=False)
+    results_per_page = SelectField(
+        "Results per page",
+        choices=[(10, "10"), (20, "20"), (50, "50"), (100, "100")],
+        default=20,
+        coerce=int,
+    )
+    page = IntegerField("Page", default=1, validators=[validators.optional()])
+
+
 @router.get("/blog", response_model=None)
 async def list_blog_posts(
-    request: Request, current_user: LoggedInUserOptional, db: DBSession
+    request: Request,
+    current_user: LoggedInUserOptional,
+    db: DBSession,
 ) -> _TemplateResponse:
     """Return the blog list page."""
+    is_form_request = request.headers.get("hx-trigger") == "search-form"
+    params = dict(request.query_params)
+    form = SearchForm.load(params)
+    if not form.validate():
+        template = LIST_POSTS_FORM_TEMPLATE if is_form_request else LIST_POSTS_FULL_TEMPLATE
+        FlashMessage(
+            title="Error searching blog posts",
+            text="See errors in form",
+            category=FlashCategory.ERROR,
+        )
+        return templates.TemplateResponse(
+            template,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
+                constants.FORM: form,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
     blog_posts = blog_handler.get_blog_posts(
         db=db,
         can_see_unpublished=current_user.has_permission(Action.READ_UNPUBLISHED_BP),
-        order_by_field="created_timestamp",
-        asc=False,
-        limit=20,
-        offset=0,
+        search=form.search.data,
+        tags=form.tags.data,
+        order_by_field=form.order_by.data,
+        asc=form.asc.data,
+        results_per_page=form.results_per_page.data,
+        page=form.page.data,
     )
+    template = LISTED_POSTS_TEMPLATE if is_form_request else LIST_POSTS_FULL_TEMPLATE
+
     return templates.TemplateResponse(
-        "blog/list_posts.html",
+        template,
         {
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
             constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
             BLOG_POSTS: blog_posts,
+            constants.FORM: form,
         },
     )
 

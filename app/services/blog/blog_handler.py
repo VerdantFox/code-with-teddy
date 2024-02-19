@@ -76,20 +76,37 @@ class SaveCommentResponse(BaseModel, arbitrary_types_allowed=True):
 
 
 def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
-    db: Session,
     *,
-    can_see_unpublished: bool = False,
+    db: Session,
+    can_see_unpublished: bool,
+    search: str | None = None,
+    tags: str | None = None,
     order_by_field: str = "created_timestamp",
     asc: bool = False,
-    limit: int = 20,
-    offset: int = 0,
+    results_per_page: int = 20,
+    page: int = 1,
 ) -> list[db_models.BlogPost]:
     """Get blog posts."""
     query = db.query(db_models.BlogPost)
     if not can_see_unpublished:
         query = query.filter(db_models.BlogPost.is_published.is_(True))
-    order_by = getattr(getattr(db_models.BlogPost, order_by_field), "asc" if asc else "desc")
-    return query.order_by(order_by()).limit(limit).offset(offset).all()
+    if tags:
+        tags_list = transforms.to_list(tags, lowercase=True)
+        query = query.filter(db_models.BlogPost.tags.any(db_models.BlogPostTag.tag.in_(tags_list)))
+    if search:
+        query = query.filter(db_models.BlogPost.ts_vector.match(search))
+    order_by = getattr(db_models.BlogPost, order_by_field)
+
+    if not asc:
+        order_by = order_by.desc()
+    limit, offset = _calculate_limit_offset(results_per_page=results_per_page, page=page)
+    return query.order_by(order_by).limit(limit).offset(offset).all()
+
+
+def _calculate_limit_offset(*, results_per_page: int, page: int) -> tuple[int, int]:
+    """Calculate the limit and offset for a query."""
+    limit = results_per_page
+    return limit, (page - 1) * limit
 
 
 def get_bp_from_id(*, db: Session, bp_id: int, for_update: bool = False) -> db_models.BlogPost:
