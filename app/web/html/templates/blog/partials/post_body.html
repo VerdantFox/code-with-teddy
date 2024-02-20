@@ -1,5 +1,3 @@
 {% if blog_post %}
-  <article id="blog-article" class="">
-    {{ blog_post.html_content|safe }}
-  </article>
+  <article id="blog-article">{{ blog_post.html_content|safe }}</article>
 {% endif %}
