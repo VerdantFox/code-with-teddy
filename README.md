@@ -6,22 +6,40 @@ My portfolio, blog, and mini-projects website, revamped for 2024
 
 ### Python
 
+First, install [uv](https://github.com/astral-sh/uv) for package management. I recommend:
+
+```bash
+pipx install uv
+```
+
+Then install python environment:
+
 ```bash
 # Create a virtual environment
-python3.11 -m venv venv
+uv venv --python=3.11 venv
 source venv/bin/activate
 
-# Upgrade pip
-pip install --upgrade pip
-
 # Install DEV dependencies
-pip install -r requirements-dev.txt
+uv pip install -r requirements-dev.txt
+```
+
+Update requirements with:
+
+```bash
+./scripts/update-requirements.sh
 ```
 
 ### Node
 
+First, install the latest versions of npm and node. Then install the node environment:
+
 ```bash
 # Install node environment
 npm install
+```
 
+To update the node packages run:
+
+```bash
+npm update
 ```

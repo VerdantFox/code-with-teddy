@@ -75,7 +75,7 @@
           >
             {% for tag in blog_post.tags %}
               <a
-                href="{{ url_for('html:list_blog_posts').include_query_params(tags=tag.tag) }}"
+                href="{{ url_for('html:list_blog_posts').include_query_params(tags=tag.tag) }}#posts-section"
                 class="rounded-full py-1 px-4 bg-primary-300 dark:bg-offset-800"
                 >{{ tag.tag }}</a
               >
