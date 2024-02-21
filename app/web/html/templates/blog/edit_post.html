@@ -1,6 +1,11 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
 {% set hx_boost = False %}
+{% if form.is_new.data %}
+  {% set page_title = "Create blog post" %}
+{% else %}
+  {% set page_title = "Edit blog post" %}
+{% endif %}
 {%
   set admin_extras = [
   {"href": url_for("html:create_bp_get"),

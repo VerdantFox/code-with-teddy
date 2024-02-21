@@ -1,5 +1,6 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
+{% set page_title = blog_post.title %}
 {%
   set admin_extras = [
   {"href": url_for("html:edit_bp_get", bp_id=blog_post.id),
