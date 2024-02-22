@@ -40,11 +40,11 @@
     id="advanced-search"
     class="mb-24 flex flex-col gap-6 max-w-3xl"
   >
-    {{ render_partial('shared/partials/forms/field.html', field=form.tags) }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.tags, extra_fields={"hx-get": url_for('html:list_blog_posts'), "hx-include": "#search-form"}) }}
     <div class="flex items-center gap-8">
-      {{ render_partial('shared/partials/forms/field.html', field=form.results_per_page) }}
-      {{ render_partial('shared/partials/forms/field.html', field=form.order_by) }}
-      {{ render_partial('shared/partials/forms/toggle_field.html', field=form.asc) }}
+      {{ render_partial('shared/partials/forms/field.html', field=form.results_per_page, extra_fields={"hx-get": url_for('html:list_blog_posts'), "hx-include": "#search-form"}) }}
+      {{ render_partial('shared/partials/forms/field.html', field=form.order_by, extra_fields={"hx-get": url_for('html:list_blog_posts'), "hx-include": "#search-form"}) }}
+      {{ render_partial('shared/partials/forms/toggle_field.html', field=form.asc, extra_fields={"hx-get": url_for('html:list_blog_posts'), "hx-include": "#search-form"}) }}
     </div>
   </div>
   {{ render_partial('shared/partials/flash_messages.html', request=request) }}

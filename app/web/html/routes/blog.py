@@ -36,8 +36,8 @@ from app.web.html.wtform_utils.wtform_fields import BooleanField
 
 # ----------- Routers -----------
 router = APIRouter(tags=["blog"])
-
 logger = getLogger(__name__)
+
 BLOG_POST = "blog_post"
 BLOG_POSTS = "blog_posts"
 LIKED = "liked"
@@ -97,7 +97,7 @@ async def list_blog_posts(
     db: DBSession,
 ) -> _TemplateResponse:
     """Return the blog list page."""
-    is_form_request = request.headers.get("hx-trigger") == "search-form"
+    is_form_request = request.headers.get("hx-target") == "blog-post-list"
     params = dict(request.query_params)
     form = SearchForm.load(params)
     if not form.validate():
