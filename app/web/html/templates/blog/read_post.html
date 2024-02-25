@@ -127,13 +127,22 @@
   <div
     x-data="{ tocOpen: false, allowTocClose: false }"
     class="break-words text-wrap"
+    x-init="() => {
+      window.addEventListener('resize', () => {
+          tocOpen = false;
+      });
+    }"
   >
     <div class="max-w-[100rem] border-b dark:border-grayscale-900">
       <div
         class="grid grid-cols-[minmax(20rem,_1fr)_4fr_minmax(20rem,_1fr)] max-2xl:grid-cols-[minmax(20rem,_1fr)_4fr_minmax(16rem,_1fr)] max-xl:grid-cols-[minmax(20rem,_1fr)_3fr] max-lg:grid-cols-[minmax(14rem,_1fr)_3fr] max-md:grid-cols-1 gap-20 max-xl:gap-12 md:relative "
       >
         <!-- Table of Contents -->
-        <div id="toc-outer" class="md:bg-offset-50 md:dark:bg-grayscale-800">
+        <div
+          id="toc-outer"
+          class="md:bg-offset-50 md:dark:bg-grayscale-800"
+          x-trap.inert="tocOpen"
+        >
           <button
             x-cloak
             @click="tocOpen = false; allowTocClose = false"
