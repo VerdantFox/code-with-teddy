@@ -85,7 +85,15 @@
           x-transition.duration.500ms
         >
           <div class="flex justify-center content-center">
-            <video class="w-4/5" muted autoplay loop controls>
+            <video
+              class="w-4/5"
+              muted
+              autoplay
+              loop
+              controls
+              playsinline
+              poster="{{ url_for('html:static', path='media/shared/video-poster.svg') }}"
+            >
               {% set locations = media_item.locations_to_list() %}
               {% for location in locations %}
                 <source

@@ -56,6 +56,7 @@ def upload_blog_media(media: UploadFile, name: str) -> tuple[str, str]:
         A tuple of the path string and the media type.
 
     See `save_media` for more details.
+
     """
     name = secure_filename(f"{name}.{get_suffix(media)}")
     return save_media(media, name)
@@ -72,6 +73,7 @@ def save_media(media: UploadFile, name: str) -> tuple[str, str]:
 
     Images save a webp version as well as the original,
     if the webp version is smaller.
+
     """
     media_type = get_media_type_from_file(media)
     if media_type == MediaType.IMAGE:

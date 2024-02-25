@@ -45,8 +45,10 @@ function setElementWidthHeight(element) {
     }
     image.src = element.src
   } else if (element.tagName === "VIDEO") {
-    element.setAttribute("width", element.videoWidth)
-    element.setAttribute("height", element.videoHeight)
+    element.addEventListener("loadedmetadata", function () {
+      element.setAttribute("width", this.videoWidth)
+      element.setAttribute("height", this.videoHeight)
+    })
   }
 }
 
@@ -59,3 +61,37 @@ function setAllMediaWidthHeight() {
     setElementWidthHeight(element)
   })
 }
+
+// Lazy load videos
+document.addEventListener("DOMContentLoaded", function () {
+  const lazyVideos = [].slice.call(document.querySelectorAll("video.lazy"))
+
+  if ("IntersectionObserver" in window) {
+    const lazyVideoObserver = new IntersectionObserver(function (
+      entries,
+      observer
+    ) {
+      entries.forEach(function (video) {
+        if (video.isIntersecting) {
+          for (const source in video.target.children) {
+            const videoSource = video.target.children[source]
+            if (
+              typeof videoSource.tagName === "string" &&
+              videoSource.tagName === "SOURCE"
+            ) {
+              videoSource.src = videoSource.dataset.src
+            }
+          }
+
+          video.target.load()
+          video.target.classList.remove("lazy")
+          lazyVideoObserver.unobserve(video.target)
+        }
+      })
+    })
+
+    lazyVideos.forEach(function (lazyVideo) {
+      lazyVideoObserver.observe(lazyVideo)
+    })
+  }
+})

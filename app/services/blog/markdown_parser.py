@@ -66,7 +66,7 @@ def update_html(html: str, *, update_headers: bool = True) -> str:
         _update_html_headers(html_soup)
     _update_html_pre_tags(html_soup)
     _update_html_code_highlights(html_soup)
-    _update_html_images(html_soup)
+    _update_html_media(html_soup)
     return str(html_soup)
 
 
@@ -100,7 +100,7 @@ def _update_html_code_highlights(html_soup: BeautifulSoup) -> None:
         code_tag["class"].append("not-prose")
 
 
-def _update_html_images(html_soup: BeautifulSoup) -> None:
+def _update_html_media(html_soup: BeautifulSoup) -> None:
     """Add classes to all images.
 
     - Make all images centered.
@@ -109,13 +109,19 @@ def _update_html_images(html_soup: BeautifulSoup) -> None:
     - Make all images lazy loaded.
     """
     for img in html_soup.find_all("img"):
-        img["class"] = "rounded-lg"
+        img["class"] = [*img.get("class", []), "rounded-lg"]
         img["loading"] = "lazy"
         if img.parent.name != "p":
             continue
-        img.parent["class"] = "text-center"
+        img.parent["class"] = [*img.parent.get("class", []), "text-center"]
     for picture in html_soup.find_all("picture"):
-        picture.parent["class"] = "text-center"
+        picture.parent["class"] = [*picture.parent.get("class", []), "text-center"]
+    for video in html_soup.find_all("video"):
+        video["class"] = [*video.get("class", []), "lazy"]
+        for source in video.find_all("source"):
+            if source.get("src"):
+                source["data-src"] = source["src"]
+                del source["src"]
 
 
 def update_toc(toc: str) -> str:
