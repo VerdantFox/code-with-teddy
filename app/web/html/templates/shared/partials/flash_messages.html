@@ -1,7 +1,7 @@
 {% set messages = get_flashed_messages(request) %}
 <!-- prettier-ignore-start -->
 {% if messages %}
-  <script>
+  <script nonce="{{ request.state.nonce }}">
     {% for message in messages %}
       pushNotify('{{ message.title or "" }}', '{{ message.text or "" }}', '{{ message.category.value }}', {{ message.timeout * 1000 }})
     {% endfor %}

@@ -104,7 +104,7 @@
             >
               {{ render_partial('shared/partials/icons/trash.html', title="Delete comment", class="h-7 w-7 icon-btn") }}
             </button>
-            <script>
+            <script nonce="{{ request.state.nonce }}">
               addConfirmEventListener("delete-comment-btn-{{ comment.id }}")
             </script>
           {% endif %}

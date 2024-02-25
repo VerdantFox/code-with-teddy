@@ -108,7 +108,7 @@
       {% endif %}
     {% endfor %}
     <div id="flash-errors"></div>
-    <script>
+    <script nonce="{{ request.state.nonce }}">
       // Set the width and height of all media elements
       setAllMediaWidthHeight()
     </script>

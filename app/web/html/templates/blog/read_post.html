@@ -13,7 +13,7 @@
 %}
 
 {% block custom_js %}
-  <script>
+  <script nonce="{{ request.state.nonce }}">
     // Highlight the table of contents element that corresponds to the current
     // scroll position
     function highlightTocElement(id) {

@@ -11,7 +11,7 @@
 {% endblock content %}
 
 {% block custom_js %}
-  <script>
+  <script nonce="{{ request.state.nonce }}">
     function setAvatarImage() {
       const imgPreview = document.getElementById("avatar-image")
       const chooseFile = document.getElementById("{{ form.avatar_upload.id }}")

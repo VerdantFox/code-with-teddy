@@ -23,7 +23,7 @@
   %}
 {% endif %}
 {% block custom_js %}
-  <script>
+  <script nonce="{{ request.state.nonce }}">
     var formSubmitting = false
     function setFormSubmitting() {
       formSubmitting = true

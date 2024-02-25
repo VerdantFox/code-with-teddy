@@ -18,14 +18,21 @@
 
 <!-- External JavaScript Libraries (loaded from our code) -->
 <script
+  nonce="{{ request.state.nonce }}"
   defer
   src="{{ url_for('html:static', path='js/libraries/bundled-deferred.js') }}?{{ libraries_static_version }}"
 ></script>
-<script src="{{ url_for('html:static', path='js/libraries/bundled-non-deferred.js') }}?{{ libraries_static_version }}"></script>
+<script
+  nonce="{{ request.state.nonce }}"
+  src="{{ url_for('html:static', path='js/libraries/bundled-non-deferred.js') }}?{{ libraries_static_version }}"
+></script>
 
 <!-- Custom JavaScript -->
-<script src="{{ url_for('html:static', path='js/custom/script.js') }}?{{ static_version }}"></script>
-<script>
+<script
+  nonce="{{ request.state.nonce }}"
+  src="{{ url_for('html:static', path='js/custom/script.js') }}?{{ static_version }}"
+></script>
+<script nonce="{{ request.state.nonce }}">
   // Handle initial dark mode state here before body loads
   // to avoid flash of unstyled content. Afterwards, handled by Alpine.js.
   if (
