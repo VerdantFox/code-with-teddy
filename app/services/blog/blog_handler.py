@@ -378,9 +378,9 @@ def _commit_media_to_db(
 def toggle_blog_post_like(*, db: Session, bp: db_models.BlogPost, like: bool) -> db_models.BlogPost:
     """Toggle a blog post like."""
     if like:
-        bp.likes += 1
+        bp.likes = db_models.BlogPost.likes + 1
     else:
-        bp.likes -= 1
+        bp.likes = db_models.BlogPost.likes - 1
     db.commit()
     return bp
 
