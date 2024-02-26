@@ -9,13 +9,6 @@ keyboard = Controller()
 cli_app = typer.Typer(add_completion=False)
 
 
-class Opts:
-    """Options for the typer function script."""
-
-    no_browser_sync_help = "Don't run browser-sync."
-    no_browser_sync = typer.Option(..., help="Don't run browser-sync.")
-
-
 @cli_app.command()
 def main(
     *,
@@ -28,12 +21,30 @@ def main(
             help="Don't run browser-sync.",
         ),
     ] = False,
+    start_postgres: Annotated[
+        bool,
+        typer.Option(
+            ...,
+            "--start-postgres/--no-start-postgres",
+            "-p/-np",
+            help="Don't start a local postgres server.",
+        ),
+    ] = True,
 ) -> None:
     """Run the app in development mode."""
     run_tailwind()
     if browser_sync:
         run_browser_sync()
-    run_uvicorn()
+    run_uvicorn(start_postgres=start_postgres)
+
+
+def run_cmd(args: list[str], *, new_terminal: bool = True) -> None:
+    """Run a command in the opened terminal."""
+    if new_terminal:
+        open_new_terminal()
+    keyboard.type(" ".join(args))
+    keyboard.press(Key.enter)
+    keyboard.release(Key.enter)
 
 
 def open_new_terminal() -> None:
@@ -49,22 +60,16 @@ def open_new_terminal() -> None:
     time.sleep(0.5)
 
 
-def run_cmd(args: list[str]) -> None:
-    """Run a command in the opened terminal."""
-    open_new_terminal()
-    keyboard.type(" ".join(args))
-    keyboard.press(Key.enter)
-    keyboard.release(Key.enter)
-
-
 def run_tailwind() -> None:
     """Start a tailwind server with hot reloading."""
     args = ["npm", "run", "watch"]
     run_cmd(args)
 
 
-def run_uvicorn() -> None:
+def run_uvicorn(*, start_postgres: bool) -> None:
     """Start a uvicorn server with hot reloading."""
+    open_new_terminal()
+    run_setup(start_postgres=start_postgres)
     args = [
         "uvicorn",
         "app.web.main:app",
@@ -74,7 +79,17 @@ def run_uvicorn() -> None:
         '--reload-include="*.css"',
         '--reload-include="*.js"',
     ]
-    run_cmd(args)
+    run_cmd(args, new_terminal=False)
+
+
+def run_setup(*, start_postgres: bool) -> None:
+    """Run the setup script."""
+    args = ["uv", "pip", "sync", "requirements-dev.txt"]
+    run_cmd(args, new_terminal=False)
+
+    if start_postgres:
+        args = ["docker", "start", "postgres"]
+        run_cmd(args, new_terminal=False)
 
 
 def run_browser_sync() -> None:

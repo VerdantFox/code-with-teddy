@@ -65,7 +65,9 @@ dependencies = [
     # Pytz: timezone library
     "pytz",
     # SQLAlchemy: database toolkit
-    "SQLAlchemy",
+    "sqlalchemy[asyncio]",
+    # Uv: Python package manager
+    "uv",
     # Uvicorn: ASGI server
     "uvicorn[standard]",
     # werkzeug: WSGI utility library (also useful utilities for our ASGI app)
