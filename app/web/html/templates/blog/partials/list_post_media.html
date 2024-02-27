@@ -25,7 +25,7 @@
           <button
             type="button"
             class="btn-sm btn-filled"
-            onclick="copyElementToClipboard('#media-html-{{ loop.index }}')"
+            @click="copyElementToClipboard('#media-html-{{ loop.index }}')"
           >
             Copy HTML
           </button>

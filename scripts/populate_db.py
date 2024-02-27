@@ -13,8 +13,11 @@ You can run (or not run) this script automatically as the last step of the
 """
 import os
 import random
+import textwrap
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+import faker
 
 from app import permissions
 from app.datastore import db_models
@@ -37,6 +40,8 @@ THREE_DAYS_FUTURE = TODAY + timedelta(days=3)
 LAST_MONTH = TODAY - timedelta(days=30)
 LAST_WEEK = TODAY - timedelta(days=7)
 NEXT_WEEK = TODAY + timedelta(days=7)
+
+FAKER = faker.Faker()
 
 
 def populate_database() -> None:
@@ -136,7 +141,6 @@ class PopulateDB:
             err_msg = f"Failed to save blog post: {response.err_msg}"
             raise ValueError(err_msg)
         blog_post = response.blog_post
-        # blog_post.comments = self._populate_comments(blog_post) # noqa: ERA001
         blog_post.likes = random.randint(0, 100)
         blog_post.views = random.randint(0, 10_000)
         blog_post.created_timestamp = LAST_MONTH + timedelta(
@@ -145,10 +149,33 @@ class PopulateDB:
         blog_post.updated_timestamp = blog_post.created_timestamp + timedelta(
             days=random.randint(0, 10), hours=random.randint(0, 23)
         )
-
         self.session.commit()
         self.session.refresh(blog_post)
+        for _ in range(random.randint(1, 5)):
+            self._create_comment(blog_post)
         return blog_post
+
+    def _create_comment(self, blog_post: db_models.BlogPost) -> None:
+        """Create a comment for a blog post."""
+        is_guest = random.choice([True, False])
+        content = textwrap.dedent(
+            f"""\
+            {FAKER.paragraph()}
+
+            ## {FAKER.sentence()}
+
+            {FAKER.paragraph()}
+            """
+        )
+        data = blog_handler.SaveCommentInput(
+            bp_id=blog_post.id,
+            guest_id=f"guest_id_{random.randint(1, 1000)}" if is_guest else None,
+            name="Guest Name" if is_guest else None,
+            email="guest@email.com" if is_guest else None,
+            user_id=None if is_guest else random.choice(self.users).id,
+            content=content,
+        )
+        blog_handler.save_new_comment(db=self.session, data=data)
 
 
 if __name__ == "__main__":

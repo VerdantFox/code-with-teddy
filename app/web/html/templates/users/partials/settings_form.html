@@ -22,7 +22,7 @@
     <div
       class="col-span-2 max-lg:col-span-1 flex items-center justify-start gap-8 max-lg:flex-col"
     >
-      {{ render_partial('shared/partials/forms/file_upload_field.html', field=form.avatar_upload, class="max-lg:w-full", extra_fields={"@change":"setAvatarImage()"}) }}
+      {{ render_partial('shared/partials/forms/file_upload_field.html', request=request, field=form.avatar_upload, class="max-lg:w-full", extra_fields={"@change":"setAvatarImage()"}) }}
       <span class="text-lg font-bold">OR</span>
       {{ render_partial('shared/partials/forms/field.html', field=form.avatar_url, class="w-full", extra_fields={"@change":"setAvatarImage()"}) }}
     </div>

@@ -11,5 +11,6 @@ def set_guest_user_id_cookie(*, guest_id: str, response: Response) -> None:
         guest_id,
         max_age=constants.ONE_YEAR_IN_SECONDS,
         httponly=True,
+        secure=True,
         samesite="lax",
     )

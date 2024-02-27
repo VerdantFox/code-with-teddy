@@ -20,7 +20,7 @@
             <div class="p-3 hidden @2xl:block"></div>
           </div>
           {# The @input updates the name field (above) from the file name in the input field (below) #}
-          {{ render_partial('shared/partials/forms/file_upload_field.html', field=form.media, class="w-full", hx_form_id="blog-media-form", extra_fields={"@input": "fileInput = $event.target.files[0].name; media_title = fileInput.split('.')[0].replace(/[_-]/g, ' ').charAt(0).toUpperCase() + fileInput.split('.')[0].replace(/[_-]/g, ' ').slice(1);"}) }}
+          {{ render_partial('shared/partials/forms/file_upload_field.html', request=request, field=form.media, class="w-full", hx_form_id="blog-media-form", extra_fields={"@input": "fileInput = $event.target.files[0].name; media_title = fileInput.split('.')[0].replace(/[_-]/g, ' ').charAt(0).toUpperCase() + fileInput.split('.')[0].replace(/[_-]/g, ' ').slice(1);"}) }}
         </div>
       </div>
       {{ render_partial('shared/partials/forms/submit_button.html', text="Upload", class="w-full @2xl:w-min", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}

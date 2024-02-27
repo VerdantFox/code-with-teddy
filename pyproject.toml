@@ -82,6 +82,8 @@ dev = [
     "alembic",
     # Docker: containerization tool
     "docker",
+    # Faker: fake data generator
+    "faker",
     # Mypy: static type checker
     "mypy",
     # Pip-tools: dependency management

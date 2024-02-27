@@ -271,6 +271,9 @@ email-validator==2.1.1 \
 evdev==1.7.0 \
     --hash=sha256:95bd2a1e0c6ce2cd7a2ecc6e6cd9736ff794b3ad5cb54d81d8cbc2e414d0b870
     # via pynput
+faker==23.2.1 \
+    --hash=sha256:0520a6b97e07c658b2798d7140971c1d5bc4bcd5013e7937fe075fd054aa320c \
+    --hash=sha256:f07b64d27f67b62c7f0536a72f47813015b3b51cd4664918454011094321e464
 fastapi==0.110.0 \
     --hash=sha256:266775f0dcc95af9d3ef39bad55cff525329a931d5fd51930aadd4f428bf7ff3 \
     --hash=sha256:87a1f6fb632a218222c5984be540055346a8f5d8a68e8f6fb647b1dc9934de4b
@@ -808,6 +811,10 @@ pyproject-hooks==1.0.0 \
 pytest==8.0.2 \
     --hash=sha256:d4051d623a2e0b7e51960ba963193b09ce6daeb9759a451844a21e4ddedfc1bd \
     --hash=sha256:edfaaef32ce5172d5466b5127b42e0d6d35ebbe4453f0e3505d96afd93f6b096
+python-dateutil==2.8.2 \
+    --hash=sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86 \
+    --hash=sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9
+    # via faker
 python-dotenv==1.0.1 \
     --hash=sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca \
     --hash=sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a
@@ -930,6 +937,7 @@ six==1.16.0 \
     #   bleach
     #   ecdsa
     #   pynput
+    #   python-dateutil
     #   python-xlib
 sniffio==1.3.1 \
     --hash=sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2 \
