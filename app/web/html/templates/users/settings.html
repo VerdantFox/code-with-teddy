@@ -9,29 +9,3 @@
     </div>
   </section>
 {% endblock content %}
-
-{% block custom_js %}
-  <script nonce="{{ request.state.nonce }}">
-    function setAvatarImage() {
-      const imgPreview = document.getElementById("avatar-image")
-      const chooseFile = document.getElementById("{{ form.avatar_upload.id }}")
-      const remoteFile = document.getElementById("{{ form.avatar_url.id }}")
-
-      const files = chooseFile.files[0]
-      console.log(files)
-      if (files) {
-        const fileReader = new FileReader()
-        fileReader.readAsDataURL(files)
-        fileReader.addEventListener("load", function () {
-          imgPreview.innerHTML =
-            '<img src="' + this.result + '" class="object-cover h-36 w-36" />'
-        })
-      } else if (remoteFile.value) {
-        imgPreview.innerHTML =
-          '<img src="' +
-          remoteFile.value +
-          '" class="object-cover h-36 w-36" />'
-      }
-    }
-  </script>
-{% endblock custom_js %}

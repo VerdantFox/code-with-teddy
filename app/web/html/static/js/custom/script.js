@@ -1,3 +1,4 @@
+// Push a notification message to the screen
 function pushNotify(title, text = "", status = "success", autotimeout = 3000) {
   new Notify({
     status: status,
@@ -18,6 +19,7 @@ function pushNotify(title, text = "", status = "success", autotimeout = 3000) {
   })
 }
 
+// Copy text to the clipboard
 function copyTextToClipboard(text, message = "Copied!") {
   navigator.clipboard
     .writeText(text.trim())
@@ -29,6 +31,7 @@ function copyTextToClipboard(text, message = "Copied!") {
     })
 }
 
+// Copy the innerHTML of an element to the clipboard
 function copyElementToClipboard(selector, message = "Copied!") {
   const element = document.querySelector(selector)
   let textToCopy = element.innerHTML
@@ -36,6 +39,7 @@ function copyElementToClipboard(selector, message = "Copied!") {
   copyTextToClipboard(textToCopy, message)
 }
 
+// Set width and height attributes for an individual img or video element
 function setElementWidthHeight(element) {
   if (element.tagName === "IMG") {
     const image = new Image()
@@ -52,6 +56,8 @@ function setElementWidthHeight(element) {
   }
 }
 
+// Set width and height attributes for all img and video elements
+// If they are missing
 function setAllMediaWidthHeight() {
   // Select all img and video elements
   const mediaElements = document.querySelectorAll(
@@ -95,3 +101,59 @@ document.addEventListener("DOMContentLoaded", function () {
     })
   }
 })
+
+// Highlight the table of contents element that corresponds to the current
+// scroll position (in blog posts)
+function highlightTocElement(id) {
+  const navLinks = document.querySelectorAll("#toc a")
+  const highlightedNavLink = document.querySelector(`#toc a[href='#${id}']`)
+  if (!highlightedNavLink) {
+    return
+  }
+  navLinks.forEach((a) => {
+    a.classList.remove("blog-nav-highlight")
+  })
+  highlightedNavLink.classList.add("blog-nav-highlight")
+}
+
+// Add a confirm dialog popup to all elements with the `confirm` class
+function addConfirmEventListener(id) {
+  const el = document.getElementById(id)
+  if (!el) {
+    return
+  }
+  // Confirm before proceeding with an htmx request
+  el.addEventListener("htmx:confirm", function (e) {
+    e.preventDefault()
+    Swal.fire({
+      title: "Proceed?",
+      text: e.detail.question,
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+    }).then(function (result) {
+      if (result.isConfirmed) {
+        e.detail.issueRequest(true) // use true to skip window.confirm
+      }
+    })
+  })
+}
+
+// Set the avatar image preview (in user settings)
+function setAvatarImage(avatar_upload_id, avatar_url_id) {
+  const imgPreview = document.getElementById("avatar-image")
+  const chooseFile = document.getElementById(avatar_upload_id)
+  const remoteFile = document.getElementById(avatar_url_id)
+
+  const files = chooseFile.files[0]
+  if (files) {
+    const fileReader = new FileReader()
+    fileReader.readAsDataURL(files)
+    fileReader.addEventListener("load", function () {
+      imgPreview.innerHTML =
+        '<img src="' + this.result + '" class="object-cover h-36 w-36" />'
+    })
+  } else if (remoteFile.value) {
+    imgPreview.innerHTML =
+      '<img src="' + remoteFile.value + '" class="object-cover h-36 w-36" />'
+  }
+}
