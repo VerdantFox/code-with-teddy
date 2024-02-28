@@ -42,8 +42,7 @@ class CSPMiddleware(BaseHTTPMiddleware):
             f"default-src {SELF}",
             f"style-src {SELF}  {FONTS_BUNNY} {UNSAFE_INLINE}",
             f"font-src {SELF} {FONTS_BUNNY}",
-            # f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL}",  # noqa: ERA001
-            f"script-src {SELF} {UNSAFE_INLINE} {UNSAFE_EVAL}",
+            f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL}",
             "img-src * data:",
         ]
         response.headers["Content-Security-Policy"] = "; ".join(csp_policy)

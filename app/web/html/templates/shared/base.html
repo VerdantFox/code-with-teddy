@@ -38,6 +38,11 @@
     nonce="{{ request.state.nonce }}"
     src="{{ url_for('html:static', path='js/custom/script_end.js') }}?{{ static_version }}"
   ></script>
+  <script nonce="{{ request.state.nonce }}">
+    if (!htmx.config.inlineScriptNonce) {
+      htmx.config.inlineScriptNonce = "{{ request.state.nonce }}"
+    }
+  </script>
   {% block custom_js_end %}
   {% endblock custom_js_end %}
 </html>

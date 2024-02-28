@@ -23,6 +23,8 @@ def is_allowed_extension(extensions: list[str], error_msg: str = "") -> Callable
         filename = (
             field.data.filename if isinstance(field.data, StarletteUploadFile) else field.data
         )
+        if not filename:
+            return
         if not extensions_regex.search(filename):
             msg = error_msg or f"Invalid file extension. Allowed: {', '.join(extensions)}."
             raise ValidationError(msg)
