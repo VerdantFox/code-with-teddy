@@ -1,16 +1,16 @@
 """database: database connection and dependency."""
-from collections.abc import Generator
+
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.settings import settings
 
 # connect_args={"check_same_thread": False} for SQLite
 
-engine = create_engine(
+engine = create_async_engine(
     settings.db_connection_string,
     echo=settings.db_echo,
     pool_size=settings.db_pool_size,
@@ -18,10 +18,11 @@ engine = create_engine(
 )
 
 
-def get_db_session() -> Generator[Session, None, None]:
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """Start a SessionLocal transaction and yield it."""
-    with Session(engine) as session:
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
+    async with async_session() as session:
         yield session
 
 
-DBSession = Annotated[Session, Depends(get_db_session)]
+DBSession = Annotated[AsyncSession, Depends(get_db_session)]

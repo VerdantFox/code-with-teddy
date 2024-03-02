@@ -117,7 +117,7 @@ async def list_blog_posts(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    blog_posts = blog_handler.get_blog_posts(
+    blog_posts = await blog_handler.get_blog_posts(
         db=db,
         can_see_unpublished=current_user.has_permission(Action.READ_UNPUBLISHED_BP),
         search=form.search.data,
@@ -205,7 +205,7 @@ async def create_bp_post(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     input_data = blog_handler.SaveBlogInput(**form.data)
-    response = blog_handler.save_blog_post(db, input_data)
+    response = await blog_handler.save_blog_post(db, input_data)
     if not response.success or not response.blog_post:
         for error_field, error_msg in response.field_errors.items():
             form[error_field].errors.extend(error_msg)
@@ -243,7 +243,7 @@ async def read_blog_post(
     NOTE: This route needs to be after the create_bp_get route,
     otherwise it will match.
     """
-    bp = blog_handler.get_bp_from_slug(db=db, slug=slug)
+    bp = await blog_handler.get_bp_from_slug(db=db, slug=slug)
     liked = bp.id in _get_liked_posts_from_cookie(request)
     comment_form_class = (
         LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
@@ -266,12 +266,12 @@ async def read_blog_post(
 @router.post("/blog/{bp_id}/like", response_model=None)
 async def like_blog_post(request: Request, db: DBSession, bp_id: int) -> _TemplateResponse:
     """Like or unlike a blog post and set a cookie to remember it."""
-    with db.begin():
-        bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id, for_update=True)
+    async with db.begin():
+        bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id, for_update=True)
         liked_posts = _get_liked_posts_from_cookie(request)
         liked = bp.id in liked_posts
-        blog_handler.toggle_blog_post_like(db=db, bp=bp, like=not liked)
-    db.refresh(bp)
+        await blog_handler.toggle_blog_post_like(db=db, bp=bp, like=not liked)
+    await db.refresh(bp)
 
     response = templates.TemplateResponse(
         "blog/partials/like_button.html",
@@ -344,7 +344,7 @@ async def get_comment(
     request: Request, db: DBSession, comment_id: int, current_user: LoggedInUserOptional
 ) -> _TemplateResponse:
     """Return a comment. Called when canceling a comment edit."""
-    comment = blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
+    comment = await blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
     return templates.TemplateResponse(
         COMMENT_TEMPLATE,
         {constants.REQUEST: request, constants.CURRENT_USER: current_user, "comment": comment},
@@ -356,7 +356,7 @@ async def comment_edit_get(
     request: Request, db: DBSession, comment_id: int, current_user: LoggedInUserOptional
 ) -> _TemplateResponse:
     """Return page partial to edit a comment."""
-    comment = blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
+    comment = await blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
     if not blog_handler.can_edit_comment(current_user=current_user, comment=comment):
         return templates.TemplateResponse(
             COMMENT_TEMPLATE,
@@ -433,7 +433,7 @@ async def comment_blog_post(
         LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
     )
     form = comment_form_class.load(form_data)
-    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
+    bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     liked = bp.id in _get_liked_posts_from_cookie(request)
     if current_user.is_authenticated:
         assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
@@ -483,7 +483,7 @@ async def comment_blog_post(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    saved_comment_response = blog_handler.save_new_comment(db, input_data)
+    saved_comment_response = await blog_handler.save_new_comment(db, input_data)
 
     if not saved_comment_response.success:
         for error_field, error_msg in saved_comment_response.field_errors.items():
@@ -506,7 +506,7 @@ async def comment_blog_post(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    db.refresh(bp)
+    await db.refresh(bp)
     FlashMessage(
         title="Comment saved!",
         text="Find it above the form.",
@@ -534,7 +534,7 @@ async def edit_comment(
     current_user: LoggedInUserOptional,
 ) -> _TemplateResponse:
     """Edit a comment."""
-    comment = blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
+    comment = await blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
     if not blog_handler.can_edit_comment(current_user=current_user, comment=comment):
         FlashMessage(
             title="Error editing comment",
@@ -569,7 +569,7 @@ async def edit_comment(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     try:
-        comment = blog_handler.update_existing_comment(
+        comment = await blog_handler.update_existing_comment(
             db=db, comment=comment, md_content=md_content, current_user=current_user
         )
     except Exception:
@@ -602,14 +602,16 @@ async def edit_comment(
 
 
 @router.delete("/blog/comment/{comment_id}", response_model=None)
-def delete_comment(
+async def delete_comment(
     request: Request,
     db: DBSession,
     comment_id: int,
     current_user: LoggedInUserOptional,
 ) -> _TemplateResponse:
     """Delete a comment."""
-    response = blog_handler.delete_comment(db=db, comment_id=comment_id, current_user=current_user)
+    response = await blog_handler.delete_comment(
+        db=db, comment_id=comment_id, current_user=current_user
+    )
     if not response.success:
         FlashMessage(
             title="Error deleting comment",
@@ -658,7 +660,7 @@ async def edit_bp_get(
     request: Request, current_user: LoggedInUser, db: DBSession, bp_id: int
 ) -> _TemplateResponse:
     """Return page to edit a blog post."""
-    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
+    bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     form = BlogPostForm.load(
         {
             "is_new": False,
@@ -703,9 +705,9 @@ async def edit_bp_post(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
+    bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     input_data = blog_handler.SaveBlogInput(**form.data, existing_bp=bp)
-    response = blog_handler.save_blog_post(db, input_data)
+    response = await blog_handler.save_blog_post(db, input_data)
     if not response.success or not response.blog_post:
         for error_field, error_msg in response.field_errors.items():
             form[error_field].errors.extend(error_msg)
@@ -740,7 +742,7 @@ async def edit_bp_live_update(
     if not form.validate():
         return f"Invalid form data. Errors: {form.errors}"
     input_data = blog_handler.SaveBlogInput(**form.data)
-    bp = blog_handler.set_new_bp_fields(data=input_data)
+    bp = await blog_handler.set_new_bp_fields(data=input_data)
     return templates.TemplateResponse(
         "blog/partials/edit_preview.html",
         {
@@ -767,7 +769,7 @@ async def upload_blog_post_media(
         "media": media,
     }
     form = BlogPostMediaForm.load(form_data_dict)
-    bp = blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
+    bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     if not form.validate():
         return templates.TemplateResponse(
             UPLOAD_MEDIA_TEMPLATE,
@@ -780,7 +782,7 @@ async def upload_blog_post_media(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
 
-    bp = blog_handler.save_media_for_blog_post(
+    bp = await blog_handler.save_media_for_blog_post(
         db=db,
         blog_post=bp,
         name=form.name.data,
@@ -824,7 +826,7 @@ async def reorder_bp_media(
             {constants.REQUEST: request},
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    bp = blog_handler.reorder_media_for_blog_post(
+    bp = await blog_handler.reorder_media_for_blog_post(
         db=db,
         media_id=media_id,
         bp_id=bp_id,
@@ -850,7 +852,7 @@ async def delete_blog_post_media(
     media_id: int,
 ) -> _TemplateResponse:
     """Delete a blog post."""
-    bp = blog_handler.delete_media_from_blog_post(
+    bp = await blog_handler.delete_media_from_blog_post(
         db=db,
         media_id=media_id,
         bp_id=bp_id,

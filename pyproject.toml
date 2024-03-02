@@ -26,6 +26,8 @@ maintainers = [
 # established by PyPA:
 #   https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [
+    # Asyncpg: PostgreSQL database adapter
+    "asyncpg",
     # Bcrypt: password hashing library
     "bcrypt",
     # BeautifulSoup: HTML parser
@@ -51,7 +53,7 @@ dependencies = [
     # Pillow: image processing library
     "pillow",
     # PsycoPG: PostgreSQL database adapter
-    "psycopg[binary]",
+    "psycopg[binary,pool]",
     # Pydantic: data modeling, validation and settings management
     "pydantic",
     # Pydantic-settings: Pydantic settings management

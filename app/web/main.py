@@ -2,6 +2,10 @@
 
 This is the main entrypoint for the web app. It mounts the API and HTML apps.
 """
+
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -15,7 +19,18 @@ from app.web.html import main as html_main
 # TODO: Change this to a secret key and store it in secrets.
 SESSION_SECRET = "SUPER-SECRET-KEY"  # noqa: S105 (hardcoded-password-string)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 (unused-argument)
+    """Code to run before taking any requests and just before shutdown."""
+    async with engine.begin() as conn:
+        await conn.run_sync(db_models.Base.metadata.create_all)
+    yield
+    # Code to run before shutdown.
+    await engine.dispose()
+
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost",
@@ -38,8 +53,6 @@ app.add_middleware(
 )
 
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
-
-db_models.Base.metadata.create_all(bind=engine)
 
 
 @app.get("/api")

@@ -1,4 +1,5 @@
 """auth: Authentication for the web app."""
+
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
@@ -7,6 +8,7 @@ import bcrypt
 from fastapi import Cookie, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from sqlalchemy import select
 
 from app.datastore import db_models
 from app.datastore.database import DBSession
@@ -42,9 +44,9 @@ async def get_current_user_optional_by_cookie(
     Return an UnauthenticatedUser if no access_token is provided.
     """
     if access_token:
-        current_user: db_models.User | web_models.UnauthenticatedUser = (
-            await get_current_user_required_by_token(db=db, access_token=access_token)
-        )
+        current_user: (
+            db_models.User | web_models.UnauthenticatedUser
+        ) = await get_current_user_required_by_token(db=db, access_token=access_token)
     else:
         current_user = web_models.UnauthenticatedUser()
     guest_id = guest_id or str(uuid.uuid4())
@@ -86,7 +88,7 @@ async def get_current_user_required_by_token(
 
     payload = await parse_access_token(access_token=access_token)
     user_id = int(payload.get("user_id", 0))  # type: ignore[arg-type]
-    return get_user_by_id(user_id, db)
+    return await get_user_by_id(user_id, db)
 
 
 async def refresh_token(
@@ -146,12 +148,14 @@ def encode_access_token(payload: dict[str, str | int | datetime]) -> web_models.
     return web_models.Token(access_token=access_token, token_type="bearer")  # noqa: S106 (hardcoded-password-func-arg)
 
 
-def authenticate_user(username_or_email: str, password: str, db: DBSession) -> db_models.User:
+async def authenticate_user(username_or_email: str, password: str, db: DBSession) -> db_models.User:
     """Authenticate a user."""
     if "@" in username_or_email:
-        user = db.query(db_models.User).filter(db_models.User.email == username_or_email).first()
+        stmt = select(db_models.User).filter(db_models.User.email == username_or_email)
     else:
-        user = db.query(db_models.User).filter(db_models.User.username == username_or_email).first()
+        stmt = select(db_models.User).filter(db_models.User.username == username_or_email)
+    result = await db.execute(stmt)
+    user = result.scalars().first()
     if not user:
         raise errors.UserNotAuthenticatedError
     if not verify_password(password, user.password_hash):
@@ -164,15 +168,19 @@ def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verify_password(plain_password: str, hashed_password: str | None) -> bool:
     """Verify a plain password against a hashed version of the password."""
+    if not hashed_password:
+        return False
     return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
 
 
-def get_user_by_id(user_id: ft.Id, db: DBSession) -> db_models.User:
+async def get_user_by_id(user_id: ft.Id, db: DBSession) -> db_models.User:
     """Get a user by id."""
-    if user_model := db.query(db_models.User).filter(db_models.User.id == user_id).first():
-        return user_model
+    stmt = select(db_models.User).filter(db_models.User.id == user_id)
+    result = await db.execute(stmt)
+    if user := result.scalars().first():
+        return user
     raise errors.UserNotFoundError
 
 

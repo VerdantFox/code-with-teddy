@@ -1,4 +1,5 @@
 """settings: settings management for the app."""
+
 from pydantic_settings import BaseSettings
 
 

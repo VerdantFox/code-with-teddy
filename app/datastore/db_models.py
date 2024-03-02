@@ -1,10 +1,12 @@
 """db_models: SQLAlchemy models for the database."""
+
 from datetime import datetime
 from typing import Annotated, ClassVar
 
 import sqlalchemy as sa
 from sqlalchemy import Column, Computed, ForeignKey, Index, String, Table
 from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from app import mixins
@@ -48,7 +50,7 @@ class TSVector(sa.types.TypeDecorator):
     cache_ok = True
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     """Base model for database models."""
 
     type_annotation_map: ClassVar[dict] = {
@@ -168,6 +170,7 @@ class BlogPostMedia(Base):
         name: The name of the media, given as the title of the HTML tag.
         locations: The location of the file on the filesystem. If multiple versions
             of the file are included, they are comma-separated.
+
     """
 
     __tablename__ = "blog_post_media"

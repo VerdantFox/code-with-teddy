@@ -1,4 +1,5 @@
 """blog_handler: service for manipulating blog posts."""
+
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import datetime, timezone
@@ -9,9 +10,11 @@ from typing import Self
 import sqlalchemy
 from fastapi import UploadFile
 from pydantic import BaseModel, model_validator
+from sqlalchemy import Select, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.datastore import db_models
-from app.datastore.database import Session
 from app.services.blog import blog_utils, markdown_parser
 from app.services.general import transforms
 from app.services.media import media_handler
@@ -75,9 +78,18 @@ class SaveCommentResponse(BaseModel, arbitrary_types_allowed=True):
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
 
 
-def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
+def _get_bp_statement() -> Select:
+    return select(db_models.BlogPost).options(
+        selectinload(db_models.BlogPost.tags),
+        selectinload(db_models.BlogPost.media),
+        selectinload(db_models.BlogPost.comments).selectinload(db_models.BlogPostComment.user),
+        selectinload(db_models.BlogPost.old_slugs),
+    )
+
+
+async def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
     *,
-    db: Session,
+    db: AsyncSession,
     can_see_unpublished: bool,
     search: str | None = None,
     tags: str | None = None,
@@ -87,20 +99,22 @@ def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
     page: int = 1,
 ) -> list[db_models.BlogPost]:
     """Get blog posts."""
-    query = db.query(db_models.BlogPost)
+    stmt = _get_bp_statement()
     if not can_see_unpublished:
-        query = query.filter(db_models.BlogPost.is_published.is_(True))
+        stmt = stmt.filter(db_models.BlogPost.is_published.is_(True))
     if tags:
         tags_list = transforms.to_list(tags, lowercase=True)
-        query = query.filter(db_models.BlogPost.tags.any(db_models.BlogPostTag.tag.in_(tags_list)))
+        stmt = stmt.filter(db_models.BlogPost.tags.any(db_models.BlogPostTag.tag.in_(tags_list)))
     if search:
-        query = query.filter(db_models.BlogPost.ts_vector.match(search))
+        stmt = stmt.filter(db_models.BlogPost.ts_vector.match(search))
     order_by = getattr(db_models.BlogPost, order_by_field)
 
     if not asc:
         order_by = order_by.desc()
     limit, offset = _calculate_limit_offset(results_per_page=results_per_page, page=page)
-    return query.order_by(order_by).limit(limit).offset(offset).all()
+    stmt = stmt.order_by(order_by).limit(limit).offset(offset)
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
 
 
 def _calculate_limit_offset(*, results_per_page: int, page: int) -> tuple[int, int]:
@@ -109,53 +123,55 @@ def _calculate_limit_offset(*, results_per_page: int, page: int) -> tuple[int, i
     return limit, (page - 1) * limit
 
 
-def get_bp_from_id(*, db: Session, bp_id: int, for_update: bool = False) -> db_models.BlogPost:
+async def get_bp_from_id(
+    *, db: AsyncSession, bp_id: int, for_update: bool = False
+) -> db_models.BlogPost:
     """Get a blog post from its ID."""
     try:
-        query = db.query(db_models.BlogPost).filter(db_models.BlogPost.id == bp_id)
+        stmt = _get_bp_statement().filter(db_models.BlogPost.id == bp_id)
         if for_update:
-            query = query.with_for_update()
-        return query.one()
+            stmt = stmt.with_for_update()
+        result = await db.execute(stmt)
+        return result.scalars().one()
     except sqlalchemy.exc.NoResultFound as e:
         raise errors.BlogPostNotFoundError from e
 
 
-def get_bp_from_slug(db: Session, slug: str) -> db_models.BlogPost:
+async def get_bp_from_slug(db: AsyncSession, slug: str) -> db_models.BlogPost:
     """Get a blog post from its slug."""
     try:
-        return db.query(db_models.BlogPost).filter(db_models.BlogPost.slug == slug).one()
+        stmt = _get_bp_statement().filter(db_models.BlogPost.slug == slug)
+        result = await db.execute(stmt)
+        return result.scalars().one()
     except sqlalchemy.exc.NoResultFound:
         # FIXME: This maybe should raise an error that redirects to the new slug
-        return _get_bp_from_slug_history(db=db, slug=slug)
+        return await _get_bp_from_slug_history(db=db, slug=slug)
 
 
-def _get_bp_from_slug_history(db: Session, slug: str) -> db_models.BlogPost:
+async def _get_bp_from_slug_history(db: AsyncSession, slug: str) -> db_models.BlogPost:
     """Get a blog post from its slug history."""
     try:
-        return (
-            db.query(db_models.OldBlogPostSlug)
-            .filter(db_models.OldBlogPostSlug.slug == slug)
-            .one()
-            .blog_post
-        )
+        stmt = select(db_models.OldBlogPostSlug).filter(db_models.OldBlogPostSlug.slug == slug)
+        result = await db.execute(stmt)
+        return result.scalars().one().blog_post
     except sqlalchemy.exc.NoResultFound as e:
         raise errors.BlogPostNotFoundError from e
 
 
-def save_blog_post(db: Session, data: SaveBlogInput) -> SaveBlogResponse:
+async def save_blog_post(db: AsyncSession, data: SaveBlogInput) -> SaveBlogResponse:
     """Save a blog post."""
     SaveBlogResponse.model_rebuild()
 
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
     try:
-        blog_post = _save_bp_to_db(data=data, db=db)
+        blog_post = await _save_bp_to_db(data=data, db=db)
     except sqlalchemy.exc.IntegrityError as e:
-        return _create_bp_save_sqlalchemy_error_response(
+        return await _create_bp_save_sqlalchemy_error_response(
             db=db,
             e=e,
             field_errors=field_errors,
         )
-    db.refresh(blog_post)
+    await db.refresh(blog_post)
     return SaveBlogResponse(
         success=True,
         blog_post=blog_post,
@@ -164,27 +180,27 @@ def save_blog_post(db: Session, data: SaveBlogInput) -> SaveBlogResponse:
     )
 
 
-def _save_bp_to_db(
+async def _save_bp_to_db(
     *,
     data: SaveBlogInput,
-    db: Session,
+    db: AsyncSession,
 ) -> db_models.BlogPost:
     """Create or update a blog post and save it to the database."""
     if data.existing_bp:
-        blog_post = update_existing_bp_fields(
+        blog_post = await update_existing_bp_fields(
             db=db,
             data=data,
         )
     else:
-        blog_post = create_new_bp(db=db, data=data)
+        blog_post = await create_new_bp(db=db, data=data)
 
-    db.commit()
+    await db.commit()
     return blog_post
 
 
-def update_existing_bp_fields(
+async def update_existing_bp_fields(
     *,
-    db: Session,
+    db: AsyncSession,
     data: SaveBlogInput,
 ) -> db_models.BlogPost:
     """Update an existing blog post's fields."""
@@ -193,15 +209,19 @@ def update_existing_bp_fields(
     assert blog_post is not None  # noqa: S101 (assert)
 
     if blog_post.title != data.title:
-        old_slug = db.query(db_models.OldBlogPostSlug).filter(
+        stmt = select(db_models.OldBlogPostSlug).filter(
             db_models.OldBlogPostSlug.slug == blog_post.slug
-        ).first() or db_models.OldBlogPostSlug(slug=blog_post.slug, blog_post=blog_post)
+        )
+        result = await db.execute(stmt)
+        old_slug = result.scalars().first() or db_models.OldBlogPostSlug(
+            slug=blog_post.slug, blog_post=blog_post
+        )
         blog_post.old_slugs.append(old_slug)
         blog_post.title = data.title
         blog_post.slug = blog_utils.get_slug(data.title)
     current_tags = {tag.tag for tag in blog_post.tags}
     if current_tags != set(data.tags):
-        blog_post.tags = _get_bp_tags(db=db, tags=data.tags)
+        blog_post.tags = await _get_bp_tags(db=db, tags=data.tags)
     if blog_post.is_published != data.is_published:
         blog_post.is_published = data.is_published
     if blog_post.can_comment != data.can_comment:
@@ -222,25 +242,27 @@ def update_existing_bp_fields(
     return blog_post
 
 
-def create_new_bp(
+async def create_new_bp(
     *,
-    db: Session,
+    db: AsyncSession,
     data: SaveBlogInput,
 ) -> db_models.BlogPost:
     """Create a new blog post and add it to the database transaction."""
-    blog_post = set_new_bp_fields(data=data, db=db)
+    blog_post = await set_new_bp_fields(data=data, db=db)
     db.add(blog_post)
     return blog_post
 
 
-def set_new_bp_fields(data: SaveBlogInput, db: Session | None = None) -> db_models.BlogPost:
+async def set_new_bp_fields(
+    data: SaveBlogInput, db: AsyncSession | None = None
+) -> db_models.BlogPost:
     """Set fields for a new blog post.
 
     Can ignore db session if not expecting to add the blog post to the database.
     """
     html_description = markdown_parser.markdown_to_html(data.description)
     html_content = markdown_parser.markdown_to_html(data.content)
-    tags = _get_bp_tags(db=db, tags=data.tags)
+    tags = await _get_bp_tags(db=db, tags=data.tags)
     now = datetime.now().astimezone(timezone.utc)
     return db_models.BlogPost(
         title=data.title,
@@ -262,21 +284,32 @@ def set_new_bp_fields(data: SaveBlogInput, db: Session | None = None) -> db_mode
     )
 
 
-def _get_bp_tags(tags: Iterable[str], db: Session | None = None) -> list[db_models.BlogPostTag]:
+async def _get_bp_tags(
+    tags: Iterable[str], db: AsyncSession | None = None
+) -> list[db_models.BlogPostTag]:
     """Get blog post tags from the database or create new ones."""
+    tags = list(set(tags))
+    existing_tags = await _get_existing_bp_tags_from_list(tags=tags, db=db)
     return [
-        (
-            db.query(db_models.BlogPostTag).filter(db_models.BlogPostTag.tag == tag).first()
-            if db
-            else None
-        )
-        or db_models.BlogPostTag(tag=tag)
-        for tag in set(tags)
+        existing_tags[tag] if tag in existing_tags else db_models.BlogPostTag(tag=tag)
+        for tag in tags
     ]
 
 
-def _create_bp_save_sqlalchemy_error_response(
-    db: Session,
+async def _get_existing_bp_tags_from_list(
+    tags: Iterable[str], db: AsyncSession | None = None
+) -> dict[str, db_models.BlogPostTag]:
+    """Get blog post tags from the database or create new ones."""
+    if not db:
+        return {}
+    tags = list(set(tags))
+    stmt = select(db_models.BlogPostTag).filter(db_models.BlogPostTag.tag.in_(tags))
+    result = await db.execute(stmt)
+    return {tag.tag: tag for tag in result.scalars().all()}
+
+
+async def _create_bp_save_sqlalchemy_error_response(
+    db: AsyncSession,
     e: sqlalchemy.exc.IntegrityError,
     field_errors: defaultdict[str, list[str]],
 ) -> SaveBlogResponse:
@@ -287,7 +320,7 @@ def _create_bp_save_sqlalchemy_error_response(
     - Update the field_errors dict
     """
     logger.exception(ERROR_SAVING_BP)
-    db.rollback()
+    await db.rollback()
     err = str(e)
     msg = ERROR_SAVING_BP
     if 'duplicate key value violates unique constraint "ix_blog_posts_slug"' in err:
@@ -301,8 +334,8 @@ def _create_bp_save_sqlalchemy_error_response(
     )
 
 
-def save_media_for_blog_post(
-    db: Session,
+async def save_media_for_blog_post(
+    db: AsyncSession,
     blog_post: db_models.BlogPost,
     media: UploadFile,
     name: str,
@@ -311,7 +344,7 @@ def save_media_for_blog_post(
     locations_str, media_type = _save_bp_media(
         name=name, blog_post_slug=blog_post.slug, media=media
     )
-    return _commit_media_to_db(
+    return await _commit_media_to_db(
         db=db,
         blog_post=blog_post,
         name=name,
@@ -320,33 +353,37 @@ def save_media_for_blog_post(
     )
 
 
-def reorder_media_for_blog_post(
-    db: Session,
+async def reorder_media_for_blog_post(
+    db: AsyncSession,
     media_id: int,
     bp_id: int,
     position: int | None,
 ) -> db_models.BlogPost:
     """Reorder media for a blog post."""
-    media = db.query(db_models.BlogPostMedia).filter(db_models.BlogPostMedia.id == media_id).one()
+    stmt = select(db_models.BlogPostMedia).filter(db_models.BlogPostMedia.id == media_id)
+    result = await db.execute(stmt)
+    media = result.scalars().one()
     media.position = position
-    db.commit()
-    return get_bp_from_id(db=db, bp_id=bp_id)
+    await db.commit()
+    return await get_bp_from_id(db=db, bp_id=bp_id)
 
 
-def delete_media_from_blog_post(
-    db: Session,
+async def delete_media_from_blog_post(
+    db: AsyncSession,
     media_id: int,
     bp_id: int,
 ) -> db_models.BlogPost:
     """Delete media from a blog post."""
-    blog_post = get_bp_from_id(db=db, bp_id=bp_id)
-    media = db.query(db_models.BlogPostMedia).filter(db_models.BlogPostMedia.id == media_id).one()
+    blog_post = await get_bp_from_id(db=db, bp_id=bp_id)
+    stmt = select(db_models.BlogPostMedia).filter(db_models.BlogPostMedia.id == media_id)
+    result = await db.execute(stmt)
+    media = result.scalars().one()
     media_locations = media.locations_to_list()
     for location in media_locations:
         media_handler.del_media_from_path_str(location)
-    db.delete(media)
-    db.commit()
-    db.refresh(blog_post)
+    await db.delete(media)
+    await db.commit()
+    await db.refresh(blog_post)
     return blog_post
 
 
@@ -358,8 +395,12 @@ def _save_bp_media(name: str, blog_post_slug: str, media: UploadFile) -> tuple[s
     )
 
 
-def _commit_media_to_db(
-    db: Session, blog_post: db_models.BlogPost, name: str, locations_str: str, media_type: str
+async def _commit_media_to_db(
+    db: AsyncSession,
+    blog_post: db_models.BlogPost,
+    name: str,
+    locations_str: str,
+    media_type: str,
 ) -> db_models.BlogPost:
     """Commit a blog post media to the database."""
     bp_media_object = db_models.BlogPostMedia(
@@ -370,32 +411,34 @@ def _commit_media_to_db(
         created_timestamp=datetime.now().astimezone(timezone.utc),
     )
     db.add(bp_media_object)
-    db.commit()
-    db.refresh(blog_post)
+    await db.commit()
+    await db.refresh(blog_post)
     return blog_post
 
 
-def toggle_blog_post_like(*, db: Session, bp: db_models.BlogPost, like: bool) -> db_models.BlogPost:
+async def toggle_blog_post_like(
+    *, db: AsyncSession, bp: db_models.BlogPost, like: bool
+) -> db_models.BlogPost:
     """Toggle a blog post like."""
     if like:
         bp.likes = db_models.BlogPost.likes + 1
     else:
         bp.likes = db_models.BlogPost.likes - 1
-    db.commit()
+    await db.commit()
     return bp
 
 
-def save_new_comment(db: Session, data: SaveCommentInput) -> SaveCommentResponse:
+async def save_new_comment(db: AsyncSession, data: SaveCommentInput) -> SaveCommentResponse:
     """Save a blog post comment."""
     comment = generate_comment(data=data)
     db.add(comment)
-    db.commit()
-    db.refresh(comment)
+    await db.commit()
+    await db.refresh(comment)
     return SaveCommentResponse(success=True, comment=comment)
 
 
-def update_existing_comment(
-    db: Session,
+async def update_existing_comment(
+    db: AsyncSession,
     current_user: db_models.User | web_models.UnauthenticatedUser,
     comment: db_models.BlogPostComment,
     md_content: str,
@@ -407,8 +450,8 @@ def update_existing_comment(
     comment.updated_timestamp = datetime.now().astimezone(timezone.utc)
     if current_user.is_authenticated:
         comment.user_id = current_user.id
-    db.commit()
-    db.refresh(comment)
+    await db.commit()
+    await db.refresh(comment)
     return comment
 
 
@@ -439,11 +482,13 @@ def generate_comment_html(content: str) -> str:
     return markdown_parser.bleach_comment_html(html)
 
 
-def delete_comment(
-    db: Session, comment_id: int, current_user: db_models.User | UnauthenticatedUser
+async def delete_comment(
+    db: AsyncSession,
+    comment_id: int,
+    current_user: db_models.User | UnauthenticatedUser,
 ) -> SaveCommentResponse:
     """Delete a blog post comment."""
-    comment = get_comment_from_id(db=db, comment_id=comment_id)
+    comment = await get_comment_from_id(db=db, comment_id=comment_id)
     if not can_delete_comment(comment=comment, current_user=current_user):
         return SaveCommentResponse(
             success=False,
@@ -451,8 +496,8 @@ def delete_comment(
             status_code=HTTPStatus.FORBIDDEN,
             comment=comment,
         )
-    db.delete(comment)
-    db.commit()
+    await db.delete(comment)
+    await db.commit()
     return SaveCommentResponse(success=True)
 
 
@@ -474,13 +519,11 @@ def can_delete_comment(
     )
 
 
-def get_comment_from_id(db: Session, comment_id: int) -> db_models.BlogPostComment:
+async def get_comment_from_id(db: AsyncSession, comment_id: int) -> db_models.BlogPostComment:
     """Get a comment from its ID."""
     try:
-        return (
-            db.query(db_models.BlogPostComment)
-            .filter(db_models.BlogPostComment.id == comment_id)
-            .one()
-        )
+        stmt = select(db_models.BlogPostComment).filter(db_models.BlogPostComment.id == comment_id)
+        result = await db.execute(stmt)
+        return result.scalars().one()
     except sqlalchemy.exc.NoResultFound as e:
         raise errors.BlogPostCommentNotFoundError from e

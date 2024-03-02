@@ -1,10 +1,12 @@
 """users: API routes for users."""
+
 from typing import cast
 
 from fastapi import APIRouter, status
+from sqlalchemy import select
 
 from app.datastore import db_models
-from app.datastore.database import DBSession, Session
+from app.datastore.database import AsyncSession, DBSession
 from app.permissions import Role
 from app.web import auth, errors
 from app.web import field_types as ft
@@ -26,10 +28,12 @@ async def get_users(
     db: DBSession,
 ) -> list[db_models.User]:
     """Get users, filtering on the desired fields."""
-    query = db.query(db_models.User)
+    stmt = select(db_models.User)
     if not current_user.is_admin:
-        query = query.filter(db_models.User.id == current_user.id)
-    return cast(list[db_models.User], query.all())
+        stmt = stmt.filter(db_models.User.id == current_user.id)
+    results = await db.execute(stmt)
+
+    return cast(list[db_models.User], results.scalars().all())
 
 
 @router.get(
@@ -55,7 +59,7 @@ async def get_user(
     db: DBSession,
 ) -> db_models.User:
     """Get a user by id."""
-    return _get_user_by_id(current_user=current_user, user_id=user_id, db=db)
+    return await _get_user_by_id(current_user=current_user, user_id=user_id, db=db)
 
 
 @router.post(
@@ -78,8 +82,8 @@ async def create_user(
         is_active=True,
     )
     db.add(user_model)
-    db.commit()
-    db.refresh(user_model)
+    await db.commit()
+    await db.refresh(user_model)
     return user_model
 
 
@@ -99,8 +103,8 @@ async def update_current_user(
             field = "hashed_password"  # noqa: PLW2901 (redefined-loop-name)
             value = auth.hash_password(value)  # noqa: PLW2901 (redefined-loop-name)
         setattr(current_user, field, value)
-    db.commit()
-    db.refresh(current_user)
+    await db.commit()
+    await db.refresh(current_user)
     return current_user
 
 
@@ -116,14 +120,14 @@ async def update_user(
     db: DBSession,
 ) -> db_models.User:
     """Update a user."""
-    user_model = _get_user_by_id(current_user=current_user, user_id=user_id, db=db)
+    user_model = await _get_user_by_id(current_user=current_user, user_id=user_id, db=db)
     for field, value in user_in.model_dump(exclude_unset=True).items():
         if field == "password":
             field = "hashed_password"  # noqa: PLW2901 (redefined-loop-name)
             value = auth.hash_password(value)  # noqa: PLW2901 (redefined-loop-name)
         setattr(user_model, field, value)
-    db.commit()
-    db.refresh(user_model)
+    await db.commit()
+    await db.refresh(user_model)
     return user_model
 
 
@@ -133,13 +137,13 @@ async def delete_current_user(
     db: DBSession,
 ) -> None:
     """Delete a user."""
-    user_model = _get_user_by_id(
+    user_model = await _get_user_by_id(
         current_user=current_user,
         user_id=current_user.id,
         db=db,
     )
-    db.delete(user_model)
-    db.commit()
+    await db.delete(user_model)
+    await db.commit()
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -150,20 +154,21 @@ async def delete(
 ) -> None:
     """Delete a user."""
     user_model = _get_user_by_id(current_user=current_user, user_id=user_id, db=db)
-    db.delete(user_model)
-    db.commit()
+    await db.delete(user_model)
+    await db.commit()
 
 
 # ----------- Helper functions -----------
-def _get_user_by_id(
+async def _get_user_by_id(
     current_user: db_models.User,
     user_id: ft.Id,
-    db: Session,
+    db: AsyncSession,
 ) -> db_models.User:
     """Get a user by id."""
-    query = db.query(db_models.User).filter(db_models.User.id == user_id)
+    stmt = select(db_models.User).filter(db_models.User.id == user_id)
     if not current_user.is_admin:
-        query = query.filter(db_models.User.id == current_user.id)
-    if user_model := query.first():
+        stmt = stmt.filter(db_models.User.id == current_user.id)
+    results = await db.execute(stmt)
+    if user_model := results.scalars().first():
         return user_model
     raise errors.UserNotFoundError

@@ -1,4 +1,5 @@
 """auth: Authentication routes for the API."""
+
 from fastapi import APIRouter
 
 from app.datastore.database import DBSession
@@ -16,5 +17,7 @@ async def login_for_access_token(
     password: ft.StrFormField,
 ) -> web_models.Token:
     """Authenticate the user and return an access token."""
-    user = auth.authenticate_user(username_or_email=username_or_email, password=password, db=db)
+    user = await auth.authenticate_user(
+        username_or_email=username_or_email, password=password, db=db
+    )
     return auth.create_access_token(user=user)

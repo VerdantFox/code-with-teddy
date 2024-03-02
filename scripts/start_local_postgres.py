@@ -4,6 +4,8 @@ And populates the postgres database from the SQLAlchemy models.
 
 Run with `python -m dev_tools.start_local_postgres --help`
 """
+
+import asyncio
 import contextlib
 import os
 import time
@@ -57,7 +59,7 @@ class DBBuilder:
         self.docker_client: docker.DockerClient = self.set_docker_client()
         self.container: docker_containers.Container | None = None
 
-    def main(self) -> docker_containers.Container:
+    async def main(self) -> docker_containers.Container:
         """Start the postgres container and populate the database."""
         self.set_docker_client()
         if self.teardown:
@@ -72,10 +74,10 @@ class DBBuilder:
             self.run_migrations()
         elif self.create_db:
             self.print("Creating database...")
-            self.create_database()
+            await self.create_database()
         if self.populate:
             self.print("Populating database...")
-            populate_db.populate_database()
+            await populate_db.populate_database(connection_string=self.get_connection_string())
         self.announce_vars()
         return self.container
 
@@ -88,7 +90,7 @@ class DBBuilder:
     def get_connection_string(self) -> str:
         """Get the connection string for the postgres container."""
         return (
-            f"postgresql+psycopg2://{quote_plus(self.username)}:{quote_plus(self.password)}"
+            f"postgresql+psycopg://{quote_plus(self.username)}:{quote_plus(self.password)}"
             f"@localhost:{self.port}/{self.database}"
         )
 
@@ -150,9 +152,11 @@ class DBBuilder:
         )
 
     @staticmethod
-    def create_database() -> None:
+    async def create_database() -> None:
         """Create a postgres database if it does not exist."""
-        db_models.Base.metadata.create_all(bind=database.engine)
+        async with database.engine.begin() as conn:
+            await conn.run_sync(db_models.Base.metadata.create_all)
+        await database.engine.dispose()
 
     def run_migrations(self) -> None:
         """Run migrations to a specific version."""
@@ -161,14 +165,8 @@ class DBBuilder:
 
     def announce_vars(self) -> None:
         """Announce connection variables."""
-        self.print("[underline]Connection variables:[/underline]")
-        self.print(f"postgres container name: [yellow]{self.container_name}[/yellow]")
-        self.print(f"postgres port:           [cyan]{self.port}[/cyan]")
-        self.print(f"postgres username:       [yellow]{self.username}[/yellow]")
-        self.print(f"postgres password:       [yellow]{self.password}[/yellow]")
-        self.print(f"postgres database:       [yellow]{self.database}[/yellow]")
         self.print(
-            f"connection string:       [green]{self.get_connection_string()}[/green]",
+            f"[yellow]connection string:[/yellow] [green]{self.get_connection_string()}[/green]",
         )
 
 
@@ -216,7 +214,7 @@ def typer_main(  # noqa: PLR0913 too-many-arguments
         populate=populate,
         silent=silent,
     )
-    db_builder.main()
+    asyncio.run(db_builder.main())
 
 
 if __name__ == "__main__":

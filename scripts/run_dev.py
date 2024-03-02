@@ -1,4 +1,5 @@
 """Run the app in development mode."""
+
 import time
 from typing import Annotated
 

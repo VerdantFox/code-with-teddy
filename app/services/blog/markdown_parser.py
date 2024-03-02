@@ -1,4 +1,5 @@
 """markdown_parser: service for parsing markdown into HTML."""
+
 # TODO: Consider using markdown-it for parsing markdown to HTML.
 import re
 
@@ -275,7 +276,7 @@ ALLOWED_COMMENT_ATTRIBUTES = {
     "img": ["alt", "src", "loading"],
     "source": ["src", "srcset", "type"],
     "pre": ["tabindex"],
-    "video": ["style", "width", "height", "muted", "autoplay", "loop", "controls"],
+    "video": ["width", "height", "muted", "autoplay", "loop", "controls"],
 }
 
 

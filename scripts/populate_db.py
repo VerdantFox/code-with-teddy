@@ -11,6 +11,8 @@ You can run (or not run) this script automatically as the last step of the
 `./dev_tools/start-local-postgres.sh` script by supplying the
 `--populate/--no-populate` flag to that script. `--populate` is the default.
 """
+
+import asyncio
 import os
 import random
 import textwrap
@@ -18,16 +20,16 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import faker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app import permissions
 from app.datastore import db_models
-from app.datastore.database import Session, engine
+from app.datastore.database import engine
 from app.services.blog import blog_handler, blog_utils
 from app.web import auth
 
 # DB connection constants
 DB_STRING_KEY = "DB_CONNECTION_STRING"
-LOCAL_DB_CONNECTION_STRING = "postgresql+psycopg2://postgres:postgres@localhost:5432/postgres"
 EXAMPLE_BP_DIR = Path(__file__).parent.parent / "tests" / "data" / "example_blog_posts"
 
 # datetime constants
@@ -44,14 +46,15 @@ NEXT_WEEK = TODAY + timedelta(days=7)
 FAKER = faker.Faker()
 
 
-def populate_database() -> None:
+async def populate_database(connection_string: str | None = None) -> None:
     """Run the populate db script."""
     db_connection_before = os.environ.get(DB_STRING_KEY)
-    os.environ[DB_STRING_KEY] = LOCAL_DB_CONNECTION_STRING
-    session = Session(engine)
-    pop_db = PopulateDB(session=session)
-    with session:
-        pop_db.populate()
+    if connection_string:
+        os.environ[DB_STRING_KEY] = connection_string
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
+    async with async_session() as session:
+        pop_db = PopulateDB(session=session)
+        await pop_db.populate()
 
     if db_connection_before:
         os.environ[DB_STRING_KEY] = db_connection_before
@@ -60,13 +63,13 @@ def populate_database() -> None:
 class PopulateDB:
     """Populates the database with dummy data."""
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         """Initialize the class."""
         self.session = session
         self.users: list[db_models.User] = []
         self.blog_posts: list[db_models.BlogPost] = []
 
-    def _populate_users(self) -> None:
+    async def _populate_users(self) -> None:
         """Populate the users table."""
         self.users = [
             db_models.User(
@@ -107,19 +110,19 @@ class PopulateDB:
         ]
         for user in self.users:
             self.session.add(user)
-            self.session.commit()
-            self.session.refresh(user)
+            await self.session.commit()
+            await self.session.refresh(user)
 
-    def _populate_blog_posts(self) -> None:
+    async def _populate_blog_posts(self) -> None:
         """Populate the blog_posts table."""
-        self.blog_posts = [self.bp_from_path(bp_path) for bp_path in EXAMPLE_BP_DIR.iterdir()]
+        self.blog_posts = [await self.bp_from_path(bp_path) for bp_path in EXAMPLE_BP_DIR.iterdir()]
 
-    def populate(self) -> None:
+    async def populate(self) -> None:
         """Populate the database with dummy data."""
-        self._populate_users()
-        self._populate_blog_posts()
+        await self._populate_users()
+        await self._populate_blog_posts()
 
-    def bp_from_path(self, blog_post_path: Path) -> db_models.BlogPost:
+    async def bp_from_path(self, blog_post_path: Path) -> db_models.BlogPost:
         """Generate a blog post from a Path."""
         file_content = blog_post_path.read_text()
         title = blog_utils.get_bp_title(file_content)
@@ -136,7 +139,7 @@ class PopulateDB:
             content=md_content,
             thumbnail_url=thumbnail_url,
         )
-        response = blog_handler.save_blog_post(db=self.session, data=data)
+        response = await blog_handler.save_blog_post(db=self.session, data=data)
         if not response.blog_post:
             err_msg = f"Failed to save blog post: {response.err_msg}"
             raise ValueError(err_msg)
@@ -149,13 +152,13 @@ class PopulateDB:
         blog_post.updated_timestamp = blog_post.created_timestamp + timedelta(
             days=random.randint(0, 10), hours=random.randint(0, 23)
         )
-        self.session.commit()
-        self.session.refresh(blog_post)
+        await self.session.commit()
+        await self.session.refresh(blog_post)
         for _ in range(random.randint(1, 5)):
-            self._create_comment(blog_post)
+            await self._create_comment(blog_post)
         return blog_post
 
-    def _create_comment(self, blog_post: db_models.BlogPost) -> None:
+    async def _create_comment(self, blog_post: db_models.BlogPost) -> None:
         """Create a comment for a blog post."""
         is_guest = random.choice([True, False])
         content = textwrap.dedent(
@@ -175,8 +178,8 @@ class PopulateDB:
             user_id=None if is_guest else random.choice(self.users).id,
             content=content,
         )
-        blog_handler.save_new_comment(db=self.session, data=data)
+        await blog_handler.save_new_comment(db=self.session, data=data)
 
 
 if __name__ == "__main__":
-    populate_database()
+    asyncio.run(populate_database())

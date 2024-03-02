@@ -1,4 +1,5 @@
 """auth: Authentication functions for the HTML web app."""
+
 from fastapi import APIRouter, Request, Response
 from starlette.templating import _TemplateResponse
 
@@ -23,7 +24,9 @@ async def login_for_access_token(
     password: ft.StrFormField,
 ) -> Token:
     """Authenticate a user, set a cookie with the access token, and return the token."""
-    user = auth.authenticate_user(username_or_email=username_or_email, password=password, db=db)
+    user = await auth.authenticate_user(
+        username_or_email=username_or_email, password=password, db=db
+    )
     token = auth.create_access_token(user=user)
     response.set_cookie(
         key=ACCESS_TOKEN_KEY,
