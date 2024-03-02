@@ -68,8 +68,7 @@ function setAllMediaWidthHeight() {
   })
 }
 
-// Lazy load videos
-document.addEventListener("DOMContentLoaded", function () {
+function lazyLoadVideos() {
   const lazyVideos = [].slice.call(document.querySelectorAll("video.lazy"))
 
   if ("IntersectionObserver" in window) {
@@ -100,7 +99,8 @@ document.addEventListener("DOMContentLoaded", function () {
       lazyVideoObserver.observe(lazyVideo)
     })
   }
-})
+}
+document.addEventListener("DOMContentLoaded", lazyLoadVideos)
 
 // Highlight the table of contents element that corresponds to the current
 // scroll position (in blog posts)
@@ -156,4 +156,33 @@ function setAvatarImage(avatar_upload_id, avatar_url_id) {
     imgPreview.innerHTML =
       '<img src="' + remoteFile.value + '" class="object-cover h-36 w-36" />'
   }
+}
+
+// Set the thumbnail image preview (in Blog edit)
+function setThumbnailImage() {
+  const imgPreview = document.getElementById("thumbnail-image")
+  const remoteFile = document.getElementById("{{ form.thumbnail_url.id }}")
+  if (remoteFile.value) {
+    imgPreview.innerHTML =
+      '<img src="' +
+      remoteFile.value +
+      '" class="object-cover max-w-lg max-h-36" />'
+  }
+}
+
+var formSubmitting = false
+function setFormSubmitting() {
+  formSubmitting = true
+}
+
+// Prompt the user before leaving the page if there are unsaved changes (in Blog edit)
+function promptForExit(event, isDirty) {
+  if (formSubmitting || !isDirty) {
+    return undefined
+  }
+
+  const confirmationMessage = "Any unsaved changes will be lost."
+
+  event.returnValue = confirmationMessage //Gecko + IE
+  return confirmationMessage //Gecko + Webkit, Safari, Chrome etc.
 }

@@ -7,7 +7,7 @@
   {% for key, val in extra_fields.items() %}
     {{ key }}="{{ val }}"
   {% endfor %}
-  {% if onsubmit %}onsubmit="{{ onsubmit }}"{% endif %}
+  {% if onsubmit %}@submit="{{ onsubmit }}"{% endif %}
 >
   {{ text }}
 </button>

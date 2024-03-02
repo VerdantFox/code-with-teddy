@@ -8,6 +8,18 @@
   "text": "Create Blog Post"}
   ]
 %}
+{% block custom_js_end %}
+  <script nonce="{{ request.state.nonce }}">
+    lazyLoadVideos()
+  </script>
+{% endblock custom_js_end %}
+{% block custom_css %}
+  <link
+    rel="stylesheet"
+    href="{{ url_for('html:static', path='css/blog-code-hilights.css') }}?{{ static_version }}"
+  />
+{% endblock custom_css %}
+
 {% block content %}
 
   {% if form.page.data == 1 %}

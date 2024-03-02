@@ -110,7 +110,7 @@ def _update_html_media(html_soup: BeautifulSoup) -> None:
     - Make all images lazy loaded.
     """
     for img in html_soup.find_all("img"):
-        img["class"] = [*img.get("class", []), "rounded-lg"]
+        img["class"] = [*img.get("class", []), "rounded-lg", "mx-auto"]
         img["loading"] = "lazy"
         if img.parent.name != "p":
             continue

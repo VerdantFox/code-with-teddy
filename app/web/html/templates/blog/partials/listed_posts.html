@@ -90,6 +90,16 @@
         >
           {{ blog_post.html_description | safe }}
         </div>
+        <p
+          x-cloak
+          x-show="!compact"
+          x-transition.duration.500ms
+          class="mt-6 link text-xl"
+        >
+          <a href="{{ url_for('html:read_blog_post', slug=blog_post.slug) }}">
+            Read full article...
+          </a>
+        </p>
       </div>
     </article>
   {% endfor %}

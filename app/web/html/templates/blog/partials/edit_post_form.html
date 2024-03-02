@@ -6,7 +6,7 @@
     action="{{ url_for('html:edit_bp_post', bp_id=request.path_params['bp_id'] ) }}"
   {% endif %}
   class="@container"
-  onsubmit="setFormSubmitting()"
+  @submit="setFormSubmitting()"
   hx-target-error="preview"
 >
   {{ render_partial('shared/partials/forms/top_error.html', message=message) }}

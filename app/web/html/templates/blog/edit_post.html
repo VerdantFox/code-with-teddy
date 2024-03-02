@@ -22,37 +22,11 @@
     ] + admin_extras
   %}
 {% endif %}
-{% block custom_js %}
+{% block custom_js_end %}
   <script nonce="{{ request.state.nonce }}">
-    var formSubmitting = false
-    function setFormSubmitting() {
-      formSubmitting = true
-    }
-
-    function promptForExit(event, isDirty) {
-      if (formSubmitting || !isDirty) {
-        return undefined
-      }
-
-      var confirmationMessage = "Any unsaved changes will be lost."
-
-      ;(event || window.event).returnValue = confirmationMessage //Gecko + IE
-      return confirmationMessage //Gecko + Webkit, Safari, Chrome etc.
-    }
-
-    function setThumbnailImage() {
-      const imgPreview = document.getElementById("thumbnail-image")
-      const remoteFile = document.getElementById("{{ form.thumbnail_url.id }}")
-      if (remoteFile.value) {
-        imgPreview.innerHTML =
-          '<img src="' +
-          remoteFile.value +
-          '" class="object-cover max-w-lg max-h-36" />'
-      }
-    }
+    lazyLoadVideos()
   </script>
-{% endblock custom_js %}
-
+{% endblock custom_js_end %}
 {% block custom_css %}
   <link
     rel="stylesheet"
