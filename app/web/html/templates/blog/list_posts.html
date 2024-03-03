@@ -49,7 +49,7 @@
   <section
     id="posts-section"
     class="section-container mb-48"
-    x-data="{compact: $persist(false)}"
+    x-data="{compact: $persist(true)}"
   >
     {{ render_partial('blog/partials/list_posts_form.html', request=request, blog_posts=blog_posts, form=form) }}
     <div :class="compact ? '' : 'max-w-3xl'">

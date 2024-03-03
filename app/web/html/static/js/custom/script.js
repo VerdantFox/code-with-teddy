@@ -186,3 +186,33 @@ function promptForExit(event, isDirty) {
   event.returnValue = confirmationMessage //Gecko + IE
   return confirmationMessage //Gecko + Webkit, Safari, Chrome etc.
 }
+
+// Copy the text to the input field (in Blog comments)
+function copyToInput(text, inputId) {
+  // Get the input field
+  const inputField = document.getElementById(inputId)
+
+  // Replace ">>>>" with a newline followed by "> "
+  text = text.replace(/>>>>/g, "\n> ")
+
+  // Trim trailing "\n> " strings
+  text = text.replace(/\n> $/g, "")
+
+  // Copy the text to the input field
+  inputField.value = `> ${text}\n\n`
+
+  // Scroll the screen to the input field smoothly
+  inputField.scrollIntoView({ behavior: "smooth" })
+
+  // Delay the focus for the duration of the scroll animation
+  setTimeout(function () {
+    inputField.focus()
+  }, 700)
+
+  // Set the cursor to the end of the input field
+  // Delay the focus for the duration of the scroll animation
+  setTimeout(function () {
+    inputField.selectionStart = inputField.selectionEnd =
+      inputField.value.length
+  }, 710)
+}

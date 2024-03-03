@@ -1,6 +1,7 @@
 {% if comment %}
   {% set comment_id = comment.id or "base" %}
   <article
+    x-data="{replyText: '{{ shorten(comment.md_content, replace_newline='>>>>') }}'}"
     id="comment-{{ comment_id }}"
     class="relative htmx-fade-out-150ms htmx-fade-in-300ms{% if is_preview %}
       ring-2 ring-offset-500 rounded-lg
@@ -65,7 +66,12 @@
             </p>
           {% endif %}
         </div>
-        <div class="">{{ comment.html_content | safe }}</div>
+        <div
+          id="comment-content-{{ comment_id }}"
+          class="prose-blockquote:bg-grayscale-200 dark:prose-blockquote:bg-grayscale-700"
+        >
+          {{ comment.html_content | safe }}
+        </div>
         {% if message %}{{ render_partial('shared/partials/forms/top_error.html', message=message) }}{% endif %}
       </div>
     </div>
@@ -73,7 +79,12 @@
       <div class="absolute top-2 right-2">
         <div class="flex gap-3">
           <!-- Reply -->
-          <button type="button" class="group" data-tippy-theme="light-border">
+          <button
+            type="button"
+            class="group"
+            data-tippy-theme="light-border"
+            @click="copyToInput(replyText, 'content')"
+          >
             {{ render_partial('shared/partials/icons/chats.html', title="Reply to comment", class="h-7 w-7 icon-btn") }}
           </button>
           {% if comment.guest_id == current_user.guest_id or comment.user_id == current_user.id %}

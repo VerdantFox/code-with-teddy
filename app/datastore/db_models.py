@@ -207,7 +207,3 @@ class BlogPostComment(Base):
     created_timestamp: Mapped[DateTimeIndexed]
     updated_timestamp: Mapped[DateTimeIndexed]
     likes: Mapped[IntIndexedDefaultZero]
-    parent_id: Mapped[CommentFK | None]
-    # replies: Mapped[list["BlogPostComment"]] = relationship(
-    #     "BlogPostComment", backref="parent", remote_side=[id]
-    # )  # noqa: ERA001,RUF100

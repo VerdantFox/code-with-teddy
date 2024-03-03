@@ -57,7 +57,6 @@ class SaveCommentInput(BaseModel, arbitrary_types_allowed=True):
     name: str | None = None
     email: str | None = None
     content: str
-    parent_id: int | None = None
 
     @model_validator(mode="after")
     def check_user_id_or_name(self) -> Self:
@@ -470,7 +469,6 @@ def generate_comment(data: SaveCommentInput) -> db_models.BlogPostComment:
         created_timestamp=now,
         updated_timestamp=now,
         likes=0,
-        parent_id=data.parent_id,
     )
 
 
