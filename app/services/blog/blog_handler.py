@@ -522,7 +522,11 @@ def can_delete_comment(
 async def get_comment_from_id(db: AsyncSession, comment_id: int) -> db_models.BlogPostComment:
     """Get a comment from its ID."""
     try:
-        stmt = select(db_models.BlogPostComment).filter(db_models.BlogPostComment.id == comment_id)
+        stmt = (
+            select(db_models.BlogPostComment)
+            .options(selectinload(db_models.BlogPostComment.blog_post))
+            .filter(db_models.BlogPostComment.id == comment_id)
+        )
         result = await db.execute(stmt)
         return result.scalars().one()
     except sqlalchemy.exc.NoResultFound as e:
