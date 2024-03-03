@@ -15,7 +15,7 @@ In this tutorial, I'll show you how to **automatically** _hot-reload_ your [Fast
 
 You can find bare-bones example code for this tutorial in my GitHub repository named ["hot-reload-examples", here](https://github.com/VerdantFox/hot-reload-examples). The following video shows the _hot reloading_ in action, using that repository's `fastapi` example.
 
-<div class="flex justify-center content-center"><video class="w-4/5" muted="" autoplay="" loop="" controls="" playsinline="" poster="http://localhost:8000/static/media/shared/video-poster.svg"><source src="http://localhost:8000/static/media/local/blog/hot-reload.mp4" type="video/mp4">Your browser does not support the video tag.</video></div>
+<div class="flex justify-center content-center"><video muted="" autoplay="" loop="" controls="" playsinline="" poster="http://localhost:8000/static/media/shared/video-poster.svg"><source src="http://localhost:8000/static/media/local/blog/hot-reload.mp4" type="video/mp4">Your browser does not support the video tag.</video></div>
 
 ## Installations
 
