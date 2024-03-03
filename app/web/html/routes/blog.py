@@ -83,8 +83,8 @@ class SearchForm(Form):
     asc = BooleanField("Ascending", default=False)
     results_per_page = SelectField(
         "Results per page",
-        choices=[(10, "10"), (20, "20"), (50, "50"), (100, "100")],
-        default=20,
+        choices=[(1, "1"), (2, "2"), (5, "5"), (10, "10"), (20, "20"), (50, "50"), (100, "100")],
+        default=10,
         coerce=int,
     )
     page = IntegerField("Page", default=1, validators=[validators.optional()])
@@ -117,7 +117,7 @@ async def list_blog_posts(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    blog_posts = await blog_handler.get_blog_posts(
+    paginator = await blog_handler.get_blog_posts(
         db=db,
         can_see_unpublished=current_user.has_permission(Action.READ_UNPUBLISHED_BP),
         search=form.search.data,
@@ -127,6 +127,7 @@ async def list_blog_posts(
         results_per_page=form.results_per_page.data,
         page=form.page.data,
     )
+    form.page.data = paginator.current_page
     template = LISTED_POSTS_TEMPLATE if is_form_request else LIST_POSTS_FULL_TEMPLATE
 
     return templates.TemplateResponse(
@@ -135,8 +136,8 @@ async def list_blog_posts(
             constants.REQUEST: request,
             constants.CURRENT_USER: current_user,
             constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
-            BLOG_POSTS: blog_posts,
             constants.FORM: form,
+            "paginator": paginator,
         },
     )
 

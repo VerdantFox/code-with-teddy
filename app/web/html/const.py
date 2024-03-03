@@ -24,3 +24,4 @@ def shorten(
 
 
 templates.env.globals["shorten"] = shorten
+templates.env.globals["abs"] = abs

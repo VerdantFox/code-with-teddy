@@ -3,7 +3,7 @@
   :class="compact ? 'gap-12' : 'gap-36'"
   class="flex flex-col htmx-fade-out-150ms htmx-fade-in-300ms"
 >
-  {% for blog_post in blog_posts %}
+  {% for blog_post in paginator.blog_posts %}
     <article class="flex gap-16 items-center">
       <div
         x-cloak
@@ -103,4 +103,5 @@
       </div>
     </article>
   {% endfor %}
+  {{ render_partial('blog/partials/paginator.html', request=request, paginator=paginator) }}
 </div>

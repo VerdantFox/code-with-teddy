@@ -63,20 +63,6 @@
   .tippy-box {
     @apply p-1 bg-white text-grayscale-800 ring-1 ring-inset ring-grayscale-600 dark:bg-grayscale-800 dark:text-white;
   }
-
-  .blog-nav-highlight {
-    @apply bg-primary-800 text-white dark:text-white hover:text-white dark:hover:text-white;
-  }
-
-  /* This is a triple-backtick code block anywhere in a blog post */
-  /* For some reason they were 2xl. Made lg so that we'd need less horizontal scroll */
-  div.highlight.not-prose {
-    @apply text-lg max-xs:text-base;
-  }
-  /* This is a triple-backtick code block in a comments section of a blog post */
-  #comments-section div.highlight.not-prose {
-    @apply border-2 border-grayscale-300 dark:border-grayscale-600 bg-white dark:bg-grayscale-900;
-  }
 }
 
 @layer utilities {
@@ -159,6 +145,21 @@ button.swal2-confirm.swal2-styled {
 .htmx-fade-in-300ms {
   opacity: 1;
   transition: opacity 1s ease-out;
+}
+
+/* Blog stuff */
+.blog-nav-highlight {
+  @apply bg-primary-800 text-white dark:text-white hover:text-white dark:hover:text-white;
+}
+
+/* This is a triple-backtick code block anywhere in a blog post */
+/* For some reason they were 2xl. Made lg so that we'd need less horizontal scroll */
+div.highlight.not-prose {
+  @apply text-lg max-xs:text-base;
+}
+/* This is a triple-backtick code block in a comments section of a blog post */
+#comments-section div.highlight.not-prose {
+  @apply border-2 border-grayscale-300 dark:border-grayscale-600 bg-white dark:bg-grayscale-900;
 }
 
 .blog-prose {

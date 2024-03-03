@@ -9,7 +9,7 @@ from typing import Self
 
 import sqlalchemy
 from fastapi import UploadFile
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import Select, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -86,6 +86,20 @@ def _get_bp_statement() -> Select:
     )
 
 
+class Paginator(BaseModel, arbitrary_types_allowed=True):
+    """Response for getting blog posts."""
+
+    blog_posts: list[db_models.BlogPost] = Field(repr=False)
+    min_result: int
+    max_result: int
+    total_results: int
+    total_pages: int
+    current_page: int
+    is_first_page: bool = False
+    is_last_page: bool = False
+    is_only_page: bool = False
+
+
 async def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
     *,
     db: AsyncSession,
@@ -96,24 +110,55 @@ async def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
     asc: bool = False,
     results_per_page: int = 20,
     page: int = 1,
-) -> list[db_models.BlogPost]:
+) -> Paginator:
     """Get blog posts."""
     stmt = _get_bp_statement()
+    count_stmt = select(sqlalchemy.func.count()).select_from(db_models.BlogPost)
     if not can_see_unpublished:
         stmt = stmt.filter(db_models.BlogPost.is_published.is_(True))
+        count_stmt = count_stmt.where(db_models.BlogPost.is_published.is_(True))
     if tags:
         tags_list = transforms.to_list(tags, lowercase=True)
         stmt = stmt.filter(db_models.BlogPost.tags.any(db_models.BlogPostTag.tag.in_(tags_list)))
+        count_stmt = count_stmt.where(
+            db_models.BlogPost.tags.any(db_models.BlogPostTag.tag.in_(tags_list))
+        )
     if search:
         stmt = stmt.filter(db_models.BlogPost.ts_vector.match(search))
-    order_by = getattr(db_models.BlogPost, order_by_field)
+        count_stmt = count_stmt.where(db_models.BlogPost.ts_vector.match(search))
 
+    # Get total blog posts matching results here
+    count_result = await db.execute(count_stmt)
+    total_results = count_result.scalar() or 0
+    total_pages = _calculate_total_pages(
+        total_results=total_results, results_per_page=results_per_page
+    )
+    actual_page = min(page, total_pages)
+    actual_page = max(actual_page, 1)
+
+    order_by = getattr(db_models.BlogPost, order_by_field)
     if not asc:
         order_by = order_by.desc()
-    limit, offset = _calculate_limit_offset(results_per_page=results_per_page, page=page)
+    limit, offset = _calculate_limit_offset(results_per_page=results_per_page, page=actual_page)
     stmt = stmt.order_by(order_by).limit(limit).offset(offset)
     result = await db.execute(stmt)
-    return list(result.scalars().all())
+    blog_posts = list(result.scalars().all())
+    return Paginator(
+        blog_posts=blog_posts,
+        min_result=offset + 1,
+        max_result=offset + len(blog_posts),
+        total_results=total_results,
+        total_pages=total_pages,
+        current_page=actual_page,
+        is_first_page=actual_page == 1,
+        is_last_page=actual_page == total_pages,
+        is_only_page=total_pages == 1,
+    )
+
+
+def _calculate_total_pages(*, total_results: int, results_per_page: int) -> int:
+    """Calculate the total number of pages."""
+    return (total_results + results_per_page - 1) // results_per_page
 
 
 def _calculate_limit_offset(*, results_per_page: int, page: int) -> tuple[int, int]:

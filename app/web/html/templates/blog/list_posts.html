@@ -51,9 +51,9 @@
     class="section-container mb-48"
     x-data="{compact: $persist(true)}"
   >
-    {{ render_partial('blog/partials/list_posts_form.html', request=request, blog_posts=blog_posts, form=form) }}
+    {{ render_partial('blog/partials/list_posts_form.html', request=request, form=form) }}
     <div :class="compact ? '' : 'max-w-3xl'">
-      {{ render_partial('blog/partials/listed_posts.html', request=request, blog_posts=blog_posts) }}
+      {{ render_partial('blog/partials/listed_posts.html', request=request, paginator=paginator) }}
     </div>
   </section>
 
