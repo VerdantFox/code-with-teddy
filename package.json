@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Teddy's personal website",
   "scripts": {
-    "watch-debug": "tailwindcss --config ./app/web/html/tailwind.config.js --input ./app/web/html/input.css --output ./app/web/html/static/css/tailwind-styles.css --watch",
-    "watch": "tailwindcss --config ./app/web/html/tailwind.config.js --input ./app/web/html/input.css --output ./app/web/html/static/css/tailwind-styles.css --watch --minify",
+    "watch": "tailwindcss --config ./app/web/html/tailwind.config.js --input ./app/web/html/input.css --output ./app/web/html/static/css/tailwind-styles.css --watch",
     "build": "tailwindcss --config ./app/web/html/tailwind.config.js --minify --input ./app/web/html/input.css --output ./app/web/html/static/css/tailwind-styles.css --minify"
   },
   "author": "Theodore Williams",
