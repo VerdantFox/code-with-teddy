@@ -12,7 +12,7 @@
           hx-swap="morph swap:500ms"
           hx-push-url="true"
           hx-include="#search-form"
-          @click="document.querySelector('#search-form').scrollIntoView({ behavior: 'smooth' })"
+          @click="document.querySelector('#search-scroll-to').scrollIntoView({ behavior: 'smooth' })"
           class="cursor-pointer relative inline-flex items-center rounded-md border border-grayscale-300 dark:border-grayscale-600 bg-white dark:bg-grayscale-900 px-4 py-2 text-sm font-medium text-grayscale-700 dark:text-grayscale-200 hover:bg-grayscale-50 dark:hover:bg-grayscale-900"
           >Previous</a
         >
@@ -40,7 +40,7 @@
           hx-swap="morph swap:500ms"
           hx-push-url="true"
           hx-include="#search-form"
-          @click="document.querySelector('#search-form').scrollIntoView({ behavior: 'smooth' })"
+          @click="document.querySelector('search-scroll-to').scrollIntoView({ behavior: 'smooth' })"
           class="cursor-pointer relative inline-flex items-center rounded-md border border-grayscale-300 dark:border-grayscale-600 bg-white dark:bg-grayscale-900 px-4 py-2 text-sm font-medium text-grayscale-700 dark:text-grayscale-200 hover:bg-grayscale-50 dark:hover:bg-grayscale-900"
           >Next</a
         >
@@ -94,7 +94,7 @@
                 hx-swap="morph swap:500ms"
                 hx-push-url="true"
                 hx-include="#search-form"
-                @click="document.querySelector('#search-form').scrollIntoView({ behavior: 'smooth' })"
+                @click="document.querySelector('#search-scroll-to').scrollIntoView({ behavior: 'smooth' })"
                 class="cursor-pointer relative inline-flex items-center rounded-l-md px-2 py-2 text-grayscale-400 dark:text-grayscale-400 ring-1 ring-inset ring-grayscale-300 hover:bg-grayscale-50 dark:hover:bg-grayscale-900 focus:z-20 focus:outline-offset-0"
               >
                 <span class="sr-only">Previous</span>
@@ -123,7 +123,7 @@
                   hx-swap="morph swap:500ms"
                   hx-push-url="true"
                   hx-include="#search-form"
-                  @click="document.querySelector('#search-form').scrollIntoView({ behavior: 'smooth' })"
+                  @click="document.querySelector('#search-scroll-to').scrollIntoView({ behavior: 'smooth' })"
                   class="
                   cursor-pointer
                   {% if page_num == paginator.current_page %}
@@ -180,7 +180,7 @@
                 hx-swap="morph swap:500ms"
                 hx-push-url="true"
                 hx-include="#search-form"
-                @click="document.querySelector('#search-form').scrollIntoView({ behavior: 'smooth' })"
+                @click="document.querySelector('#search-scroll-to').scrollIntoView({ behavior: 'smooth' })"
                 class="cursor-pointer relative inline-flex items-center rounded-r-md px-2 py-2 text-grayscale-400 dark:text-grayscale-400 ring-1 ring-inset ring-grayscale-300 hover:bg-grayscale-50 dark:hover:bg-grayscale-900 focus:z-20 focus:outline-offset-0"
               >
                 <span class="sr-only">Next</span>
