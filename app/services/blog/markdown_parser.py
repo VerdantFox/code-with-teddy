@@ -238,6 +238,7 @@ ALLOWED_TAGS = [
     "br",
     "blockquote",
     "code",
+    "del",
     "div",
     "em",
     "figure",

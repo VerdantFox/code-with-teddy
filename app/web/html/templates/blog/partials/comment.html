@@ -1,7 +1,7 @@
 {% if comment %}
   {% set comment_id = comment.id or "base" %}
   <article
-    x-data="{replyText: '{{ shorten(comment.md_content, replace_newline='>>>>') }}'}"
+    x-data="{replyText: '{{ shorten(comment.md_content, urlencode=True) }}'}"
     id="comment-{{ comment_id }}"
     class="relative htmx-fade-out-150ms htmx-fade-in-300ms{% if is_preview %}
       ring-2 ring-offset-500 rounded-lg

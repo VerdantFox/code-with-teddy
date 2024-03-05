@@ -192,14 +192,19 @@ function copyToInput(text, inputId) {
   // Get the input field
   const inputField = document.getElementById(inputId)
 
-  // Replace ">>>>" with a newline followed by "> "
-  text = text.replace(/>>>>/g, "\n> ")
+  let textVal = text
+
+  // URL decode the text
+  textVal = decodeURIComponent(textVal)
+
+  // Replace newline characters with "\n> "
+  textVal = textVal.replace(/\n/g, "\n> ")
 
   // Trim trailing "\n> " strings
-  text = text.replace(/\n> $/g, "")
+  textVal = textVal.replace(/\n> $/g, "")
 
   // Copy the text to the input field
-  inputField.value = `> ${text}\n\n`
+  inputField.value = `> ${textVal}\n\n`
 
   // Scroll the screen to the input field smoothly
   inputField.scrollIntoView({ behavior: "smooth" })
@@ -215,4 +220,90 @@ function copyToInput(text, inputId) {
     inputField.selectionStart = inputField.selectionEnd =
       inputField.value.length
   }, 710)
+}
+
+function performKeyMapAction(input, event) {
+  const keyBindingMap = {
+    "ctrl+b": { func: flank, args: ["**"] },
+    "ctrl+i": { func: flank, args: ["*"] },
+    "ctrl+s": { func: flank, args: ["~~"] },
+    "`": { func: flank, args: ["`"] },
+    "'": { func: flank, args: ["'"] },
+    '"': { func: flank, args: ['"'] },
+    "(": { func: flank, args: ["(", ")"] },
+    "{": { func: flank, args: ["{", "}"] },
+    "[": { func: flank, args: ["[", "]"] },
+    "*": { func: flank, args: ["*"] },
+    _: { func: flank, args: ["_"] },
+    "~": { func: flank, args: ["~"] },
+    "ctrl+'": { func: addPrefixToLine, args: ["> "] },
+  }
+  const pressedKey = getPressedKey(input, event)
+  const keyMapValue = keyBindingMap[pressedKey]
+
+  console.log(pressedKey, keyMapValue)
+
+  if (!keyMapValue) return
+
+  const textInfo = getInputs(input)
+
+  const { func, args } = keyMapValue
+  func(input, event, textInfo, ...args)
+}
+
+function getPressedKey(input, event) {
+  let pressedKey = event.key
+  if (event.ctrlKey) {
+    pressedKey = `ctrl+${pressedKey}`
+  }
+  return pressedKey
+}
+
+function getInputs(input) {
+  const cursorStart = input.selectionStart
+  const cursorEnd = input.selectionEnd
+  const text = input.value
+  const beforeText = text.substring(0, cursorStart)
+  const selectedText = text.substring(cursorStart, cursorEnd)
+  const afterText = text.substring(cursorEnd)
+  return { cursorStart, cursorEnd, text, beforeText, selectedText, afterText }
+}
+
+function addPrefixToLine(input, event, textInfo, prefix) {
+  const cursorPosition = input.selectionStart
+  const beforeCursor = input.value.substring(0, cursorPosition)
+  const afterCursor = input.value.substring(cursorPosition)
+
+  // Find the start of the line
+  const lineStart = beforeCursor.lastIndexOf("\n") + 1
+
+  // Add the prefix to the start of the line
+  const newValue =
+    beforeCursor.substring(0, lineStart) +
+    prefix +
+    beforeCursor.substring(lineStart) +
+    afterCursor
+
+  // Update the input value
+  input.value = newValue
+
+  // Move the cursor to its original position
+  input.selectionStart = input.selectionEnd = cursorPosition + prefix.length // "+ prefix.length" because we added the prefix
+}
+
+function flank(input, event, textInfo, left, right) {
+  if (textInfo.cursorStart === textInfo.cursorEnd) return
+  event.preventDefault()
+
+  let leftChar = left
+  let rightChar = right
+  if (!rightChar) {
+    rightChar = leftChar
+  }
+
+  input.value = `${textInfo.beforeText}${leftChar}${textInfo.selectedText}${rightChar}${textInfo.afterText}`
+
+  // Keep the original highlighted text highlighted
+  input.selectionStart = textInfo.cursorStart + leftChar.length
+  input.selectionEnd = textInfo.cursorEnd + rightChar.length
 }
