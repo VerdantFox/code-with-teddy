@@ -56,9 +56,9 @@
     <div class="p-2 flex gap-1 items-center">
       <!-- Link -->
       <button
-        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '[', '](url)'), false"
+        @click="$event.preventDefault(); addLink(document.getElementById('{{ field.id }}'), $event), false"
         {# FIXME: Add function #}
-        title="Hyperlink"
+        title="Hyperlink (Ctrl+L)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
       >
@@ -129,6 +129,12 @@
       </button>
     </div>
   </div>
-  {{ field(class=field_class if field_class else "rounded-b-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400 border-grayscale-900 dark:border-grayscale-500" + (' border-red-700 dark:border-red-400' if field.errors else ''), **extra_fields) }}
+  <div class="relative inline-block w-full">
+    {{ field(class=field_class if field_class else "w-full rounded-b-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400 border-grayscale-900 dark:border-grayscale-500" + (' border-red-700 dark:border-red-400' if field.errors else ''), **extra_fields) }}
+    <span
+      id="textarea-char-count"
+      class="absolute bottom-2 right-5 opacity-50"
+    ></span>
+  </div>
   {{ render_partial('shared/partials/forms/field_errors.html', errors=field.errors) }}
 </div>

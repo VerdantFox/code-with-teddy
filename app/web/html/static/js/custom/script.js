@@ -222,6 +222,24 @@ function copyToInput(text, inputId) {
   }, 710)
 }
 
+function mdTextareaKeyPress(textareaElement, event, charCount = 0) {
+  performKeyMapAction(textareaElement, event)
+  setTimeout(() => {
+    updateCharCount(
+      textareaElement,
+      document.getElementById("textarea-char-count"),
+      charCount
+    )
+  }, 0)
+}
+
+function updateCharCount(textareaElement, containerElement, maxCharCount) {
+  if (!maxCharCount) return
+  const textareaCharCount = textareaElement.value.length
+  const result = `${textareaCharCount} / ${maxCharCount}`
+  containerElement.textContent = result
+}
+
 function performKeyMapAction(textareaElement, event) {
   const keyBindingMap = {
     "ctrl+b": { func: flank, args: ["**"] },
@@ -236,6 +254,7 @@ function performKeyMapAction(textareaElement, event) {
     "*": { func: flank, args: ["*"] },
     _: { func: flank, args: ["_"] },
     "~": { func: flank, args: ["~"] },
+    "ctrl+l": { func: addLink, args: [] },
     "ctrl+'": { func: addPrefixToLine, args: ["> "] },
     "ctrl+q": { func: addPrefixToLine, args: ["> "] },
     "ctrl+u": { func: addPrefixToLine, args: ["- "] },
@@ -322,6 +341,28 @@ function flank(textareaElement, event, left, right, requireHighlighted = true) {
   // Dispatch an input event to indicate the value has changed
   const newInputEvent = new Event("input", { bubbles: true, cancelable: true })
   textareaElement.dispatchEvent(newInputEvent)
+}
+
+function addLink(textareaElement, event) {
+  event.preventDefault()
+
+  const textInfo = getTextInfo(textareaElement)
+  const linkText = textInfo.selectedText || "Link text"
+  const linkUrl = "https://example.com"
+
+  const newValue = `${textInfo.beforeText}[${linkText}](${linkUrl})${textInfo.afterText}`
+  textareaElement.value = newValue
+
+  // Calculate the start and end positions of the linkUrl
+  const linkUrlStart = textInfo.cursorStart + linkText.length + 3
+  const linkUrlEnd = linkUrlStart + linkUrl.length
+
+  // Highlight the linkUrl
+  textareaElement.selectionStart = linkUrlStart
+  textareaElement.selectionEnd = linkUrlEnd
+
+  // Focus the textarea element
+  textareaElement.focus()
 }
 
 function deleteLine(textareaElement, event) {

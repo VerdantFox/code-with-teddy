@@ -76,7 +76,7 @@
           {{ render_partial('shared/partials/forms/field.html', field=comment_form.email) }}
         {% endif %}
         {# Comment form content field #}
-        {{ render_partial('shared/partials/forms/markdown_textarea.html', button_extra_attrs={"hx-trigger": "click", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}, field=comment_form.content, extra_fields={"rows": "5", "@keydown": "performKeyMapAction($el, $event)", "hx-trigger": "keyup changed delay:500ms", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}) }}
+        {{ render_partial('shared/partials/forms/markdown_textarea.html', button_extra_attrs={"hx-trigger": "click", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}, field=comment_form.content, extra_fields={"rows": "6", "@keydown": "mdTextareaKeyPress($el, $event, 2000)", "hx-trigger": "keyup changed delay:500ms", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}) }}
       </div>
       <div class="flex items-center gap-4">
         {# Submit button #}
