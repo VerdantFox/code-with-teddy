@@ -68,7 +68,7 @@
         {% else %}
           <div class="flex max-md:flex-col gap-6">
             {# Comment form name field #}
-            {{ render_partial('shared/partials/forms/field.html', class="flex-1", field=comment_form.name, extra_fields={"hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:1000ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}) }}
+            {{ render_partial('shared/partials/forms/field.html', class="flex-1", field=comment_form.name, extra_fields={"hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:500ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}) }}
             {# Comment form not robot field #}
             {{ render_partial('shared/partials/forms/toggle_field.html', field=comment_form.not_robot) }}
           </div>
@@ -76,7 +76,7 @@
           {{ render_partial('shared/partials/forms/field.html', field=comment_form.email) }}
         {% endif %}
         {# Comment form content field #}
-        {{ render_partial('shared/partials/forms/field.html', field=comment_form.content, extra_fields={"rows": "5", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:1000ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms", "@keydown": "performKeyMapAction($el, $event)"}) }}
+        {{ render_partial('shared/partials/forms/markdown_textarea.html', button_extra_attrs={"hx-trigger": "click", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}, field=comment_form.content, extra_fields={"rows": "5", "@keydown": "performKeyMapAction($el, $event)", "hx-trigger": "keyup changed delay:500ms", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}) }}
       </div>
       <div class="flex items-center gap-4">
         {# Submit button #}

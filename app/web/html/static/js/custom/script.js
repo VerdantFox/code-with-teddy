@@ -222,7 +222,7 @@ function copyToInput(text, inputId) {
   }, 710)
 }
 
-function performKeyMapAction(input, event) {
+function performKeyMapAction(textareaElement, event) {
   const keyBindingMap = {
     "ctrl+b": { func: flank, args: ["**"] },
     "ctrl+i": { func: flank, args: ["*"] },
@@ -237,60 +237,71 @@ function performKeyMapAction(input, event) {
     _: { func: flank, args: ["_"] },
     "~": { func: flank, args: ["~"] },
     "ctrl+'": { func: addPrefixToLine, args: ["> "] },
+    "ctrl+q": { func: addPrefixToLine, args: ["> "] },
+    "ctrl+u": { func: addPrefixToLine, args: ["- "] },
+    "ctrl+o": { func: addPrefixToLine, args: ["1. "] },
+    "ctrl+d": { func: deleteLine, args: [] },
   }
-  const pressedKey = getPressedKey(input, event)
+  const pressedKey = getPressedKey(event)
   const keyMapValue = keyBindingMap[pressedKey]
 
   if (!keyMapValue) return
 
-  const textInfo = getInputs(input)
-
   const { func, args } = keyMapValue
-  func(input, event, textInfo, ...args)
+  func(textareaElement, event, ...args)
 }
 
-function getPressedKey(input, event) {
+function getPressedKey(event) {
   let pressedKey = event.key
   if (event.ctrlKey) {
-    pressedKey = `ctrl+${pressedKey}`
+    if (event.shiftKey) {
+      pressedKey = `ctrl+shift+${pressedKey}`
+    } else {
+      pressedKey = `ctrl+${pressedKey}`
+    }
   }
   return pressedKey
 }
 
-function getInputs(input) {
-  const cursorStart = input.selectionStart
-  const cursorEnd = input.selectionEnd
-  const text = input.value
-  const beforeText = text.substring(0, cursorStart)
-  const selectedText = text.substring(cursorStart, cursorEnd)
-  const afterText = text.substring(cursorEnd)
-  return { cursorStart, cursorEnd, text, beforeText, selectedText, afterText }
-}
+function addPrefixToLine(textareaElement, event, prefix, trimIfSame = false) {
+  event.preventDefault()
 
-function addPrefixToLine(input, event, textInfo, prefix) {
-  const cursorPosition = input.selectionStart
-  const beforeCursor = input.value.substring(0, cursorPosition)
-  const afterCursor = input.value.substring(cursorPosition)
+  const cursorPosition = textareaElement.selectionStart
+  const beforeCursor = textareaElement.value.substring(0, cursorPosition)
+  const afterCursor = textareaElement.value.substring(cursorPosition)
+  let prefixValue = prefix
 
   // Find the start of the line
   const lineStart = beforeCursor.lastIndexOf("\n") + 1
+  const line = beforeCursor.substring(lineStart) + afterCursor
+
+  // Check if the first character of the line is the same as the first character of the prefix
+  if (trimIfSame && line[0] === prefixValue[0]) {
+    // Trim the whitespace from the prefix
+    prefixValue = prefixValue.trim()
+  }
 
   // Add the prefix to the start of the line
   const newValue =
     beforeCursor.substring(0, lineStart) +
-    prefix +
+    prefixValue +
     beforeCursor.substring(lineStart) +
     afterCursor
 
-  // Update the input value
-  input.value = newValue
+  // Update the textareaElement value
+  textareaElement.value = newValue
 
   // Move the cursor to its original position
-  input.selectionStart = input.selectionEnd = cursorPosition + prefix.length // "+ prefix.length" because we added the prefix
+  textareaElement.selectionStart = textareaElement.selectionEnd =
+    cursorPosition + prefixValue.length
+
+  // Focus the textarea element
+  textareaElement.focus()
 }
 
-function flank(input, event, textInfo, left, right) {
-  if (textInfo.cursorStart === textInfo.cursorEnd) return
+function flank(textareaElement, event, left, right, requireHighlighted = true) {
+  const textInfo = getTextInfo(textareaElement)
+  if (textInfo.cursorStart === textInfo.cursorEnd && requireHighlighted) return
   event.preventDefault()
 
   let leftChar = left
@@ -299,9 +310,57 @@ function flank(input, event, textInfo, left, right) {
     rightChar = leftChar
   }
 
-  input.value = `${textInfo.beforeText}${leftChar}${textInfo.selectedText}${rightChar}${textInfo.afterText}`
+  textareaElement.value = `${textInfo.beforeText}${leftChar}${textInfo.selectedText}${rightChar}${textInfo.afterText}`
 
   // Keep the original highlighted text highlighted
-  input.selectionStart = textInfo.cursorStart + leftChar.length
-  input.selectionEnd = textInfo.cursorEnd + rightChar.length
+  textareaElement.selectionStart = textInfo.cursorStart + leftChar.length
+  textareaElement.selectionEnd = textInfo.cursorEnd + rightChar.length
+
+  // Focus the textarea element
+  textareaElement.focus()
+
+  // Dispatch an input event to indicate the value has changed
+  const newInputEvent = new Event("input", { bubbles: true, cancelable: true })
+  textareaElement.dispatchEvent(newInputEvent)
+}
+
+function deleteLine(textareaElement, event) {
+  event.preventDefault()
+
+  const cursorPosition = textareaElement.selectionStart
+  const beforeCursor = textareaElement.value.substring(0, cursorPosition)
+  const afterCursor = textareaElement.value.substring(cursorPosition)
+
+  // Find the start and end of the line
+  const lineStart = beforeCursor.lastIndexOf("\n")
+  const lineEnd = afterCursor.indexOf("\n")
+  const afterLine = lineEnd === -1 ? "" : afterCursor.substring(lineEnd)
+
+  // Delete the line
+  const newValue = beforeCursor.substring(0, lineStart) + afterLine
+
+  // Update the textareaElement value
+  textareaElement.value = newValue
+
+  // Move the cursor to the start of the next line
+  textareaElement.selectionStart = textareaElement.selectionEnd = lineStart
+
+  // Focus the textarea element
+  textareaElement.focus()
+}
+
+function getTextAndCursorPosition(textareaElement) {
+  const cursorStart = textareaElement.selectionStart
+  const cursorEnd = textareaElement.selectionEnd
+  const text = textareaElement.value
+  return { cursorStart, cursorEnd, text }
+}
+
+function getTextInfo(textareaElement) {
+  const { cursorStart, cursorEnd, text } =
+    getTextAndCursorPosition(textareaElement)
+  const beforeText = text.substring(0, cursorStart)
+  const selectedText = text.substring(cursorStart, cursorEnd)
+  const afterText = text.substring(cursorEnd)
+  return { cursorStart, cursorEnd, text, beforeText, selectedText, afterText }
 }

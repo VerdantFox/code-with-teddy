@@ -1,0 +1,134 @@
+{% macro render_attrs(button_extra_attrs) %}
+  {% if button_extra_attrs %}
+    {% for key, val in button_extra_attrs.items() %}
+      {{ key }}="{{ val }}"
+    {% endfor %}
+  {% endif %}
+{% endmacro %}
+
+{% if not extra_fields %}
+  {% set extra_fields = {} %}
+{% endif %}
+{% if field.description %}
+  {% set _ = extra_fields.update({"placeholder": field.description}) %}
+{% endif %}
+
+<div id="md-textarea" class="flex flex-col {{ class }}">
+  {{ field.label(class='mb-2' +  (' text-red-800 dark:text-red-300' if field.errors else '')) }}
+  <div
+    class="rounded-t-lg leading-none border border-b-0 border-grayscale-900 dark:border-grayscale-500 dark:bg-grayscale-700 flex gap-1 items-center"
+  >
+    <div class="p-2 flex gap-1 items-center">
+      <!-- Bold -->
+      <button
+        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '**', '**', false)"
+        title="Bold (Ctrl+B)"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        <strong>B</strong>
+      </button>
+      <!-- Italic -->
+      <button
+        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '*', '*', false)"
+        title="Italic (Ctrl+I)"
+        class="comment-button font-serif"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        <em><strong>I</strong></em>
+      </button>
+      <!-- Strikethrough -->
+      <button
+        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '~~', '~~', false)"
+        title="Strikethrough (Ctrl+S)"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/strikethrough-bold.html', class="h-5 w-5") }}
+      </button>
+    </div>
+
+    <!-- Break -->
+    <span
+      class="py-4 border-l border-grayscale-400 dark:border-grayscale-500"
+    ></span>
+
+    <div class="p-2 flex gap-1 items-center">
+      <!-- Link -->
+      <button
+        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '[', '](url)'), false"
+        {# FIXME: Add function #}
+        title="Hyperlink"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/link-bold.html', class="h-5 w-5") }}
+      </button>
+      <!-- Blockquote -->
+      <button
+        @click="$event.preventDefault(); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '> ')"
+        title="Blockquote (Ctrl+Q)"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/quotes-bold.html', class="h-5 w-5") }}
+      </button>
+      <!-- Inline code -->
+      <button
+        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '`', '`', false)"
+        title="Inline code (`)"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/code-simple-bold.html', class="h-5 w-5") }}
+      </button>
+      <!-- Code block -->
+      <button
+        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '```\n', '\n```', false)"
+        {# FIXME: Add function #}
+        title="Code block"
+        class="comment-button max-xs:hidden"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/code-bold.html', class="h-5 w-5") }}
+      </button>
+    </div>
+
+    <!-- Break -->
+    <span
+      class="py-4 border-l border-grayscale-400 dark:border-grayscale-500 max-xs:hidden"
+    ></span>
+
+    <div class="p-2 flex gap-1 items-center max-xs:hidden">
+      <!-- Heading -->
+      <button
+        @click="$event.preventDefault(); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '# ', true)"
+        title="Heading"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        <strong>H</strong>
+      </button>
+      <!-- Ordered list -->
+      <button
+        @click="$event.preventDefault(); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '1. ')"
+        title="Numbered list (Ctrl+O)"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/list-numbers-bold.html', class="h-5 w-5") }}
+      </button>
+      <!-- Unordered list -->
+      <button
+        @click="$event.preventDefault(); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '- ')"
+        title="Bulleted list (Ctrl+U)"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/list-bullets-bold.html', class="h-5 w-5") }}
+      </button>
+    </div>
+  </div>
+  {{ field(class=field_class if field_class else "rounded-b-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400 border-grayscale-900 dark:border-grayscale-500" + (' border-red-700 dark:border-red-400' if field.errors else ''), **extra_fields) }}
+  {{ render_partial('shared/partials/forms/field_errors.html', errors=field.errors) }}
+</div>

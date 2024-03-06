@@ -27,7 +27,7 @@
     {{ render_partial('shared/partials/forms/field.html', field=form.description, extra_fields={"@input.once": "isDirty = true"}) }}
     {{
       render_partial(
-      'shared/partials/forms/field.html',
+      'shared/partials/forms/markdown_textarea.html',
       field=form.content,
       extra_fields={"rows": "8", "hx-post": url_for('html:edit_bp_live_update'), "hx-trigger": "keyup changed delay:1000ms", "hx-target": "#preview", "hx-swap": "innerHTML", "@input.once": "isDirty = true", "@keydown": "performKeyMapAction($el, $event)"}
       )
