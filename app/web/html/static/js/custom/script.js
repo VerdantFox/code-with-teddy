@@ -241,8 +241,6 @@ function performKeyMapAction(input, event) {
   const pressedKey = getPressedKey(input, event)
   const keyMapValue = keyBindingMap[pressedKey]
 
-  console.log(pressedKey, keyMapValue)
-
   if (!keyMapValue) return
 
   const textInfo = getInputs(input)

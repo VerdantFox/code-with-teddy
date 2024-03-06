@@ -48,8 +48,8 @@ class SaveBlogResponse(BaseModel, arbitrary_types_allowed=True):
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
 
 
-class SaveCommentInput(BaseModel, arbitrary_types_allowed=True):
-    """Input data model for saving a blog post comment."""
+class CommentInputPreview(BaseModel, arbitrary_types_allowed=True):
+    """Input for comment preview."""
 
     bp_id: int
     guest_id: str | None = None
@@ -57,6 +57,10 @@ class SaveCommentInput(BaseModel, arbitrary_types_allowed=True):
     name: str | None = None
     email: str | None = None
     content: str
+
+
+class SaveCommentInput(CommentInputPreview):
+    """Input data model for saving a blog post comment."""
 
     @model_validator(mode="after")
     def check_user_id_or_name(self) -> Self:
@@ -499,7 +503,7 @@ async def update_existing_comment(
     return comment
 
 
-def generate_comment(data: SaveCommentInput) -> db_models.BlogPostComment:
+def generate_comment(data: CommentInputPreview) -> db_models.BlogPostComment:
     """Generate a blog post comment."""
     html_content = generate_comment_html(data.content)
     now = datetime.now().astimezone(timezone.utc)

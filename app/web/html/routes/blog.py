@@ -406,7 +406,9 @@ async def comment_post_preview(
         form_data_dict["name"] = current_user.full_name or current_user.username
     user_id = current_user.id if current_user.is_authenticated else None
     try:
-        input_data = blog_handler.SaveCommentInput(**form_data_dict, user_id=user_id, bp_id=bp_id)
+        input_data = blog_handler.CommentInputPreview(
+            **form_data_dict, user_id=user_id, bp_id=bp_id
+        )
     except ValidationError:
         return HTMLResponse()
     comment = blog_handler.generate_comment(input_data)
