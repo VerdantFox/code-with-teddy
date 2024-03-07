@@ -21,7 +21,7 @@
     <div class="p-2 flex gap-1 items-center">
       <!-- Bold -->
       <button
-        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '**', '**', false)"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '**', '**', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         title="Bold (Ctrl+B)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -30,7 +30,7 @@
       </button>
       <!-- Italic -->
       <button
-        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '*', '*', false)"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '*', '*', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         title="Italic (Ctrl+I)"
         class="comment-button font-serif"
         {{ render_attrs(button_extra_attrs) }}
@@ -39,7 +39,7 @@
       </button>
       <!-- Strikethrough -->
       <button
-        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '~~', '~~', false)"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '~~', '~~', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         title="Strikethrough (Ctrl+S)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -56,7 +56,7 @@
     <div class="p-2 flex gap-1 items-center">
       <!-- Link -->
       <button
-        @click="$event.preventDefault(); addLink(document.getElementById('{{ field.id }}'), $event), false"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addLink(document.getElementById('{{ field.id }}'), $event); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         {# FIXME: Add function #}
         title="Hyperlink (Ctrl+L)"
         class="comment-button"
@@ -66,7 +66,7 @@
       </button>
       <!-- Blockquote -->
       <button
-        @click="$event.preventDefault(); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '> ')"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '> '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         title="Blockquote (Ctrl+Q)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -75,7 +75,7 @@
       </button>
       <!-- Inline code -->
       <button
-        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '`', '`', false)"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '`', '`', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         title="Inline code (`)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -84,7 +84,7 @@
       </button>
       <!-- Code block -->
       <button
-        @click="$event.preventDefault(); flank(document.getElementById('{{ field.id }}'), $event, '```\n', '\n```', false)"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '```\n', '\n```', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         {# FIXME: Add function #}
         title="Code block"
         class="comment-button max-xs:hidden"
@@ -102,7 +102,7 @@
     <div class="p-2 flex gap-1 items-center max-xs:hidden">
       <!-- Heading -->
       <button
-        @click="$event.preventDefault(); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '# ', true)"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '# '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         title="Heading"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -111,7 +111,7 @@
       </button>
       <!-- Ordered list -->
       <button
-        @click="$event.preventDefault(); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '1. ')"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '1. '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         title="Numbered list (Ctrl+O)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -120,7 +120,7 @@
       </button>
       <!-- Unordered list -->
       <button
-        @click="$event.preventDefault(); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '- ')"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '- '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
         title="Bulleted list (Ctrl+U)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}

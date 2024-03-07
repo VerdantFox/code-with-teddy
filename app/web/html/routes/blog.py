@@ -334,8 +334,8 @@ class NotLoggedInCommentForm(LoggedInCommentForm):
         validators=[validators.DataRequired(), validators.Length(min=1, max=100)],
     )
     email = EmailField(
-        "Email (optional—for reply messages)",
-        description="awesome@email.com",
+        "Email (optional—for replies only)",
+        description="awesome@email.com (optional)",
         validators=[validators.Optional(), validators.Email()],
     )
 
