@@ -1,0 +1,53 @@
+# Todos
+
+A list of stuff that needs to get done for the project, roughly in order of importance.
+
+- [ ] Write tests
+  - [ ] functional tests against FastAPI
+  - [ ] unit tests for high-value, low-level functions
+  - [ ] playwright end-to-end tests
+  - [ ] Integration tests (maybe)
+  - [ ] Locust stress tests
+- [ ] Blog comment edit history (undo/redo kind of messed up right now)
+- [ ] Add projects to projects page (plus individual pages as needed)
+  - [ ] Finance (complete first)
+  - [ ] Twisted towers
+  - [ ] Connect 4 (remake first)
+  - [ ] Moth hunt
+  - [ ] File renamer
+- [ ] Set up Oauth authentication (google and github)
+- [ ] Set up secrets with keyring
+  - [ ] Move any existing hardcoded secrets to keyring (fresh secrets obviously)
+- [ ] Set up email service
+  - [ ] Emails for blog post comments
+  - [ ] Emails for recover password
+  - [ ] Supply domain to whoever so emails don't go to spam
+- [ ] Update HTML head metadata
+  - [ ] For blog images (and all other pages image)
+  - [ ] For descriptions on all pages
+  - [ ] Search what other metadata should be provided
+- [ ] Look up extra security desired
+  - [x] CSP
+  - [ ] etc.
+- [ ] Deploy
+  - [ ] Set up container orchestration
+  - [ ] Set up deployment script
+  - [ ] Purchase domain
+  - [ ] Start DigitalOcean site
+  - [ ] Update apt, get docker, git, etc.
+  - [ ] Hook domain into real site
+  - [ ] Set up initial postgres
+  - [ ] Set up https
+- [ ] Refactor to separate db models from services models
+- [ ] Add sqlite database option (for faster tests)
+- [ ] Set up logging
+  - [ ] log to files that clean up automatically
+  - [ ] See if other info should be logged
+  - [ ] Connect with Sentry for logging
+- [ ] Rebuild projects
+  - [ ] Finance
+  - [ ] Connect 4
+  - [ ] Analytics
+- [ ] New projects
+  - [ ] Games API (plus blog post series)
+  - [ ] Multiplayer sockets game (plus blog posts)
