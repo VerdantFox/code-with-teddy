@@ -3,6 +3,141 @@
 @tailwind utilities;
 
 @layer base {
+  /* Start scrollbar styling */
+  /* stylelint-disable no-descending-specificity -- incorrectly applied rule here */
+  /* Start light theme scrollbars */
+  * {
+    scrollbar-color: #a8a29e #e7e5e4;
+  }
+
+  /* Works on Chrome, Edge, and Safari */
+  ::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #e7e5e4;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #a8a29e;
+    border-radius: 5px;
+    border: 2px solid #e7e5e4;
+  }
+  /* Buttons */
+  ::-webkit-scrollbar-button:single-button {
+    background-color: #e7e5e4;
+    display: block;
+    border-style: solid;
+    height: 11px;
+    width: 11px;
+  }
+  /* Up */
+  ::-webkit-scrollbar-button:single-button:vertical:decrement {
+    border-width: 0 8px 8px 8px;
+    border-color: transparent transparent #a8a29e transparent;
+  }
+
+  ::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+    border-color: transparent transparent #57534e transparent;
+  }
+  /* Down */
+  ::-webkit-scrollbar-button:single-button:vertical:increment {
+    border-width: 8px 8px 0 8px;
+    border-color: #a8a29e transparent transparent transparent;
+  }
+
+  ::-webkit-scrollbar-button:vertical:single-button:increment:hover {
+    border-color: #57534e transparent transparent transparent;
+  }
+  /* left */
+  ::-webkit-scrollbar-button:single-button:horizontal:decrement {
+    border-width: 8px 8px 8px 0;
+    border-color: transparent #a8a29e transparent transparent;
+  }
+
+  ::-webkit-scrollbar-button:single-button:horizontal:decrement:hover {
+    border-color: transparent #57534e transparent transparent;
+  }
+  /* right */
+  ::-webkit-scrollbar-button:single-button:horizontal:increment {
+    border-width: 8px 0 8px 8px;
+    border-color: transparent transparent transparent #a8a29e;
+  }
+
+  ::-webkit-scrollbar-button:horizontal:single-button:increment:hover {
+    border-color: transparent transparent transparent #57534e;
+  }
+  /* End light theme scrollbars */
+
+  /* Start dark theme scrollbars */
+  /* Works on Firefox */
+  .dark * {
+    scrollbar-color: #292524 #44403c;
+  }
+
+  /* Works on Chrome, Edge, and Safari */
+  .dark ::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: #44403c;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: #292524;
+    border-radius: 5px;
+    border: 2px solid #44403c;
+  }
+  /* Buttons */
+  .dark ::-webkit-scrollbar-button:single-button {
+    background-color: #44403c;
+    display: block;
+    border-style: solid;
+    height: 11px;
+    width: 11px;
+  }
+  /* Up */
+  .dark ::-webkit-scrollbar-button:single-button:vertical:decrement {
+    border-width: 0 8px 8px 8px;
+    border-color: transparent transparent #292524 transparent;
+  }
+
+  .dark ::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+    border-color: transparent transparent #d6d3d1 transparent;
+  }
+  /* Down */
+  .dark ::-webkit-scrollbar-button:single-button:vertical:increment {
+    border-width: 8px 8px 0 8px;
+    border-color: #292524 transparent transparent transparent;
+  }
+
+  .dark ::-webkit-scrollbar-button:vertical:single-button:increment:hover {
+    border-color: #d6d3d1 transparent transparent transparent;
+  }
+  /* left */
+  .dark ::-webkit-scrollbar-button:single-button:horizontal:decrement {
+    border-width: 8px 8px 8px 0;
+    border-color: transparent #292524 transparent transparent;
+  }
+
+  .dark ::-webkit-scrollbar-button:single-button:horizontal:decrement:hover {
+    border-color: transparent #d6d3d1 transparent transparent;
+  }
+  /* right */
+  .dark ::-webkit-scrollbar-button:single-button:horizontal:increment {
+    border-width: 8px 0 8px 8px;
+    border-color: transparent transparent transparent #292524;
+  }
+
+  .dark ::-webkit-scrollbar-button:horizontal:single-button:increment:hover {
+    border-color: transparent transparent transparent #d6d3d1;
+  }
+  /* End dark theme scrollbars */
+  /* End scrollbar styling */
+  /* stylelint-enable no-descending-specificity */
+
   .transition-bg-color {
     transition-property: background-color, opacity;
   }
