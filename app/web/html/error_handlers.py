@@ -12,6 +12,7 @@ from app.web.html.flash_messages import FlashCategory, FlashMessage
 logger = logging.getLogger(__name__)
 
 ERROR_TEMPLATE = "errors/general_error.html"
+GENERAL_ERROR_URL_FOR = "html:general_error"
 
 
 def register_error_handlers(app: FastAPI) -> None:
@@ -22,6 +23,7 @@ def register_error_handlers(app: FastAPI) -> None:
         request: Request,
         _error: errors.UserNotValidatedError,
     ) -> RedirectResponse:
+        """Handle expired login, prompting user re-authentication."""
         response = RedirectResponse(
             request.url,
             status_code=status.HTTP_303_SEE_OTHER,
@@ -39,6 +41,7 @@ def register_error_handlers(app: FastAPI) -> None:
         request: Request,
         _error: errors.UserNotAuthenticatedError,
     ) -> RedirectResponse:
+        """Redirect unauthenticated users to the login page with a warning."""
         FlashMessage(
             title="Not logged in",
             text="Please log in to use that service.",
@@ -54,8 +57,9 @@ def register_error_handlers(app: FastAPI) -> None:
         request: Request,
         error: errors.WebError,
     ) -> RedirectResponse:
+        """Handle generic web errors by redirecting to a general error page."""
         return RedirectResponse(
-            request.url_for("html:general_error").include_query_params(
+            request.url_for(GENERAL_ERROR_URL_FOR).include_query_params(
                 detail=error.detail,
                 status_code=error.status_code,
             ),
@@ -66,9 +70,10 @@ def register_error_handlers(app: FastAPI) -> None:
         request: Request,
         error: RequestValidationError,
     ) -> RedirectResponse:
+        """Log form validation errors and redirect to a general error page."""
         logger.error("Form submission errors: %s", error.errors())
         return RedirectResponse(
-            request.url_for("html:general_error").include_query_params(
+            request.url_for(GENERAL_ERROR_URL_FOR).include_query_params(
                 detail=(
                     "Something went wrong with the form submission. Please report to Teddy "
                     "if the problem persists."
@@ -83,8 +88,9 @@ def register_error_handlers(app: FastAPI) -> None:
         request: Request,
         _error: Exception,
     ) -> RedirectResponse:
+        """Handle unexpected server errors by redirecting to a general error page."""
         return RedirectResponse(
-            request.url_for("html:general_error").include_query_params(
+            request.url_for(GENERAL_ERROR_URL_FOR).include_query_params(
                 detail=(
                     "Something went wrong on the server."
                     " Contact Teddy Williams to report a problem."
@@ -99,10 +105,11 @@ def register_error_handlers(app: FastAPI) -> None:
         request: Request,
         _error: Exception,
     ) -> RedirectResponse:
+        """Redirect to a general error page for 404 Not Found errors."""
         return RedirectResponse(
-            request.url_for("html:general_error").include_query_params(
+            request.url_for(GENERAL_ERROR_URL_FOR).include_query_params(
                 detail="Page not found.",
                 status_code=404,
             ),
-            status_code=status.HTTP_303_SEE_OTHER,
+            status_code=status.HTTP_302_FOUND,
         )
