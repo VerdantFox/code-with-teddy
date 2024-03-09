@@ -61,5 +61,5 @@ async def api_home(request: Request) -> RedirectResponse:
     return RedirectResponse(url=request.url_for("api:swagger_ui_html"), status_code=302)
 
 
-app.mount("/api", api_main.app, name="api")
+app.mount("/api/v1", api_main.app, name="api")
 app.mount("/", html_main.app, name="html")

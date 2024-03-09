@@ -1,4 +1,5 @@
 """error_handlers: Error handlers for the HTML web package."""
+
 import logging
 
 from fastapi import FastAPI, Request, status
@@ -89,6 +90,19 @@ def register_error_handlers(app: FastAPI) -> None:
                     " Contact Teddy Williams to report a problem."
                 ),
                 status_code=500,
+            ),
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+
+    @app.exception_handler(404)
+    async def not_found_error(
+        request: Request,
+        _error: Exception,
+    ) -> RedirectResponse:
+        return RedirectResponse(
+            request.url_for("html:general_error").include_query_params(
+                detail="Page not found.",
+                status_code=404,
             ),
             status_code=status.HTTP_303_SEE_OTHER,
         )

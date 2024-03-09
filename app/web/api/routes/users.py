@@ -22,6 +22,7 @@ router = APIRouter(tags=["users"], prefix="/users")
     "",
     response_model=list[api_models.UserOutLimited],
     status_code=status.HTTP_200_OK,
+    responses={401: {"model": api_models.ErrorOut}},
 )
 async def get_users(
     current_user: auth.TokenOptionalUser,
@@ -38,8 +39,9 @@ async def get_users(
 
 @router.get(
     "/current-user",
-    status_code=status.HTTP_200_OK,
     response_model=api_models.UserOutLimited,
+    status_code=status.HTTP_200_OK,
+    responses={401: {"model": api_models.ErrorOut}},
 )
 async def get_current_user(
     current_user: auth.TokenOptionalUser,
@@ -50,8 +52,9 @@ async def get_current_user(
 
 @router.get(
     "/{user_id}",
-    status_code=status.HTTP_200_OK,
     response_model=api_models.UserOutLimited,
+    status_code=status.HTTP_200_OK,
+    responses={401: {"model": api_models.ErrorOut}, 404: {"model": api_models.ErrorOut}},
 )
 async def get_user(
     current_user: auth.TokenRequiredUser,
@@ -64,19 +67,22 @@ async def get_user(
 
 @router.post(
     "",
-    status_code=status.HTTP_201_CREATED,
     response_model=api_models.UserOutLimited,
+    status_code=status.HTTP_201_CREATED,
+    responses={401: {"model": api_models.ErrorOut}, 403: {"model": api_models.ErrorOut}},
 )
 async def create_user(
+    current_user: auth.TokenRequiredUser,
     user_in: api_models.UserInPost,
     db: DBSession,
 ) -> db_models.User:
     """Create a user."""
+    if not current_user.is_admin:
+        raise errors.UserPermissionsError
     user_model = db_models.User(
-        email=user_in.email,
         username=user_in.username,
-        first_name=user_in.first_name,
-        last_name=user_in.last_name,
+        email=user_in.email,
+        full_name=user_in.full_name,
         hashed_password=auth.hash_password(user_in.password),
         role=Role.USER,
         is_active=True,
@@ -89,8 +95,9 @@ async def create_user(
 
 @router.patch(
     "/current-user",
-    status_code=status.HTTP_200_OK,
     response_model=api_models.UserOutLimited,
+    status_code=status.HTTP_200_OK,
+    responses={401: {"model": api_models.ErrorOut}},
 )
 async def update_current_user(
     current_user: auth.TokenRequiredUser,
@@ -110,8 +117,9 @@ async def update_current_user(
 
 @router.patch(
     "/{user_id}",
-    status_code=status.HTTP_200_OK,
     response_model=api_models.UserOutLimited,
+    status_code=status.HTTP_200_OK,
+    responses={401: {"model": api_models.ErrorOut}, 404: {"model": api_models.ErrorOut}},
 )
 async def update_user(
     current_user: auth.TokenRequiredUser,
@@ -131,7 +139,11 @@ async def update_user(
     return user_model
 
 
-@router.delete("/current-user", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/current-user",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={401: {"model": api_models.ErrorOut}},
+)
 async def delete_current_user(
     current_user: auth.TokenRequiredUser,
     db: DBSession,
@@ -146,14 +158,19 @@ async def delete_current_user(
     await db.commit()
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{user_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={401: {"model": api_models.ErrorOut}, 404: {"model": api_models.ErrorOut}},
+)
 async def delete(
     current_user: auth.TokenRequiredUser,
     user_id: ft.Id,
     db: DBSession,
 ) -> None:
     """Delete a user."""
-    user_model = _get_user_by_id(current_user=current_user, user_id=user_id, db=db)
+    user_model = await _get_user_by_id(current_user=current_user, user_id=user_id, db=db)
     await db.delete(user_model)
     await db.commit()
 

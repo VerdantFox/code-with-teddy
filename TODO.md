@@ -8,6 +8,9 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] playwright end-to-end tests
   - [ ] Integration tests (maybe)
   - [ ] Locust stress tests
+- [ ] Better errors
+  - [ ] redirect for html errors
+  - [ ] 404 page for missing
 - [ ] Blog comment edit history (undo/redo kind of messed up right now)
 - [ ] Add projects to projects page (plus individual pages as needed)
   - [ ] Finance (complete first)
@@ -38,6 +41,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Hook domain into real site
   - [ ] Set up initial postgres
   - [ ] Set up https
+  - [ ] Set up github actions for CI/CD
 - [ ] Refactor to separate db models from services models
 - [ ] Add sqlite database option (for faster tests)
 - [ ] Set up logging

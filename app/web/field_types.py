@@ -1,4 +1,5 @@
 """field_types: Custom field types for FastAPI models."""
+
 from typing import Annotated
 
 from fastapi import Form, Path
