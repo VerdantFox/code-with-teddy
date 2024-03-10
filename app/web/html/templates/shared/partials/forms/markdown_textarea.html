@@ -159,7 +159,7 @@
   <div class="relative inline-block w-full">
     <textarea
       @keydown="mdTextareaKeyPress($el, $event, historyManager, {{ max_chars }})"
-      class="w-full rounded-b-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400 border-grayscale-900 dark:border-grayscale-500 {% if field.errors %}
+      class="w-full rounded-bl-lg rounded-br-md focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400 border-grayscale-900 dark:border-grayscale-500 {% if field.errors %}
         border-red-700 dark:border-red-400
       {% endif %}"
       id="{{ field.id }}"

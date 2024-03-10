@@ -70,6 +70,7 @@
   }
 
   ::-webkit-resizer {
+    background-color: transparent;
     background-size: cover;
     background-image: url("/static/media/shared/notches.svg");
   }
@@ -140,6 +141,7 @@
     border-color: transparent transparent transparent #d6d3d1;
   }
   .dark ::-webkit-resizer {
+    background-color: transparent;
     background-size: cover;
     background-image: url("/static/media/shared/notches-dark.svg");
   }
