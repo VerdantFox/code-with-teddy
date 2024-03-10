@@ -8,10 +8,10 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] playwright end-to-end tests
   - [ ] Integration tests (maybe)
   - [ ] Locust stress tests
-- [ ] Better errors
-  - [ ] redirect for html errors
-  - [ ] 404 page for missing
-- [ ] Blog comment edit history (undo/redo kind of messed up right now)
+- [x] Better errors
+      ~~- [x] redirect for html errors~~
+  - [x] 404 page for missing
+- [x] Blog comment edit history
 - [ ] Add projects to projects page (plus individual pages as needed)
   - [ ] Finance (complete first)
   - [ ] Twisted towers

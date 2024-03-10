@@ -1,4 +1,5 @@
 """users: HTML routes for users."""
+
 from typing import Annotated
 from uuid import uuid4
 
@@ -39,10 +40,12 @@ class LoginForm(Form):
     username_or_email: StringField = StringField(
         "Username or Email",
         description="awesome@email.com",
+        render_kw={"autocomplete": "username"},
         validators=[validators.Length(min=3, max=25)],
     )
     password: PasswordField = PasswordField(
         "Password",
+        render_kw={"autocomplete": "current-password"},
         validators=[validators.Length(min=8, max=25)],
     )
     redirect_url: HiddenField = HiddenField()
@@ -130,6 +133,7 @@ class RegisterUserForm(Form):
     email: StringField = StringField(
         "Email",
         description="awesome@email.com",
+        render_kw={"autocomplete": "username"},
         validators=[validators.Length(min=1, max=25)],
     )
     username: StringField = StringField(
@@ -144,10 +148,12 @@ class RegisterUserForm(Form):
     )
     password: PasswordField = PasswordField(
         "Password",
+        render_kw={"autocomplete": "new-password"},
         validators=[validators.Length(min=8, max=25)],
     )
     confirm_password: PasswordField = PasswordField(
         "Confirm Password",
+        render_kw={"autocomplete": "new-password"},
         validators=[
             validators.Length(min=8, max=25),
             validators.EqualTo("password", message="Passwords must match"),
@@ -198,9 +204,9 @@ async def register_post(
     )
     db.add(user_model)
     try:
-        db.commit()
+        await db.commit()
     except sqlalchemy.exc.IntegrityError as e:
-        db.rollback()
+        await db.rollback()
         if 'unique constraint "ix_users_email"' in str(e):
             register_form.email.errors.append("Email already exists for another account.")
         if 'unique constraint "ix_users_username"' in str(e):
@@ -213,7 +219,7 @@ async def register_post(
                 constants.FORM: register_form,
             },
         )
-    db.refresh(user_model)
+    await db.refresh(user_model)
     FlashMessage(
         title="Registration successful!",
         msg=f"username: {user_model.username}",
@@ -342,9 +348,9 @@ async def user_settings_post(
     await update_user_settings_from_form(form=form, user=current_user)
 
     try:
-        db.commit()
+        await db.commit()
     except sqlalchemy.exc.IntegrityError as e:
-        db.rollback()
+        await db.rollback()
         if "email" in str(e):
             form.email.errors.append("Email already exists for another account.")
         if "username" in str(e):
@@ -358,7 +364,7 @@ async def user_settings_post(
                 constants.CURRENT_USER: current_user,
             },
         )
-    db.refresh(current_user)
+    await db.refresh(current_user)
 
     FlashMessage(
         title="Settings updated!",

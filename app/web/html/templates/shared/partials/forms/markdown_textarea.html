@@ -13,7 +13,10 @@
   {% set _ = extra_fields.update({"placeholder": field.description}) %}
 {% endif %}
 
-<div id="md-textarea" class="flex flex-col {{ class }}">
+<div
+  x-data="{historyManager: new TextAreaHistoryManager()}"
+  class="md-textarea flex flex-col {{ class }}"
+>
   {{ field.label(class='mb-2' +  (' text-red-800 dark:text-red-300' if field.errors else '')) }}
   <div
     class="rounded-t-lg leading-none border border-b-0 border-grayscale-900 dark:border-grayscale-500 dark:bg-grayscale-700 flex gap-1 items-center"
@@ -21,7 +24,7 @@
     <div class="p-2 flex gap-1 items-center">
       <!-- Bold -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '**', '**', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '**', '**', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Bold (Ctrl+B)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -30,7 +33,7 @@
       </button>
       <!-- Italic -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '*', '*', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '*', '*', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Italic (Ctrl+I)"
         class="comment-button font-serif"
         {{ render_attrs(button_extra_attrs) }}
@@ -39,9 +42,9 @@
       </button>
       <!-- Strikethrough -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '~~', '~~', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '~~', '~~', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Strikethrough (Ctrl+S)"
-        class="comment-button"
+        class="comment-button max-lg:hidden"
         {{ render_attrs(button_extra_attrs) }}
       >
         {{ render_partial('shared/partials/icons/strikethrough-bold.html', class="h-5 w-5") }}
@@ -56,8 +59,7 @@
     <div class="p-2 flex gap-1 items-center">
       <!-- Link -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addLink(document.getElementById('{{ field.id }}'), $event); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
-        {# FIXME: Add function #}
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addLink(document.getElementById('{{ field.id }}'), $event); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Hyperlink (Ctrl+L)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -66,16 +68,16 @@
       </button>
       <!-- Blockquote -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '> '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '> '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Blockquote (Ctrl+Q)"
-        class="comment-button"
+        class="comment-button max-xs:hidden"
         {{ render_attrs(button_extra_attrs) }}
       >
         {{ render_partial('shared/partials/icons/quotes-bold.html', class="h-5 w-5") }}
       </button>
       <!-- Inline code -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '`', '`', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '`', '`', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Inline code (`)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -84,10 +86,9 @@
       </button>
       <!-- Code block -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '```\n', '\n```', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
-        {# FIXME: Add function #}
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); flank(textareaElement, $event, '```\n', '\n```', false); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Code block"
-        class="comment-button max-xs:hidden"
+        class="comment-button max-sm:hidden"
         {{ render_attrs(button_extra_attrs) }}
       >
         {{ render_partial('shared/partials/icons/code-bold.html', class="h-5 w-5") }}
@@ -96,13 +97,13 @@
 
     <!-- Break -->
     <span
-      class="py-4 border-l border-grayscale-400 dark:border-grayscale-500 max-xs:hidden"
+      class="py-4 border-l border-grayscale-400 dark:border-grayscale-500 max-sm:hidden"
     ></span>
 
-    <div class="p-2 flex gap-1 items-center max-xs:hidden">
+    <div class="p-2 flex gap-1 items-center max-sm:hidden">
       <!-- Heading -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '# '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '# '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Heading"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -111,7 +112,7 @@
       </button>
       <!-- Ordered list -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '1. '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '1. '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Numbered list (Ctrl+O)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -120,7 +121,7 @@
       </button>
       <!-- Unordered list -->
       <button
-        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '- '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); addPrefixToLine(document.getElementById('{{ field.id }}'), $event, '- '); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }}); historyManager.saveState(textareaElement, $event)"
         title="Bulleted list (Ctrl+U)"
         class="comment-button"
         {{ render_attrs(button_extra_attrs) }}
@@ -128,9 +129,51 @@
         {{ render_partial('shared/partials/icons/list-bullets-bold.html', class="h-5 w-5") }}
       </button>
     </div>
+
+    <!-- Break -->
+    <span
+      class="py-4 border-l border-grayscale-400 dark:border-grayscale-500"
+    ></span>
+
+    <div class="p-2 flex gap-1 items-center">
+      <!-- Undo button -->
+      <button
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); historyManager.undo(textareaElement, $event); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        title="Undo (Ctrl+Z)"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/arrow-counter-clockwise-bold.html', class="h-5 w-5") }}
+      </button>
+      <!-- Redo button -->
+      <button
+        @click="$event.preventDefault(); const textareaElement = document.getElementById('{{ field.id }}'); historyManager.redo(textareaElement, $event); updateCharCount(textareaElement, document.getElementById('textarea-char-count'), {{ max_chars }});"
+        title="Redo (Ctrl+Y)"
+        class="comment-button"
+        {{ render_attrs(button_extra_attrs) }}
+      >
+        {{ render_partial('shared/partials/icons/arrow-clockwise-bold.html', class="h-5 w-5") }}
+      </button>
+    </div>
   </div>
   <div class="relative inline-block w-full">
-    {{ field(class=field_class if field_class else "w-full rounded-b-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400 border-grayscale-900 dark:border-grayscale-500" + (' border-red-700 dark:border-red-400' if field.errors else ''), **extra_fields) }}
+    <textarea
+      @keydown="mdTextareaKeyPress($el, $event, historyManager, {{ max_chars }})"
+      class="w-full rounded-b-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400 border-grayscale-900 dark:border-grayscale-500 {% if field.errors %}
+        border-red-700 dark:border-red-400
+      {% endif %}"
+      id="{{ field.id }}"
+      name="{{ field.name }}"
+      placeholder="{{ field.description }}"
+      {% for validator in field.validators %}
+        {% for flag, val in validator.field_flags.items() %}
+          {{ flag }}="{{ val }}"
+        {% endfor %}
+      {% endfor %}
+      {% for attr, val in extra_fields.items() %}
+        {{ attr }}="{{ val }}"
+      {% endfor %}
+    ></textarea>
     <span
       id="textarea-char-count"
       class="absolute bottom-2 right-5 opacity-50"

@@ -222,8 +222,13 @@ function copyToInput(text, inputId) {
   }, 710)
 }
 
-function mdTextareaKeyPress(textareaElement, event, charCount = 0) {
-  performKeyMapAction(textareaElement, event)
+function mdTextareaKeyPress(
+  textareaElement,
+  event,
+  historyManager,
+  charCount = 0
+) {
+  performKeyMapAction(textareaElement, event, historyManager)
   setTimeout(() => {
     updateCharCount(
       textareaElement,
@@ -231,6 +236,7 @@ function mdTextareaKeyPress(textareaElement, event, charCount = 0) {
       charCount
     )
   }, 0)
+  historyManager.saveState(textareaElement, event)
 }
 
 function updateCharCount(textareaElement, containerElement, maxCharCount) {
@@ -240,33 +246,42 @@ function updateCharCount(textareaElement, containerElement, maxCharCount) {
   containerElement.textContent = result
 }
 
-function performKeyMapAction(textareaElement, event) {
-  const keyBindingMap = {
-    "ctrl+b": { func: flank, args: ["**"] },
-    "ctrl+i": { func: flank, args: ["*"] },
-    "ctrl+s": { func: flank, args: ["~~"] },
-    "`": { func: flank, args: ["`"] },
-    "'": { func: flank, args: ["'"] },
-    '"': { func: flank, args: ['"'] },
-    "(": { func: flank, args: ["(", ")"] },
-    "{": { func: flank, args: ["{", "}"] },
-    "[": { func: flank, args: ["[", "]"] },
-    "*": { func: flank, args: ["*"] },
-    _: { func: flank, args: ["_"] },
-    "~": { func: flank, args: ["~"] },
-    "ctrl+l": { func: addLink, args: [] },
-    "ctrl+'": { func: addPrefixToLine, args: ["> "] },
-    "ctrl+q": { func: addPrefixToLine, args: ["> "] },
-    "ctrl+u": { func: addPrefixToLine, args: ["- "] },
-    "ctrl+o": { func: addPrefixToLine, args: ["1. "] },
-    "ctrl+d": { func: deleteLine, args: [] },
-  }
+const keyBindingMap = {
+  "ctrl+b": { func: flank, args: ["**"] },
+  "ctrl+i": { func: flank, args: ["*"] },
+  "ctrl+s": { func: flank, args: ["~~"] },
+  "`": { func: flank, args: ["`"] },
+  "'": { func: flank, args: ["'"] },
+  '"': { func: flank, args: ['"'] },
+  "(": { func: flank, args: ["(", ")"] },
+  "{": { func: flank, args: ["{", "}"] },
+  "[": { func: flank, args: ["[", "]"] },
+  "*": { func: flank, args: ["*"] },
+  _: { func: flank, args: ["_"] },
+  "~": { func: flank, args: ["~"] },
+  "ctrl+l": { func: addLink, args: [] },
+  "ctrl+'": { func: addPrefixToLine, args: ["> "] },
+  "ctrl+q": { func: addPrefixToLine, args: ["> "] },
+  "ctrl+u": { func: addPrefixToLine, args: ["- "] },
+  "ctrl+o": { func: addPrefixToLine, args: ["1. "] },
+  "ctrl+d": { func: deleteLine, args: [] },
+  "ctrl+z": { func: "undo", args: [] },
+  "ctrl+shift+z": { func: "redo", args: [] },
+  "ctrl+y": { func: "redo", args: [] },
+}
+
+function performKeyMapAction(textareaElement, event, historyManager) {
   const pressedKey = getPressedKey(event)
   const keyMapValue = keyBindingMap[pressedKey]
 
   if (!keyMapValue) return
 
   const { func, args } = keyMapValue
+  // if keyMapValue is a string, it's a historyManager method
+  if (typeof func === "string") {
+    historyManager[func](textareaElement, event, ...args)
+    return
+  }
   func(textareaElement, event, ...args)
 }
 
@@ -404,4 +419,70 @@ function getTextInfo(textareaElement) {
   const selectedText = text.substring(cursorStart, cursorEnd)
   const afterText = text.substring(cursorEnd)
   return { cursorStart, cursorEnd, text, beforeText, selectedText, afterText }
+}
+
+class TextAreaHistoryManager {
+  constructor() {
+    this.history = []
+    this.currentPosition = -1
+  }
+
+  saveState(textareaElement, event) {
+    const state = {
+      value: textareaElement.value,
+      cursorStart: textareaElement.selectionStart,
+      cursorEnd: textareaElement.selectionEnd,
+    }
+    const previousState = this.history[this.currentPosition]
+    // Return early if state is not different from the previous state
+    if (
+      previousState &&
+      previousState.value === state.value &&
+      previousState.cursorStart === state.cursorStart &&
+      previousState.cursorEnd === state.cursorEnd
+    ) {
+      return
+    }
+
+    // Remove states after current position to discard redos when a new state is saved
+    this.history = this.history.slice(0, this.currentPosition + 1)
+    this.history.push(state)
+    this.currentPosition++
+
+    // Limit history to 25 states
+    if (this.history.length > 25) {
+      this.history.shift() // remove the oldest state
+      this.currentPosition-- // adjust the current position
+    }
+  }
+
+  undo(textareaElement, event) {
+    event.preventDefault()
+    if (this.currentPosition <= 0) {
+      return
+    }
+    this.currentPosition--
+    const state = this.history[this.currentPosition]
+    textareaElement.value = state.value
+    textareaElement.selectionStart = state.cursorStart
+    textareaElement.selectionEnd = state.cursorEnd
+
+    // Focus the textarea element
+    textareaElement.focus()
+  }
+
+  redo(textareaElement, event) {
+    event.preventDefault()
+    if (this.currentPosition >= this.history.length - 1) {
+      return
+    }
+    this.currentPosition++
+    const state = this.history[this.currentPosition]
+    textareaElement.value = state.value
+    textareaElement.selectionStart = state.cursorStart
+    textareaElement.selectionEnd = state.cursorEnd
+
+    // Focus the textarea element
+    textareaElement.focus()
+  }
 }
