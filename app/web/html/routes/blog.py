@@ -21,6 +21,7 @@ from app import constants
 from app.datastore.database import DBSession
 from app.permissions import Action, requires_permission
 from app.services.blog import blog_handler
+from app.web import errors
 from app.web.auth import LoggedInUser, LoggedInUserOptional
 from app.web.html import web_user_handlers
 from app.web.html.const import templates
@@ -245,6 +246,8 @@ async def read_blog_post(
     otherwise it will match.
     """
     bp = await blog_handler.get_bp_from_slug(db=db, slug=slug)
+    if (not bp.is_published) and (not current_user.has_permission(Action.READ_UNPUBLISHED_BP)):
+        raise errors.BlogPostNotFoundError
     liked = bp.id in _get_liked_posts_from_cookie(request)
     comment_form_class = (
         LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
@@ -438,6 +441,25 @@ async def comment_blog_post(
     form = comment_form_class.load(form_data)
     bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     liked = bp.id in _get_liked_posts_from_cookie(request)
+
+    if (not bp.can_comment) and (not current_user.is_admin):
+        FlashMessage(
+            title="Error saving comment",
+            text="Comments are not allowed on this post.",
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        return templates.TemplateResponse(
+            COMMENTS_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                constants.CURRENT_USER: current_user,
+                COMMENT_FORM: form,
+                constants.MESSAGE: FormErrorMessage(),
+                BLOG_POST: bp,
+                LIKED: liked,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
     if current_user.is_authenticated:
         assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
         form_data_dict["name"] = current_user.full_name or current_user.username

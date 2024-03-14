@@ -12,98 +12,101 @@
     border-y-2 border-grayscale-200 dark:border-grayscale-700 py-8
   {% endif %}"
 >
-  <div class="not-prose">
-    {% if is_edit %}
-      <h3 class="text-4xl font-bold mb-8">Editing comment</h3>
-    {% elif blog_post.comments %}
-      <h3 class="text-4xl font-bold mb-8">Write a comment</h3>
-    {% endif %}
-    <p class="mb-12 text-xl">
-      You can style your comment using markdown.
-      <a
-        href="https://www.markdownguide.org/cheat-sheet/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="link link-underlined"
-        >See this markdown cheat sheet for ideas</a
-      >.
-      {% if not (is_edit or current_user.is_authenticated) %}
-        Comment as a guest with the below form, or
-        <button class="link link-underlined" @click="loginModalOpen = true">
-          log in
-        </button>
-        to comment as yourself. Optionally, provide your email to be notified
-        when others comment on this blog post.
-      {% endif %}
-    </p>
-    <form
-      class="text-lg"
+  {% if blog_post.can_comment or current_user.is_admin %}
+    <div class="not-prose">
       {% if is_edit %}
-        hx-post="{{ url_for('html:edit_comment', comment_id=comment_preview.id) }}"
-        hx-target="#{{ comment_form_id }}"
-        hx-target-error="#{{ comment_form_id }}"
-      {% else %}
-        hx-post="{{ url_for('html:comment_blog_post', bp_id=blog_post.id) }}"
-        hx-target="#comments-section" hx-target-error="#comments-section"
+        <h3 class="text-4xl font-bold mb-8">Editing comment</h3>
+      {% elif blog_post.comments %}
+        <h3 class="text-4xl font-bold mb-8">Write a comment</h3>
       {% endif %}
-      hx-swap="outerHTML swap:150ms settle:300ms"
-    >
-      {{ render_partial('shared/partials/forms/top_error.html', message=message) }}
-      {% if is_edit %}
-        {{ render_partial('shared/partials/forms/hidden_field.html', field=comment_form.name) }}
-      {% elif not current_user.is_authenticated %}
-        {# and is not an edit #}
-        {{ render_partial('shared/partials/forms/hidden_field.html', field=comment_form.check_me) }}
-      {% endif %}
-      <div class="flex flex-col gap-6 mb-8">
-        {% if is_edit %}
-
-        {% elif current_user.is_authenticated %}
-          <p class="text-2xl font-semibold">
-            Submit a comment as
-            <span class="text-offset-700 dark:text-offset-400 font-bold"
-              >{{ current_user.username }}</span
-            >:
-          </p>
-        {% else %}
-          <div class="flex max-md:flex-col gap-6">
-            {# Comment form name field #}
-            {{ render_partial('shared/partials/forms/field.html', class="flex-1", field=comment_form.name, extra_fields={"hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:500ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}) }}
-            {# Comment form not robot field #}
-            {{ render_partial('shared/partials/forms/toggle_field.html', field=comment_form.not_robot) }}
-          </div>
-          {# Comment form email field #}
-          {{ render_partial('shared/partials/forms/field.html', field=comment_form.email) }}
-        {% endif %}
-        {# Comment form content field #}
-        {{ render_partial('shared/partials/forms/markdown_textarea.html', button_extra_attrs={"hx-trigger": "click", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}, field=comment_form.content, extra_fields={"rows": "6", "hx-trigger": "keyup changed delay:500ms", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}, max_chars=2000) }}
-      </div>
-      <div class="flex items-center gap-4">
-        {# Submit button #}
-        {{ render_partial('shared/partials/forms/submit_button.html', text="Submit", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}
-        {% if is_edit %}
-          {# Cancel button #}
-          <button
-            class="btn-sm btn-outline"
-            hx-get="{{ url_for('html:get_comment', comment_id=comment_preview.id) }}"
-            hx-target="#{{ comment_form_id }}"
-            hx-target-error="#{{ comment_form_id }}"
-            hx-swap="outerHTML swap:150ms settle:300ms"
-          >
-            Cancel
+      <p class="mb-12 text-xl">
+        You can style your comment using markdown.
+        <a
+          href="https://www.markdownguide.org/cheat-sheet/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link link-underlined"
+          >See this markdown cheat sheet for ideas</a
+        >.
+        {% if not (is_edit or current_user.is_authenticated) %}
+          Comment as a guest with the below form, or
+          <button class="link link-underlined" @click="loginModalOpen = true">
+            log in
           </button>
+          to comment as yourself. Optionally, provide your email to be notified
+          when others comment on this blog post.
         {% endif %}
-      </div>
-    </form>
-  </div>
-  {{ comment_preview_id }}
-  <div
-    id="{{ preview_comment_id }}"
-    class="mt-12 text-lg htmx-fade-out-150ms htmx-fade-in-300ms"
-  >
-    {# <div id="comment-preview" class="mt-12 text-lg"> #}
-    {% if comment_preview %}
-      {{ render_partial('blog/partials/comment.html', request=request, comment=comment_preview, is_preview=True) }}
-    {% endif %}
-  </div>
+      </p>
+      <form
+        class="text-lg"
+        {% if is_edit %}
+          hx-post="{{ url_for('html:edit_comment', comment_id=comment_preview.id) }}"
+          hx-target="#{{ comment_form_id }}"
+          hx-target-error="#{{ comment_form_id }}"
+        {% else %}
+          hx-post="{{ url_for('html:comment_blog_post', bp_id=blog_post.id) }}"
+          hx-target="#comments-section" hx-target-error="#comments-section"
+        {% endif %}
+        hx-swap="outerHTML swap:150ms settle:300ms"
+      >
+        {{ render_partial('shared/partials/forms/top_error.html', message=message) }}
+        {% if is_edit %}
+          {{ render_partial('shared/partials/forms/hidden_field.html', field=comment_form.name) }}
+        {% elif not current_user.is_authenticated %}
+          {# and is not an edit #}
+          {{ render_partial('shared/partials/forms/hidden_field.html', field=comment_form.check_me) }}
+        {% endif %}
+        <div class="flex flex-col gap-6 mb-8">
+          {% if is_edit %}
+
+          {% elif current_user.is_authenticated %}
+            <p class="text-2xl font-semibold">
+              Submit a comment as
+              <span class="text-offset-700 dark:text-offset-400 font-bold"
+                >{{ current_user.username }}</span
+              >:
+            </p>
+          {% else %}
+            <div class="flex max-md:flex-col gap-6">
+              {# Comment form name field #}
+              {{ render_partial('shared/partials/forms/field.html', class="flex-1", field=comment_form.name, extra_fields={"hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-trigger": "keyup changed delay:500ms", "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}) }}
+              {# Comment form not robot field #}
+              {{ render_partial('shared/partials/forms/toggle_field.html', field=comment_form.not_robot) }}
+            </div>
+            {# Comment form email field #}
+            {{ render_partial('shared/partials/forms/field.html', field=comment_form.email) }}
+          {% endif %}
+          {# Comment form content field #}
+          {{ render_partial('shared/partials/forms/markdown_textarea.html', button_extra_attrs={"hx-trigger": "click", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}, field=comment_form.content, extra_fields={"rows": "6", "hx-trigger": "keyup changed delay:500ms", "hx-post": url_for('html:comment_post_preview', bp_id=blog_post.id), "hx-target-error": preview_comment_id_css, "hx-target": preview_comment_id_css, "hx-swap": "innerHTML swap:150ms settle:300ms"}, max_chars=2000) }}
+        </div>
+        <div class="flex items-center gap-4">
+          {# Submit button #}
+          {{ render_partial('shared/partials/forms/submit_button.html', text="Submit", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}
+          {% if is_edit %}
+            {# Cancel button #}
+            <button
+              class="btn-sm btn-outline"
+              hx-get="{{ url_for('html:get_comment', comment_id=comment_preview.id) }}"
+              hx-target="#{{ comment_form_id }}"
+              hx-target-error="#{{ comment_form_id }}"
+              hx-swap="outerHTML swap:150ms settle:300ms"
+            >
+              Cancel
+            </button>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+    {{ comment_preview_id }}
+    <div
+      id="{{ preview_comment_id }}"
+      class="mt-12 text-lg htmx-fade-out-150ms htmx-fade-in-300ms"
+    >
+      {% if comment_preview %}
+        {{ render_partial('blog/partials/comment.html', request=request, comment=comment_preview, is_preview=True) }}
+      {% endif %}
+    </div>
+  {% else %}
+    <h3>Commenting has been disabled for this blog post...</h3>
+  {% endif %}
 </div>

@@ -173,7 +173,9 @@
       {% for attr, val in extra_fields.items() %}
         {{ attr }}="{{ val }}"
       {% endfor %}
-    ></textarea>
+    >
+{% if field.data %}{{ field.data }}{% endif %}</textarea
+    >
     <span
       id="textarea-char-count"
       class="absolute bottom-2 right-5 opacity-50"
