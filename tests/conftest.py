@@ -84,7 +84,7 @@ async def generate_postgres_container() -> AsyncGenerator[DBBuilder, None]:
     db_url = db_builder.get_connection_string()
     assert database_exists(db_url)
     yield db_builder
-    if CONTAINER_NO_TEARDOWN:
+    if CONTAINER_NO_TEARDOWN:  # pragma: no cover
         return
     drop_database(db_url)
     assert not database_exists(db_url)
