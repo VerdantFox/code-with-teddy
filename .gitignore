@@ -33,3 +33,4 @@ certbot/
 **/static/media/avatars/
 **/static/media/blog/
 **/tailwind-styles.css
+html_response.html

@@ -86,6 +86,8 @@ dev = [
     "docker",
     # Faker: fake data generator
     "faker",
+    # HTTPX: async HTTP client
+    "httpx",
     # Mypy: static type checker
     "mypy",
     # Pip-tools: dependency management
@@ -96,12 +98,16 @@ dev = [
     "pynput",
     # Pytest: testing framework
     "pytest",
+    # Pytest-asyncio: asyncio support for pytest
+    "pytest-asyncio",
     # Rich: pretty terminal output
     "rich",
     # Ruff: fast all-in-one linter, written in Rust
     "ruff",
     # Setuptools: build system
     "setuptools",
+    # SQLAlchemy-utils: utility functions for SQLAlchemy
+    "sqlalchemy-utils",
     # Typer: CLI toolkit
     "typer[all]",
     # Types-*: type stubs for external libraries
@@ -137,8 +143,6 @@ check_untyped_defs = true
 disallow_untyped_defs = true
 # Skip check against external imports that are missing type hints
 ignore_missing_imports = true
-# Require types to be marked as Optional if they support None.
-no_implicit_optional = true
 # Append an error code to each reported message.
 show_error_codes = true
 # Require types to overlap in order to allow equality comparisons.
@@ -148,11 +152,17 @@ warn_redundant_casts = true
 # Report unnecessary "# type: ignore" directives.
 warn_unused_ignores = true
 
+[[tool.mypy.overrides]]
+module = "tests.*"
+implicit_optional = true
+disallow_untyped_defs = false
+
 # Pytest
 [tool.pytest.ini_options]
 testpaths = [
     "tests",
 ]
+asyncio_mode = "auto"
 filterwarnings = [
     # Ignore warnings from all sources so that we can ignore warnings from
     # external libraries that we can't control.
@@ -243,7 +253,10 @@ unfixable = [
 ]
 
 [tool.ruff.per-file-ignores]
-"tests/*" = ["S101"]  # assert-used
+"tests/*" = [
+    "ANN201", # Missing return type annotation for function
+    "S101",  # assert-used
+]
 "**/__init__.py" = ["D104"]  # Missing docstring in public package
 "scripts/*" = [
     "FBT003",  # boolean-positional-value-in-call (needed for typer default arg)

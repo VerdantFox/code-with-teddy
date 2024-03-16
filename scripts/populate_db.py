@@ -24,7 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app import permissions
 from app.datastore import db_models
-from app.datastore.database import engine
+from app.datastore.database import get_engine
 from app.services.blog import blog_handler, blog_utils
 from app.web import auth
 
@@ -51,6 +51,7 @@ async def populate_database(connection_string: str | None = None) -> None:
     db_connection_before = os.environ.get(DB_STRING_KEY)
     if connection_string:
         os.environ[DB_STRING_KEY] = connection_string
+    engine = get_engine(new=True)
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         pop_db = PopulateDB(session=session)

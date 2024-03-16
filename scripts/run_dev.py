@@ -73,7 +73,8 @@ def run_uvicorn(*, start_postgres: bool) -> None:
     run_setup(start_postgres=start_postgres)
     args = [
         "uvicorn",
-        "app.web.main:app",
+        '"app.web.main:create_app"',
+        "--factory",
         "--host=0.0.0.0",
         "--reload",
         '--reload-include="*.html"',

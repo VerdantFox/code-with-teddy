@@ -18,6 +18,7 @@ from docker import APIClient
 from docker import errors as docker_errors
 from docker.models import containers as docker_containers
 from rich.console import Console
+from sqlalchemy import MetaData
 
 from app.datastore import database, db_models
 from scripts import populate_db
@@ -58,6 +59,7 @@ class DBBuilder:
         self.silent: bool = silent
         self.docker_client: docker.DockerClient = self.set_docker_client()
         self.container: docker_containers.Container | None = None
+        self.metadata: MetaData = MetaData()
 
     async def main(self) -> docker_containers.Container:
         """Start the postgres container and populate the database."""
@@ -151,12 +153,13 @@ class DBBuilder:
             },
         )
 
-    @staticmethod
-    async def create_database() -> None:
+    async def create_database(self) -> None:
         """Create a postgres database if it does not exist."""
-        async with database.engine.begin() as conn:
+        engine = database.get_engine(new=True, connection_string=self.get_connection_string())
+        async with engine.begin() as conn:
             await conn.run_sync(db_models.Base.metadata.create_all)
-        await database.engine.dispose()
+            await conn.run_sync(self.metadata.reflect)
+        await engine.dispose()
 
     def run_migrations(self) -> None:
         """Run migrations to a specific version."""

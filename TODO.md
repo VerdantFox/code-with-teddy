@@ -8,6 +8,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] playwright end-to-end tests
   - [ ] Integration tests (maybe)
   - [ ] Locust stress tests
+- [ ] Add resume to "experience" page
 - [x] Better errors
       ~~- [x] redirect for html errors~~
   - [x] 404 page for missing
@@ -18,7 +19,8 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Connect 4 (remake first)
   - [ ] Moth hunt
   - [ ] File renamer
-- [ ] Set up Oauth authentication (google and github)
+- [ ] Show/hide password button for login
+- [ ] Set up Oauth2 authentication (google and github)
 - [ ] Set up secrets with keyring
   - [ ] Move any existing hardcoded secrets to keyring (fresh secrets obviously)
 - [ ] Set up email service

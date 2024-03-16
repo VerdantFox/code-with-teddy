@@ -1,4 +1,5 @@
 """transforms: functions for transforming data from one type to another."""
+
 from collections.abc import Generator
 from typing import Annotated, Any
 
@@ -11,7 +12,7 @@ def to_bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
     if isinstance(value, str):
-        return value.casefold() in ("true", "t", "1")
+        return value.casefold() in ("true", "t", "yes", "y", "1")
     if isinstance(value, int):
         return value == 1
     return False
