@@ -13,6 +13,9 @@ BLOG_ENDPOINT = "/blog"
 LIST_POSTS_TITLE = "Code Chronicles"
 
 
+# ----------------------------------------------------------------------------
+# Fixtures
+# ----------------------------------------------------------------------------
 @pytest.fixture(scope="module", autouse=True)
 async def _clean_db_fixture(clean_db_module: None) -> None:  # noqa: ARG001 (unused-arg)
     """Clean the database after the module."""
@@ -26,6 +29,9 @@ def blog_posts_fixture(
     return several_blog_posts_module.copy()
 
 
+# ----------------------------------------------------------------------------
+# Tests
+# ----------------------------------------------------------------------------
 def test_get_blog_list_guest_succeeds(
     test_client: TestClient, blog_posts: list[db_models.BlogPost]
 ):
