@@ -17,7 +17,9 @@
       </div>
       <div>
         <h2 class="text-4xl font-bold mb-5 link">
-          <a href="{{ url_for('html:read_blog_post', slug=blog_post.slug) }}"
+          <a
+            class="bp-title"
+            href="{{ url_for('html:read_blog_post', slug=blog_post.slug) }}"
             >{{ blog_post.title }}</a
           >
         </h2>

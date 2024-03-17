@@ -30,9 +30,9 @@ class SaveBlogInput(BaseModel, arbitrary_types_allowed=True):
 
     existing_bp: db_models.BlogPost | None = None
     title: str
-    tags: transforms.CoercedList
-    can_comment: transforms.CoercedBool
-    is_published: transforms.CoercedBool
+    tags: transforms.CoercedList = []
+    can_comment: transforms.CoercedBool = True
+    is_published: transforms.CoercedBool = False
     description: str
     content: str
     thumbnail_url: str | None = None

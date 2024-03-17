@@ -21,11 +21,15 @@
       <div>
         <p class="text-sm text-grayscale-700 dark:text-grayscale-200">
           Showing
-          <span class="font-medium font-bold">{{ paginator.min_result }}</span>
+          <span id="mobile-min-result-shown" class="font-medium font-bold"
+            >{{ paginator.min_result }}</span
+          >
           to
-          <span class="font-medium font-bold">{{ paginator.max_result }}</span>
+          <span id="mobile-max-result-shown" class="font-medium font-bold"
+            >{{ paginator.max_result }}</span
+          >
           of
-          <span class="font-medium font-bold"
+          <span id="mobile-total-results" class="font-medium font-bold"
             >{{ paginator.total_results }}</span
           >
           results
@@ -50,17 +54,21 @@
       <div>
         <p class="text-sm text-grayscale-700 dark:text-grayscale-200">
           Showing
-          <span class="font-medium font-bold">{{ paginator.min_result }}</span>
+          <span id="desktop-min-result-shown" class="font-medium font-bold"
+            >{{ paginator.min_result }}</span
+          >
           to
-          <span class="font-medium font-bold">{{ paginator.max_result }}</span>
+          <span id="desktop-max-result-shown" class="font-medium font-bold"
+            >{{ paginator.max_result }}</span
+          >
           of
-          <span class="font-medium font-bold"
+          <span id="desktop-total-results" class="font-medium font-bold"
             >{{ paginator.total_results }}</span
           >
           results
         </p>
       </div>
-      <div>
+      <div id="paginator-buttons">
         {% if not paginator.is_only_page %}
           <nav
             class="isolate inline-flex -space-x-px rounded-md shadow-sm"

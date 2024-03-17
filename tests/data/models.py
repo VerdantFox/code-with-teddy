@@ -1,0 +1,118 @@
+"""models: models for use in tests."""
+
+import enum
+from typing import Any
+
+from app.datastore import db_models
+from app.permissions import Role
+from app.services.blog import blog_handler
+from app.web import auth
+
+
+class UserModelKeys(str, enum.Enum):
+    """User model keys."""
+
+    ID = "id"
+    USERNAME = "username"
+    FULL_NAME = "full_name"
+    EMAIL = "email"
+    TIMEZONE = "timezone"
+    IS_ACTIVE = "is_active"
+    AVATAR_LOCATION = "avatar_location"
+    PASSWORD_HASH = "password_hash"  # noqa: S105 (hardcoded-password)
+    GOOGLE_OAUTH_ID = "google_oauth_id"
+    GITHUB_OAUTH_ID = "github_oauth_id"
+    ROLE = "role"
+    PASSWORD = "password"  # noqa: S105 (hardcoded-password)
+
+
+BASIC_USER = {
+    UserModelKeys.USERNAME: "test_user",
+    UserModelKeys.EMAIL: "test@email.com",
+    UserModelKeys.FULL_NAME: "Test User",
+    UserModelKeys.IS_ACTIVE: True,
+    UserModelKeys.PASSWORD: "password",
+    UserModelKeys.PASSWORD_HASH: auth.hash_password("password"),
+    UserModelKeys.ROLE: Role.USER,
+}
+
+
+def basic_user() -> db_models.User:
+    """Return a basic user."""
+    user_dict = {key.value: value for key, value in BASIC_USER.items()}
+    user_dict.pop(UserModelKeys.PASSWORD.value)
+    return db_models.User(**user_dict)
+
+
+ADMIN_USER = {
+    UserModelKeys.USERNAME: "admin_user",
+    UserModelKeys.EMAIL: "admin@email.com",
+    UserModelKeys.FULL_NAME: "Admin User",
+    UserModelKeys.IS_ACTIVE: True,
+    UserModelKeys.ROLE: Role.ADMIN,
+    UserModelKeys.PASSWORD: "password",
+    UserModelKeys.PASSWORD_HASH: auth.hash_password("password"),
+}
+
+
+def admin_user() -> db_models.User:
+    """Return an admin user."""
+    user_dict = {key.value: value for key, value in ADMIN_USER.items()}
+    user_dict.pop(UserModelKeys.PASSWORD.value)
+    return db_models.User(**user_dict)
+
+
+class BlogPostKeys(str, enum.Enum):
+    """Blog post keys."""
+
+    ID = "id"
+    TITLE = "title"
+    SLUG = "slug"
+    OLD_SLUGS = "old_slugs"
+    TAGS = "tags"
+    READ_MINS = "read_mins"
+    IS_PUBLISHED = "is_published"
+    CAN_COMMENT = "can_comment"
+    THUMBNAIL_LOCATION = "thumbnail_location"
+    MARKDOWN_DESCRIPTION = "markdown_description"
+    MARKDOWN_CONTENT = "markdown_content"
+    HTML_DESCRIPTION = "html_description"
+    HTML_CONTENT = "html_content"
+    HTML_TOC = "html_toc"
+    MEDIA = "media"
+    CREATED_TIMESTAMP = "created_timestamp"
+    UPDATED_TIMESTAMP = "updated_timestamp"
+    LIKES = "likes"
+    VIEWS = "views"
+    COMMENTS = "comments"
+    TS_VECTOR = "ts_vector"
+
+
+class BlogPostInputKeys(str, enum.Enum):
+    """Blog post input keys."""
+
+    TITLE = "title"
+    TAGS = "tags"
+    CAN_COMMENT = "can_comment"
+    IS_PUBLISHED = "is_published"
+    DESCRIPTION = "description"
+    CONTENT = "content"
+    THUMBNAIL_URL = "thumbnail_url"
+
+
+BASIC_BLOG_POST = {
+    BlogPostInputKeys.TITLE: "Test Blog Post",
+    BlogPostInputKeys.TAGS: ["test", "blog", "post"],
+    BlogPostInputKeys.CAN_COMMENT: True,
+    BlogPostInputKeys.IS_PUBLISHED: True,
+    BlogPostInputKeys.DESCRIPTION: "This is a test blog post.",
+    BlogPostInputKeys.CONTENT: "This is the content of a test blog post.",
+}
+
+
+def basic_blog_post(**kwargs: Any) -> blog_handler.SaveBlogInput:
+    """Return a simple blog post."""
+    blog_post_dict = {key.value: value for key, value in BASIC_BLOG_POST.items()}
+    for key, value in kwargs.items():
+        blog_post_dict[key] = value
+    return blog_handler.SaveBlogInput(**blog_post_dict)

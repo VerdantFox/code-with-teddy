@@ -10,9 +10,12 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy_utils.functions import database_exists, drop_database
 
+from app.datastore import db_models
 from app.datastore.database import get_engine
+from app.services.blog import blog_handler
 from app.services.general.transforms import to_bool
 from scripts.start_local_postgres import DBBuilder
+from tests.data import models as test_models
 
 load_dotenv()
 
@@ -94,17 +97,42 @@ async def generate_postgres_container() -> AsyncGenerator[DBBuilder, None]:
 
 @pytest.fixture(name="db_session")
 async def get_db_session(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession, None]:
-    """Return the test db session and clean up after by deleting all table data."""
-    async_session = make_session(db_builder)
+    """Return the test db session."""
+    async_session = _make_session(db_builder)
     async with async_session() as session:
         yield session
-        await delete_all_data(session, db_builder)
+
+
+@pytest.fixture(name="db_session_module", scope="module")
+async def get_db_session_module(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession, None]:
+    """Return the test db session."""
+    async_session = _make_session(db_builder)
+    async with async_session() as session:
+        yield session
+
+
+@pytest.fixture(name="clean_db_function")
+async def _clean_db_function(
+    db_session: AsyncSession, db_builder: DBBuilder
+) -> AsyncGenerator[None, None]:
+    """Delete all data from the database after the function."""
+    yield
+    await _delete_all_data(db_session, db_builder)
+
+
+@pytest.fixture(name="clean_db_module", scope="module")
+async def _clean_db_module(
+    db_session_module: AsyncSession, db_builder: DBBuilder
+) -> AsyncGenerator[None, None]:
+    """Delete all data from the database after the module."""
+    yield
+    await _delete_all_data(db_session_module, db_builder)
 
 
 # ---------------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------------
-def make_session(db_builder: DBBuilder) -> async_sessionmaker[AsyncSession]:
+def _make_session(db_builder: DBBuilder) -> async_sessionmaker[AsyncSession]:
     """Create a new async session."""
     connection_string = db_builder.get_connection_string()
     db_echo: bool = False
@@ -115,10 +143,95 @@ def make_session(db_builder: DBBuilder) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def delete_all_data(session: AsyncSession, db_builder: DBBuilder) -> None:
+async def _delete_all_data(session: AsyncSession, db_builder: DBBuilder) -> None:
     """Delete all data from the database."""
     # Delete data from all tables
     for table in reversed(db_builder.metadata.sorted_tables):
         await session.execute(delete(table))
     # Commit the transaction
     await session.commit()
+
+
+# ---------------------------------------------------------------------------
+# model fixtures
+# ---------------------------------------------------------------------------
+@pytest.fixture(name="basic_user")
+async def add_basic_user(db_session: AsyncSession) -> db_models.User:
+    """Return a basic user added to the database, function scoped."""
+    user = test_models.basic_user()
+    await add_user(db_session, user)
+    return user
+
+
+@pytest.fixture(name="basic_user_module", scope="module")
+async def add_basic_user_module(db_session_module: AsyncSession) -> db_models.User:
+    """Return a basic user added to the database, module scoped."""
+    user = test_models.basic_user()
+    await add_user(db_session_module, user)
+    return user
+
+
+@pytest.fixture(name="admin_user")
+async def add_admin_user(db_session: AsyncSession) -> db_models.User:
+    """Return an admin user added to the database, function scoped."""
+    user = test_models.admin_user()
+    await add_user(db_session, user)
+    return user
+
+
+@pytest.fixture(name="admin_user_module", scope="module")
+async def add_admin_user_module(db_session_module: AsyncSession) -> db_models.User:
+    """Return an admin user added to the database, module scoped."""
+    user = test_models.admin_user()
+    await add_user(db_session_module, user)
+    return user
+
+
+async def add_user(db_session: AsyncSession, user: db_models.User) -> db_models.User:
+    """Add a user to the database."""
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest.fixture(name="basic_blog_post")
+async def add_basic_blog_post(db_session: AsyncSession) -> db_models.BlogPost:
+    """Return a basic blog post added to the database."""
+    blog_post_input: blog_handler.SaveBlogInput = test_models.basic_blog_post()
+    response = await blog_handler.save_blog_post(db=db_session, data=blog_post_input)
+    assert response.blog_post
+    return response.blog_post
+
+
+@pytest.fixture(name="several_blog_posts")
+async def add_several_blog_posts(db_session: AsyncSession) -> list[db_models.BlogPost]:
+    """Return several blog posts added to the database, function scoped."""
+    return await _add_several_blog_posts(db_session)
+
+
+@pytest.fixture(name="several_blog_posts_module", scope="module")
+async def add_several_blog_posts_module(
+    db_session_module: AsyncSession,
+) -> list[db_models.BlogPost]:
+    """Return several blog posts added to the database, module scoped."""
+    return await _add_several_blog_posts(db_session_module)
+
+
+async def _add_several_blog_posts(db_session: AsyncSession) -> list[db_models.BlogPost]:
+    """Return several blog posts added to the database."""
+    blog_post_inputs = [
+        test_models.basic_blog_post(
+            title=f"basic_{i}",
+            tags=[f"foo_{i+j}" for j in range(3)],
+            content=f"test blog post {i}. " * i,
+        )
+        for i in range(1, 5)
+    ]
+    blog_post_inputs[1].is_published = False
+    blog_posts = []
+    for bp_input in blog_post_inputs:
+        response = await blog_handler.save_blog_post(db=db_session, data=bp_input)
+        assert response.blog_post
+        blog_posts.append(response.blog_post)
+    return blog_posts

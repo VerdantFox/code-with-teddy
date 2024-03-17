@@ -51,7 +51,7 @@ async def populate_database(connection_string: str | None = None) -> None:
     db_connection_before = os.environ.get(DB_STRING_KEY)
     if connection_string:
         os.environ[DB_STRING_KEY] = connection_string
-    engine = get_engine(new=True)
+    engine = get_engine()
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         pop_db = PopulateDB(session=session)
@@ -70,7 +70,12 @@ class PopulateDB:
         self.users: list[db_models.User] = []
         self.blog_posts: list[db_models.BlogPost] = []
 
-    async def _populate_users(self) -> None:
+    async def populate(self) -> None:
+        """Populate the database with dummy data."""
+        await self.populate_users()
+        await self.populate_blog_posts()
+
+    async def populate_users(self) -> None:
         """Populate the users table."""
         self.users = [
             db_models.User(
@@ -111,19 +116,23 @@ class PopulateDB:
         ]
         for user in self.users:
             self.session.add(user)
-            await self.session.commit()
+        await self.session.commit()
+        for user in self.users:
             await self.session.refresh(user)
 
-    async def _populate_blog_posts(self) -> None:
+    async def populate_blog_posts(self) -> None:
         """Populate the blog_posts table."""
-        self.blog_posts = [await self.bp_from_path(bp_path) for bp_path in EXAMPLE_BP_DIR.iterdir()]
+        self.blog_posts = [
+            await self.populate_blog_post_from_path(bp_path) for bp_path in EXAMPLE_BP_DIR.iterdir()
+        ]
 
-    async def populate(self) -> None:
-        """Populate the database with dummy data."""
-        await self._populate_users()
-        await self._populate_blog_posts()
+    async def populate_blog_post_from_path(self, blog_post_path: Path) -> db_models.BlogPost:
+        """Populate a blog post and peripheral data from a Path."""
+        bp = await self.create_bp_from_path(blog_post_path)
+        await self.populate_bp_peripherals(bp)
+        return bp
 
-    async def bp_from_path(self, blog_post_path: Path) -> db_models.BlogPost:
+    async def create_bp_from_path(self, blog_post_path: Path) -> db_models.BlogPost:
         """Generate a blog post from a Path."""
         file_content = blog_post_path.read_text()
         title = blog_utils.get_bp_title(file_content)
@@ -144,7 +153,10 @@ class PopulateDB:
         if not response.blog_post:
             err_msg = f"Failed to save blog post: {response.err_msg}"
             raise ValueError(err_msg)
-        blog_post = response.blog_post
+        return response.blog_post
+
+    async def populate_bp_peripherals(self, blog_post: db_models.BlogPost) -> None:
+        """Populate the blog post with peripheral data."""
         blog_post.likes = random.randint(0, 100)
         blog_post.views = random.randint(0, 10_000)
         blog_post.created_timestamp = LAST_MONTH + timedelta(
@@ -156,10 +168,9 @@ class PopulateDB:
         await self.session.commit()
         await self.session.refresh(blog_post)
         for _ in range(random.randint(1, 5)):
-            await self._create_comment(blog_post)
-        return blog_post
+            await self.create_comment(blog_post)
 
-    async def _create_comment(self, blog_post: db_models.BlogPost) -> None:
+    async def create_comment(self, blog_post: db_models.BlogPost) -> None:
         """Create a comment for a blog post."""
         is_guest = random.choice([True, False])
         content = textwrap.dedent(
