@@ -17,15 +17,14 @@ StrToSoup = Callable[[str], BeautifulSoup]
 
 
 @pytest.fixture(scope="session")
-def html_to_file() -> Callable[[httpx.Response, str | None], None]:  # pragma: no cover
+def html_to_file() -> Callable[[str], None]:  # pragma: no cover
     """Write the html response to a file."""
 
-    def _html_to_file(response: httpx.Response, filename: str | None = None) -> None:
+    def _html_to_file(html_text: str) -> None:
         """Write the html response to a file."""
-        if filename is None:
-            filename = "html_response.html"
+        filename = "html_response.html"
         path = PROJECT_ROOT / filename
-        path.write_text(response.text)
+        path.write_text(html_text)
 
     return _html_to_file
 

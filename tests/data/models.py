@@ -37,9 +37,11 @@ BASIC_USER = {
 }
 
 
-def basic_user() -> db_models.User:
+def basic_user(**kwargs: Any) -> db_models.User:
     """Return a basic user."""
     user_dict = {key.value: value for key, value in BASIC_USER.items()}
+    for key, value in kwargs.items():
+        user_dict[key] = value
     user_dict.pop(UserModelKeys.PASSWORD.value)
     return db_models.User(**user_dict)
 
@@ -55,9 +57,11 @@ ADMIN_USER = {
 }
 
 
-def admin_user() -> db_models.User:
+def admin_user(**kwargs: Any) -> db_models.User:
     """Return an admin user."""
     user_dict = {key.value: value for key, value in ADMIN_USER.items()}
+    for key, value in kwargs.items():
+        user_dict[key] = value
     user_dict.pop(UserModelKeys.PASSWORD.value)
     return db_models.User(**user_dict)
 
@@ -98,11 +102,12 @@ class BlogPostInputKeys(str, enum.Enum):
     DESCRIPTION = "description"
     CONTENT = "content"
     THUMBNAIL_URL = "thumbnail_url"
+    LIKES = "likes"
+    VIEWS = "views"
 
 
 BASIC_BLOG_POST = {
     BlogPostInputKeys.TITLE: "Test Blog Post",
-    BlogPostInputKeys.TAGS: ["test", "blog", "post"],
     BlogPostInputKeys.CAN_COMMENT: True,
     BlogPostInputKeys.IS_PUBLISHED: True,
     BlogPostInputKeys.DESCRIPTION: "This is a test blog post.",
@@ -113,6 +118,24 @@ BASIC_BLOG_POST = {
 def basic_blog_post(**kwargs: Any) -> blog_handler.SaveBlogInput:
     """Return a simple blog post."""
     blog_post_dict = {key.value: value for key, value in BASIC_BLOG_POST.items()}
+    for key, value in kwargs.items():
+        blog_post_dict[key] = value
+    return blog_handler.SaveBlogInput(**blog_post_dict)
+
+
+ADVANCED_BLOG_POST = BASIC_BLOG_POST.copy()
+ADVANCED_BLOG_POST[BlogPostInputKeys.TITLE] = "Advanced Blog Post"
+ADVANCED_BLOG_POST[BlogPostInputKeys.TAGS] = ["test", "python"]
+ADVANCED_BLOG_POST[
+    BlogPostInputKeys.THUMBNAIL_URL
+] = "https://upload.wikimedia.org/wikipedia/en/0/00/WoT01_TheEyeOfTheWorld.jpg"
+ADVANCED_BLOG_POST[BlogPostInputKeys.LIKES] = 32
+ADVANCED_BLOG_POST[BlogPostInputKeys.VIEWS] = 123
+
+
+def advanced_blog_post(**kwargs: Any) -> blog_handler.SaveBlogInput:
+    """Return an advanced blog post."""
+    blog_post_dict = {key.value: value for key, value in ADVANCED_BLOG_POST.items()}
     for key, value in kwargs.items():
         blog_post_dict[key] = value
     return blog_handler.SaveBlogInput(**blog_post_dict)

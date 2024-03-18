@@ -37,6 +37,11 @@ class SaveBlogInput(BaseModel, arbitrary_types_allowed=True):
     content: str
     thumbnail_url: str | None = None
 
+    # These 2 only work for creating new blog posts
+    # and are only here for testing purposes
+    likes: int = 0
+    views: int = 0
+
 
 class SaveBlogResponse(BaseModel, arbitrary_types_allowed=True):
     """Response for saving a blog post."""
@@ -326,8 +331,8 @@ async def set_new_bp_fields(
         html_toc=html_content.toc,
         created_timestamp=now,
         updated_timestamp=now,
-        likes=0,
-        views=0,
+        likes=data.likes,
+        views=data.views,
         thumbnail_location=data.thumbnail_url,
     )
 
@@ -392,7 +397,7 @@ async def save_media_for_blog_post(
     locations_str, media_type = _save_bp_media(
         name=name, blog_post_slug=blog_post.slug, media=media
     )
-    return await _commit_media_to_db(
+    return await commit_media_to_db(
         db=db,
         blog_post=blog_post,
         name=name,
@@ -443,7 +448,7 @@ def _save_bp_media(name: str, blog_post_slug: str, media: UploadFile) -> tuple[s
     )
 
 
-async def _commit_media_to_db(
+async def commit_media_to_db(
     db: AsyncSession,
     blog_post: db_models.BlogPost,
     name: str,
