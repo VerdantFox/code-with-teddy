@@ -16,9 +16,10 @@ from app.services.blog import blog_handler
 from app.services.general.transforms import to_bool
 from scripts.start_local_postgres import DBBuilder
 from tests.data import models as test_models
+from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE
 
 load_dotenv()
-
+pytestmark = pytest.mark.anyio
 
 # ------------------------ Postgres vars ------------------------
 TEST_DB_CONTAINER_NAME = getenv("TEST_DB_CONTAINER_NAME", "postgres_test")
@@ -68,6 +69,12 @@ def pytest_ignore_collect(collection_path: Path, config: pytest.Config) -> bool:
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+@pytest.fixture(scope="session")
+def anyio_backend() -> str:
+    """Return the anyio backend to use as a session scoped fixture."""
+    return "asyncio"
+
+
 @pytest.fixture(name="db_builder", scope="session")
 async def generate_postgres_container() -> AsyncGenerator[DBBuilder, None]:
     """Generate a fresh test postgres container for the duration of the test session."""
@@ -118,6 +125,7 @@ async def _clean_db_function(
     """Delete all data from the database after the function."""
     yield
     await _delete_all_data(db_session, db_builder)
+    _clear_cookies()
 
 
 @pytest.fixture(name="clean_db_module", scope="module")
@@ -127,6 +135,7 @@ async def _clean_db_module(
     """Delete all data from the database after the module."""
     yield
     await _delete_all_data(db_session_module, db_builder)
+    _clear_cookies()
 
 
 # ---------------------------------------------------------------------------
@@ -150,6 +159,12 @@ async def _delete_all_data(session: AsyncSession, db_builder: DBBuilder) -> None
         await session.execute(delete(table))
     # Commit the transaction
     await session.commit()
+
+
+def _clear_cookies() -> None:
+    """Clear cookies from the test client."""
+    BASIC_COOKIE.clear()
+    ADMIN_COOKIE.clear()
 
 
 # ---------------------------------------------------------------------------

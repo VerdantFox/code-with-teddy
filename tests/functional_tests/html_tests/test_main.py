@@ -6,6 +6,8 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
+pytestmark = pytest.mark.anyio
+
 
 @dataclass
 class GetTestCase:
@@ -46,7 +48,7 @@ GET_TEST_CASES = [
     "test_case",
     [pytest.param(test_case, id=test_case.test_id) for test_case in GET_TEST_CASES],
 )
-def test_get_page_succeeds(test_client: TestClient, test_case: GetTestCase):
+async def test_get_page_succeeds(test_client: TestClient, test_case: GetTestCase):
     """Test that various GET pages succeed."""
     response = test_client.get(test_case.endpoint)
     assert response.status_code == test_case.expected_status

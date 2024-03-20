@@ -6,6 +6,8 @@ from fastapi.testclient import TestClient
 from app.web import main
 from scripts.start_local_postgres import DBBuilder
 
+pytestmark = pytest.mark.anyio
+
 
 @pytest.fixture(scope="session", name="test_client")
 def test_client_session_fixture(db_builder: DBBuilder) -> TestClient:  # noqa: ARG001 (unused-arg)

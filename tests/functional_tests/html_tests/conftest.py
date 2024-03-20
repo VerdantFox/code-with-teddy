@@ -10,10 +10,10 @@ from fastapi.testclient import TestClient
 
 from app import PROJECT_ROOT
 from app.datastore import db_models
+from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE
 
-ADMIN_COOKIE: dict[str, str] = {}
-BASIC_COOKIE: dict[str, str] = {}
 StrToSoup = Callable[[str], BeautifulSoup]
+pytestmark = pytest.mark.anyio
 
 
 @pytest.fixture(scope="session")

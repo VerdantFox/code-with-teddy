@@ -82,6 +82,8 @@ dependencies = [
 dev = [
     # Alembic: SQLAlchemy migration tool
     "alembic",
+    # Anyio: async library
+    "anyio",
     # Docker: containerization tool
     "docker",
     # Faker: fake data generator
@@ -98,8 +100,6 @@ dev = [
     "pynput",
     # Pytest: testing framework
     "pytest",
-    # Pytest-asyncio: asyncio support for pytest
-    "pytest-asyncio",
     # Pytest-cov: coverage support for pytest
     "pytest-cov",
     # Rich: pretty terminal output
@@ -164,7 +164,6 @@ disallow_untyped_defs = false
 testpaths = [
     "tests",
 ]
-asyncio_mode = "auto"
 filterwarnings = [
     # Ignore warnings from all sources so that we can ignore warnings from
     # external libraries that we can't control.

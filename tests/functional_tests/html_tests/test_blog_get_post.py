@@ -1,11 +1,12 @@
 """test_blog_get_post: Test the GET blog post page."""
 
-
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.datastore import db_models
+
+pytestmark = pytest.mark.anyio
 
 
 @pytest.fixture(autouse=True)
@@ -13,7 +14,7 @@ async def _clean_db_fixture(clean_db_module: None) -> None:  # noqa: ARG001 (unu
     """Clean the database after each test."""
 
 
-def test_get_basic_blog_post_succeeds(
+async def test_get_basic_blog_post_succeeds(
     test_client: TestClient, basic_blog_post_module: db_models.BlogPost
 ):
     """Test getting a blog post."""
@@ -30,7 +31,7 @@ def test_get_basic_blog_post_succeeds(
         assert string in response.text
 
 
-def test_get_blog_post_with_all_features_succeeds(
+async def test_get_blog_post_with_all_features_succeeds(
     test_client: TestClient, advanced_blog_post_module: db_models.BlogPost
 ):
     """Test getting a blog post."""
@@ -51,7 +52,7 @@ def test_get_blog_post_with_all_features_succeeds(
         assert string in response.text
 
 
-def test_get_unpublished_blog_post_as_guest_fails(
+async def test_get_unpublished_blog_post_as_guest_fails(
     test_client: TestClient, unpublished_blog_post_module: db_models.BlogPost
 ):
     """Test getting an unpublished blog post."""
@@ -63,7 +64,7 @@ def test_get_unpublished_blog_post_as_guest_fails(
 
 
 @pytest.mark.usefixtures("logged_in_basic_user_module")
-def test_get_unpublished_blog_post_as_user_fails(
+async def test_get_unpublished_blog_post_as_user_fails(
     test_client: TestClient,
     unpublished_blog_post_module: db_models.BlogPost,
 ):
@@ -76,7 +77,7 @@ def test_get_unpublished_blog_post_as_user_fails(
 
 
 @pytest.mark.usefixtures("logged_in_admin_user_module")
-def test_get_unpublished_blog_post_as_admin_succeeds(
+async def test_get_unpublished_blog_post_as_admin_succeeds(
     test_client: TestClient, unpublished_blog_post_module: db_models.BlogPost
 ):
     """Test getting an unpublished blog post."""
@@ -86,7 +87,7 @@ def test_get_unpublished_blog_post_as_admin_succeeds(
     assert bp.title in response.text
 
 
-def test_get_comments_disabled_blog_post_no_comment_option_as_guest(
+async def test_get_comments_disabled_blog_post_no_comment_option_as_guest(
     test_client: TestClient, blog_post_cannot_comment_module: db_models.BlogPost
 ):
     """Test getting a blog post with comments disabled."""
@@ -98,7 +99,7 @@ def test_get_comments_disabled_blog_post_no_comment_option_as_guest(
 
 
 @pytest.mark.usefixtures("logged_in_basic_user_module")
-def test_get_comments_disabled_blog_post_no_comment_option_as_user(
+async def test_get_comments_disabled_blog_post_no_comment_option_as_user(
     test_client: TestClient, blog_post_cannot_comment_module: db_models.BlogPost
 ):
     """Test getting a blog post with comments disabled."""
@@ -110,7 +111,7 @@ def test_get_comments_disabled_blog_post_no_comment_option_as_user(
 
 
 @pytest.mark.usefixtures("logged_in_admin_user_module")
-def test_get_comments_disabled_blog_post_no_comment_option_as_admin(
+async def test_get_comments_disabled_blog_post_no_comment_option_as_admin(
     test_client: TestClient, blog_post_cannot_comment_module: db_models.BlogPost
 ):
     """Test getting a blog post with comments disabled."""
