@@ -12,20 +12,19 @@ from tests.functional_tests.html_tests.conftest import StrToSoup
 BLOG_ENDPOINT = "/blog"
 LIST_POSTS_TITLE = "Code Chronicles"
 
-pytestmark = pytest.mark.anyio
-
 
 # ----------------------------------------------------------------------------
 # Fixtures
 # ----------------------------------------------------------------------------
 @pytest.fixture(scope="module", autouse=True)
-async def _clean_db_fixture(clean_db_module: None) -> None:  # noqa: ARG001 (unused-arg)
+def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
     """Clean the database after the module."""
 
 
 @pytest.fixture(name="blog_posts")
-async def blog_posts_fixture(
+def blog_posts_fixture(
     several_blog_posts_module: list[db_models.BlogPost],
+    anyio_backend: str,  # noqa: ARG001 (unused-arg)
 ) -> list[db_models.BlogPost]:
     """Return several blog posts."""
     return several_blog_posts_module.copy()
@@ -34,7 +33,7 @@ async def blog_posts_fixture(
 # ----------------------------------------------------------------------------
 # Tests
 # ----------------------------------------------------------------------------
-async def test_get_blog_list_guest_succeeds(
+def test_get_blog_list_guest_succeeds(
     test_client: TestClient, blog_posts: list[db_models.BlogPost]
 ):
     """Test that the GET blog list page succeeds."""
@@ -48,7 +47,7 @@ async def test_get_blog_list_guest_succeeds(
         assert blog_post.title in response.text
 
 
-async def test_get_blog_list_basic_user_succeeds(
+def test_get_blog_list_basic_user_succeeds(
     test_client: TestClient,
     blog_posts: list[db_models.BlogPost],
     logged_in_basic_user_module: db_models.User,
@@ -72,7 +71,7 @@ async def test_get_blog_list_basic_user_succeeds(
     assert total_results == len(blog_posts)
 
 
-async def test_get_blog_list_admin_user_succeeds(
+def test_get_blog_list_admin_user_succeeds(
     test_client: TestClient,
     blog_posts: list[db_models.BlogPost],
     logged_in_admin_user_module: db_models.User,
@@ -180,7 +179,7 @@ SEARCH_TEST_CASES = [
     "test_case",
     [pytest.param(test_case, id=test_case.test_id) for test_case in SEARCH_TEST_CASES],
 )
-async def test_search_blog_posts(
+def test_search_blog_posts(
     test_client: TestClient, test_case: SearchTestCase, str_to_soup: StrToSoup
 ):
     """Test searching blog posts."""
