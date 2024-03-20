@@ -174,6 +174,27 @@ filterwarnings = [
     "error:::scripts",
 ]
 
+# Coverage
+[tool.coverage.run]
+branch = true
+concurrency = ["greenlet", "thread"]
+
+[tool.coverage.report]
+exclude_lines = [
+    # Have to re-enable the standard pragma
+    "pragma: no cover",
+    # Don't complain if non-runnable code isn't run:
+    "if __name__ == __main__:",
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+]
+include = [
+    "app/*",
+    "scripts/*",
+    "tests/*",
+]
+skip_covered = true  # Don't show fully covered files in the report
+
 # Ruff
 [tool.ruff]
 line-length= 100
