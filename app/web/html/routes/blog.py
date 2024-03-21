@@ -101,34 +101,36 @@ async def list_blog_posts(
     is_form_request = request.headers.get("hx-target") == "blog-post-list"
     params = dict(request.query_params)
     form = SearchForm.load(params)
+    status_code = status.HTTP_200_OK
     if not form.validate():
         template = LIST_POSTS_FORM_TEMPLATE if is_form_request else LIST_POSTS_FULL_TEMPLATE
         FlashMessage(
             title="Error searching blog posts",
             text="See errors in form",
             category=FlashCategory.ERROR,
+        ).flash(request)
+        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    try:
+        paginator: blog_handler.Paginator | None = await blog_handler.get_blog_posts(
+            db=db,
+            can_see_unpublished=current_user.has_permission(Action.READ_UNPUBLISHED_BP),
+            search=form.search.data,
+            tags=form.tags.data,
+            order_by_field=form.order_by.data,
+            asc=form.asc.data,
+            results_per_page=form.results_per_page.data,
+            page=form.page.data,
         )
-        return templates.TemplateResponse(
-            template,
-            {
-                constants.REQUEST: request,
-                constants.CURRENT_USER: current_user,
-                constants.LOGIN_FORM: LoginForm(redirect_url=str(request.url)),
-                constants.FORM: form,
-            },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        )
-    paginator = await blog_handler.get_blog_posts(
-        db=db,
-        can_see_unpublished=current_user.has_permission(Action.READ_UNPUBLISHED_BP),
-        search=form.search.data,
-        tags=form.tags.data,
-        order_by_field=form.order_by.data,
-        asc=form.asc.data,
-        results_per_page=form.results_per_page.data,
-        page=form.page.data,
-    )
-    form.page.data = paginator.current_page
+    except AttributeError:
+        FlashMessage(
+            title="Error retrieving blog posts",
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        paginator = None
+        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    if paginator:
+        form.page.data = paginator.current_page
     template = LISTED_POSTS_TEMPLATE if is_form_request else LIST_POSTS_FULL_TEMPLATE
 
     return templates.TemplateResponse(
@@ -140,6 +142,7 @@ async def list_blog_posts(
             constants.FORM: form,
             "paginator": paginator,
         },
+        status_code=status_code,
     )
 
 

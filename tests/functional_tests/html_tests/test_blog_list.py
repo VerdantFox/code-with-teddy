@@ -109,6 +109,8 @@ class SearchTestCase:
     expected_max_result: int = 3
     expected_total_results: int = 3
     expected_bp_titles: list[int] = field(default_factory=lambda: [4, 3, 1])
+    expected_status_code: int = status.HTTP_200_OK
+    expected_text: list[str] = field(default_factory=list)
 
 
 SEARCH_PARAMS = (
@@ -124,6 +126,11 @@ SEARCH_PARAMS = (
 SEARCH_TEST_CASES = [
     SearchTestCase(
         test_id="search_all",
+    ),
+    SearchTestCase(
+        test_id="search_no_results",
+        search="asdfasdf",
+        expected_total_results=0,
     ),
     SearchTestCase(
         test_id="search_content_all",
@@ -160,6 +167,23 @@ SEARCH_TEST_CASES = [
         expected_bp_titles=[1],
     ),
     SearchTestCase(
+        test_id="page_out_of_range_pos",
+        results_per_page=2,
+        page=10,
+        expected_min_result=3,
+        expected_max_result=3,
+        expected_total_results=3,
+        expected_bp_titles=[1],
+    ),
+    SearchTestCase(
+        test_id="page_out_of_range_neg",
+        page=-10,
+        results_per_page=2,
+        expected_max_result=2,
+        expected_total_results=3,
+        expected_bp_titles=[4, 3],
+    ),
+    SearchTestCase(
         test_id="order_by_title_asc",
         order_by="title",
         asc="true",
@@ -170,6 +194,14 @@ SEARCH_TEST_CASES = [
         order_by="title",
         asc="false",
         expected_bp_titles=[4, 3, 1],
+    ),
+    SearchTestCase(
+        test_id="invalid_fields",
+        order_by="asdf",
+        results_per_page="foo",  # type: ignore[arg-type]
+        expected_total_results=0,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_text=["Invalid Choice: could not coerce.", "Not a valid choice."],
     ),
 ]
 
@@ -188,7 +220,13 @@ def test_search_blog_posts(
         if value := getattr(test_case, param):
             search_params[param] = value
     response = test_client.get(BLOG_ENDPOINT, params=search_params)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == test_case.expected_status_code
+    for text in test_case.expected_text:
+        assert text in response.text
+
+    if test_case.expected_total_results == 0:
+        assert "No results for query" in response.text
+        return
 
     soup = str_to_soup(response.text)
     total_results = int(soup.find(id="desktop-total-results").text)
