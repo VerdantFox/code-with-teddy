@@ -15,18 +15,78 @@ async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None: 
 def test_get_basic_blog_post_succeeds(
     test_client: TestClient, basic_blog_post_module: db_models.BlogPost
 ):
-    """Test getting a blog post."""
+    """Test getting a blog post as a guest."""
     bp = basic_blog_post_module
     response = test_client.get(f"/blog/{bp.slug}")
     assert response.status_code == status.HTTP_200_OK
-    strings_to_find: tuple[str, ...] = (
+    expected_strings = (
         "<span>Sign In</span>",  # no user logged in
         bp.title,
         str(bp.views),
         str(bp.likes),
     )
-    for string in strings_to_find:
+    for string in expected_strings:
         assert string in response.text
+    unexpected_strings = (
+        "<span>Sign Out</span>",
+        "User Settings",
+        "Edit Blog Post",
+        "Create Blog Post",
+    )
+    for string in unexpected_strings:
+        assert string not in response.text
+
+
+@pytest.mark.usefixtures("logged_in_basic_user_module")
+def test_get_basic_blog_post_succeeds_signed_in_succeeds(
+    test_client: TestClient, basic_blog_post_module: db_models.BlogPost
+):
+    """Test getting a blog post as a signed in basic user."""
+    bp = basic_blog_post_module
+    response = test_client.get(f"/blog/{bp.slug}")
+    assert response.status_code == status.HTTP_200_OK
+    expected_strings = (
+        "Welcome",
+        "<span>Sign Out</span>",
+        "User Settings",
+        bp.title,
+        str(bp.views),
+        str(bp.likes),
+    )
+    for string in expected_strings:
+        assert string in response.text
+    unexpected_strings = (
+        "<span>Sign In</span>",
+        "Edit Blog Post",
+        "Create Blog Post",
+    )
+    for string in unexpected_strings:
+        assert string not in response.text
+
+
+@pytest.mark.usefixtures("logged_in_admin_user_module")
+def test_get_basic_blog_post_succeeds_signed_in_admin_succeeds(
+    test_client: TestClient, basic_blog_post_module: db_models.BlogPost
+):
+    """Test getting a blog post as a signed in admin."""
+    bp = basic_blog_post_module
+    response = test_client.get(f"/blog/{bp.slug}")
+    assert response.status_code == status.HTTP_200_OK
+    expected_strings = (
+        "Welcome",
+        "<span>Sign Out</span>",
+        "User Settings",
+        bp.title,
+        str(bp.views),
+        str(bp.likes),
+        "Edit Blog Post",
+        "Create Blog Post",
+    )
+    for string in expected_strings:
+        assert string in response.text
+    unexpected_strings = ("<span>Sign In</span>",)
+    for string in unexpected_strings:
+        assert string not in response.text
 
 
 def test_get_blog_post_with_all_features_succeeds(
@@ -36,7 +96,7 @@ def test_get_blog_post_with_all_features_succeeds(
     bp = advanced_blog_post_module
     response = test_client.get(f"/blog/{bp.slug}")
     assert response.status_code == status.HTTP_200_OK
-    strings_to_find: tuple[str, ...] = (
+    expected_strings = (
         "<span>Sign In</span>",  # no user logged in
         bp.title,
         "python",  # tag (lazy loads)
@@ -46,7 +106,7 @@ def test_get_blog_post_with_all_features_succeeds(
         "Guest 1",  # first comment author
         "Some comment",  # first comment content
     )
-    for string in strings_to_find:
+    for string in expected_strings:
         assert string in response.text
 
 
@@ -104,9 +164,13 @@ def test_get_comments_disabled_blog_post_no_comment_option_as_user(
     bp = blog_post_cannot_comment_module
     response = test_client.get(f"/blog/{bp.slug}")
     assert response.status_code == status.HTTP_200_OK
-    assert bp.title in response.text
-    assert "Welcome" in response.text
-    assert "Commenting has been disabled for this blog post..." in response.text
+    expected_strings: list[str] = [
+        bp.title,
+        "Welcome",
+        "Commenting has been disabled for this blog post...",
+    ]
+    for string in expected_strings:
+        assert string in response.text
 
 
 @pytest.mark.usefixtures("logged_in_admin_user_module")

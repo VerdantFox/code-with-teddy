@@ -60,11 +60,21 @@ def test_get_blog_list_basic_user_succeeds(
 
     unpublished_blog_post = blog_posts.pop(1)
 
-    assert unpublished_blog_post.title not in response.text
-    assert "Welcome" in response.text
-    assert logged_in_basic_user_module.username in response.text
-    for blog_post in blog_posts:
-        assert blog_post.title in response.text
+    expected_strings = [
+        "Welcome",
+        "User Settings",
+        "Sign Out",
+        logged_in_basic_user_module.username,
+        *(blog_post.title for blog_post in blog_posts),
+    ]
+    for string in expected_strings:
+        assert string in response.text
+    unexpected_strings = [
+        "Create Blog Post",
+        unpublished_blog_post.title,
+    ]
+    for string in unexpected_strings:
+        assert string not in response.text
 
     soup = str_to_soup(response.text)
     total_results = int(soup.find(id="desktop-total-results").text)
@@ -82,12 +92,16 @@ def test_get_blog_list_admin_user_succeeds(
     assert response.status_code == status.HTTP_200_OK
     assert LIST_POSTS_TITLE in response.text
 
-    assert "Welcome" in response.text
-    assert logged_in_admin_user_module.username in response.text
-
-    # Admin user can see all blog posts (including unpublished)
-    for blog_post in blog_posts:
-        assert blog_post.title in response.text
+    expected_strings = [
+        "Welcome",
+        "User Settings",
+        "Sign Out",
+        "Create Blog Post",
+        logged_in_admin_user_module.username,
+        *(blog_post.title for blog_post in blog_posts),
+    ]
+    for string in expected_strings:
+        assert string in response.text
 
     soup = str_to_soup(response.text)
     total_results = int(soup.find(id="desktop-total-results").text)
