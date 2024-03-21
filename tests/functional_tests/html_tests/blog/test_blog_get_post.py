@@ -9,7 +9,7 @@ from app.datastore import db_models
 
 @pytest.fixture(autouse=True)
 async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
-    """Clean the database after each test."""
+    """Clean the database after the module."""
 
 
 def test_get_basic_blog_post_succeeds(

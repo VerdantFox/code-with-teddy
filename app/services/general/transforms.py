@@ -32,6 +32,8 @@ def to_list(string: Any, *, lowercase: bool = False) -> list[str]:
     Also, convert iterables to lists.
     Lowercase list items.
     """
+    if not string:
+        return []
     if isinstance(string, list | tuple | set | Generator):
         return list(string)
     string_list = string.strip(" []()").split(",")

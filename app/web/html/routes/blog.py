@@ -150,7 +150,7 @@ class BlogPostForm(Form):
     """Form for creating and editing blog posts."""
 
     is_new = BooleanField("Is new", default=False)
-    title = StringField("Title", description="My cool post")
+    title = StringField("Title", description="My cool post", validators=[validators.Length(min=1)])
     tags = StringField(
         "Tags", validators=[validators.optional()], description="python, fastapi, web"
     )
@@ -214,6 +214,9 @@ async def create_bp_post(
     if not response.success or not response.blog_post:
         for error_field, error_msg in response.field_errors.items():
             form[error_field].errors.extend(error_msg)
+
+        # If there is a database error, `current_user` goes stale and needs refreshing.
+        await db.refresh(current_user)
         return templates.TemplateResponse(
             EDIT_BP_TEMPLATE,
             {

@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.web import main
 from scripts.start_local_postgres import DBBuilder
+from tests.functional_tests import BASE_URL
 
 pytestmark = pytest.mark.anyio
 
@@ -13,4 +14,4 @@ pytestmark = pytest.mark.anyio
 def test_client_session_fixture(db_builder: DBBuilder) -> TestClient:  # noqa: ARG001 (unused-arg)
     """Return a test client for the app."""
     app = main.create_app()
-    return TestClient(app, base_url="https://www.code-with-teddy.com")
+    return TestClient(app, base_url=BASE_URL)
