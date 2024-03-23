@@ -313,8 +313,8 @@ class LoggedInCommentForm(Form):
 
     content = TextAreaField(
         "Comment (markdown enabled)",
-        description="Comment (2000 characters max, markdown enabled)",
-        validators=[validators.DataRequired(), validators.Length(min=1, max=2000)],
+        description="Comment (1000 characters max, markdown enabled)",
+        validators=[validators.DataRequired(), validators.Length(min=1, max=1000)],
     )
 
 
