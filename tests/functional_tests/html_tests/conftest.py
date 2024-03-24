@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from app import PROJECT_ROOT
 from app.datastore import db_models
 from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE, BASIC_COOKIE_2
 
@@ -17,19 +16,6 @@ pytestmark = pytest.mark.anyio
 
 
 # ----------------------------- Helper Functions -----------------------------
-@pytest.fixture(scope="session")
-def html_to_file() -> Callable[[str], None]:  # pragma: no cover
-    """Write the html response to a file."""
-
-    def _html_to_file(html_text: str) -> None:
-        """Write the html response to a file."""
-        filename = "html_response.html"
-        path = PROJECT_ROOT / filename
-        path.write_text(html_text)
-
-    return _html_to_file
-
-
 @pytest.fixture(scope="session")
 def str_to_soup() -> StrToSoup:  # pragma: no cover
     """Convert a string to a BeautifulSoup object."""

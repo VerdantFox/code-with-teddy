@@ -171,7 +171,7 @@ class BlogPostForm(Form):
         description="https://example.com/thumbnail.png",
         validators=[
             validators.optional(),
-            validators.Length(min=1, max=2000),
+            validators.Length(max=2000),
         ],
     )
 

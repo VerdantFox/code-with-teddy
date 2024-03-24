@@ -10,6 +10,7 @@ from app.datastore import db_models
 from tests import TestCase
 
 
+# NOTE: Can't use module scoped users because some fixtures rely on function-scoped users
 @pytest.fixture(autouse=True)
 async def _clean_db_fixture(clean_db: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
     """Clean the database after each test."""
