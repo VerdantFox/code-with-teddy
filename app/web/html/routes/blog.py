@@ -757,7 +757,7 @@ async def edit_bp_live_update(
     )
 
 
-@router.post("/blog/{bp_id}/upload-media", response_model=None)
+@router.post("/blog/{bp_id}/media", response_model=None)
 @requires_permission(Action.EDIT_BP)
 async def upload_blog_post_media(
     request: Request,
@@ -803,7 +803,7 @@ async def upload_blog_post_media(
     )
 
 
-@router.patch("/blog/{bp_id}/reorder-media/{media_id}", response_model=None)
+@router.patch("/blog/{bp_id}/media/{media_id}", response_model=None)
 @requires_permission(Action.EDIT_BP)
 async def reorder_bp_media(
     request: Request,
@@ -846,7 +846,7 @@ async def reorder_bp_media(
     )
 
 
-@router.delete("/blog/{bp_id}/upload-media/{media_id}", response_model=None)
+@router.delete("/blog/{bp_id}/media/{media_id}", response_model=None)
 @requires_permission(Action.EDIT_BP)
 async def delete_blog_post_media(
     request: Request,
