@@ -199,19 +199,10 @@ def update_element(
     """Update an element's name and class."""
     if name:
         element.name = name
-    if class_:
+    if class_:  # pragma: no branch
         element["class"] = class_
     if id_:
         element["id"] = id_
-
-
-def hoist_children_to_parent(element: Tag) -> list[Tag]:
-    """Hoist all children of element to parent element."""
-    parent = element.parent
-    children = element.find_all(recursive=False)
-    parent.extend(children)
-    element.decompose()
-    return children
 
 
 def update_a_tag_alpha_href(a_tag: Tag) -> None:

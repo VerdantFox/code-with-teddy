@@ -184,6 +184,9 @@ def _clear_cookies() -> None:
 # ---------------------------------------------------------------------------
 # model fixtures
 # ---------------------------------------------------------------------------
+
+
+# ------------------------ Users ------------------------
 @pytest.fixture(name="basic_user")
 async def add_basic_user(db_session: AsyncSession) -> db_models.User:
     """Return a basic user added to the database, function scoped."""
@@ -206,6 +209,16 @@ async def add_basic_user_2(db_session: AsyncSession) -> db_models.User:
 async def add_basic_user_module(db_session_module: AsyncSession) -> db_models.User:
     """Return a basic user added to the database, module scoped."""
     user = test_models.basic_user()
+    await add_user(db_session_module, user)
+    return user
+
+
+@pytest.fixture(name="basic_user_2_module", scope="module")
+async def add_basic_user_2_module(db_session_module: AsyncSession) -> db_models.User:
+    """Return a basic user added to the database, module scoped."""
+    user = test_models.basic_user(
+        username="test_user_2", email="test2@email.com", full_name="Test User 2"
+    )
     await add_user(db_session_module, user)
     return user
 
@@ -234,6 +247,7 @@ async def add_user(db_session: AsyncSession, user: db_models.User) -> db_models.
     return user
 
 
+# ------------------------ Blog Posts ------------------------
 @pytest.fixture(name="basic_blog_post")
 async def add_basic_blog_post(db_session: AsyncSession) -> db_models.BlogPost:
     """Return a basic blog post added to the database."""
@@ -304,7 +318,17 @@ async def add_advanced_blog_post_module(db_session_module: AsyncSession) -> db_m
     return await save_advanced_blog_post(db_session_module)
 
 
-async def save_advanced_blog_post(db_session: AsyncSession) -> db_models.BlogPost:
+@pytest.fixture(name="advanced_blog_post_with_user_module", scope="module")
+async def add_advanced_blog_post_with_user_module(
+    db_session_module: AsyncSession, basic_user_module: db_models.User
+) -> db_models.BlogPost:
+    """Return an advanced blog post added to the database."""
+    return await save_advanced_blog_post(db_session_module, user=basic_user_module)
+
+
+async def save_advanced_blog_post(
+    db_session: AsyncSession, user: db_models.User | None = None
+) -> db_models.BlogPost:
     """Save an advanced blog post to the database."""
     bp_input = test_models.advanced_blog_post()
     bp_response = await blog_handler.save_blog_post(db=db_session, data=bp_input)
@@ -317,15 +341,26 @@ async def save_advanced_blog_post(db_session: AsyncSession) -> db_models.BlogPos
         locations_str="some_location.png",
         media_type="image/png",
     )
-    comment_input = blog_handler.SaveCommentInput(
+    comment_input1 = blog_handler.SaveCommentInput(
         bp_id=bp.id,
         guest_id="guest_id_1",
         name="Guest 1",
         email="guest1@email.com",
         content="Some comment",
     )
-    comment_response = await blog_handler.save_new_comment(db=db_session, data=comment_input)
-    assert comment_response.comment
+    comment_response1 = await blog_handler.save_new_comment(db=db_session, data=comment_input1)
+    assert comment_response1.comment
+
+    if user:
+        comment_input2 = blog_handler.SaveCommentInput(
+            bp_id=bp.id,
+            user_id=user.id,
+            content="# Some comment from user",
+        )
+        comment_response2 = await blog_handler.save_new_comment(db=db_session, data=comment_input2)
+        assert comment_response2.comment
+
+    await db_session.refresh(bp, attribute_names=["comments"])
     return bp
 
 

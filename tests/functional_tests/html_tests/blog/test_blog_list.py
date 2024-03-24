@@ -1,12 +1,13 @@
 """test_blog: Test the blog page."""
 
-from dataclasses import dataclass, field
+from dataclasses import field
 
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.datastore import db_models
+from tests import TestCase
 from tests.functional_tests.html_tests.conftest import StrToSoup
 
 BLOG_ENDPOINT = "/blog"
@@ -108,14 +109,12 @@ def test_get_blog_list_admin_user_succeeds(
     assert total_results == len(blog_posts)
 
 
-@dataclass
-class SearchTestCase:
+class SearchTestCase(TestCase):
     """Search test case."""
 
-    test_id: str
     search: str = ""
     tags: str = ""
-    results_per_page: int = 0
+    results_per_page: int | str = 0
     page: int = 1
     order_by: str = ""
     asc: str = ""
@@ -139,40 +138,40 @@ SEARCH_PARAMS = (
 
 SEARCH_TEST_CASES = [
     SearchTestCase(
-        test_id="search_all",
+        id="search_all",
     ),
     SearchTestCase(
-        test_id="search_no_results",
+        id="search_no_results",
         search="asdfasdf",
         expected_total_results=0,
     ),
     SearchTestCase(
-        test_id="search_content_all",
+        id="search_content_all",
         search="test blog post",
     ),
     SearchTestCase(
-        test_id="search_title",
+        id="search_title",
         search="1",
         expected_bp_titles=[1],
         expected_max_result=1,
         expected_total_results=1,
     ),
     SearchTestCase(
-        test_id="search_tags",
+        id="search_tags",
         tags="foo_4",
         expected_bp_titles=[4, 3],
         expected_max_result=2,
         expected_total_results=2,
     ),
     SearchTestCase(
-        test_id="two_per_page_page_1",
+        id="two_per_page_page_1",
         results_per_page=2,
         expected_max_result=2,
         expected_total_results=3,
         expected_bp_titles=[4, 3],
     ),
     SearchTestCase(
-        test_id="two_per_page_page_2",
+        id="two_per_page_page_2",
         results_per_page=2,
         page=2,
         expected_min_result=3,
@@ -181,7 +180,7 @@ SEARCH_TEST_CASES = [
         expected_bp_titles=[1],
     ),
     SearchTestCase(
-        test_id="page_out_of_range_pos",
+        id="page_out_of_range_pos",
         results_per_page=2,
         page=10,
         expected_min_result=3,
@@ -190,7 +189,7 @@ SEARCH_TEST_CASES = [
         expected_bp_titles=[1],
     ),
     SearchTestCase(
-        test_id="page_out_of_range_neg",
+        id="page_out_of_range_neg",
         page=-10,
         results_per_page=2,
         expected_max_result=2,
@@ -198,21 +197,21 @@ SEARCH_TEST_CASES = [
         expected_bp_titles=[4, 3],
     ),
     SearchTestCase(
-        test_id="order_by_title_asc",
+        id="order_by_title_asc",
         order_by="title",
         asc="true",
         expected_bp_titles=[1, 3, 4],
     ),
     SearchTestCase(
-        test_id="order_by_title_desc",
+        id="order_by_title_desc",
         order_by="title",
         asc="false",
         expected_bp_titles=[4, 3, 1],
     ),
     SearchTestCase(
-        test_id="invalid_fields",
+        id="invalid_fields",
         order_by="asdf",
-        results_per_page="foo",  # type: ignore[arg-type]
+        results_per_page="foo",
         expected_total_results=0,
         expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         expected_text=["Invalid Choice: could not coerce.", "Not a valid choice."],
@@ -221,10 +220,7 @@ SEARCH_TEST_CASES = [
 
 
 @pytest.mark.usefixtures("blog_posts")
-@pytest.mark.parametrize(
-    "test_case",
-    [pytest.param(test_case, id=test_case.test_id) for test_case in SEARCH_TEST_CASES],
-)
+@SearchTestCase.parametrize(SEARCH_TEST_CASES)
 def test_search_blog_posts(
     test_client: TestClient, test_case: SearchTestCase, str_to_soup: StrToSoup
 ):

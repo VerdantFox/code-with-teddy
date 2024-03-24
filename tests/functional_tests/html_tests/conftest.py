@@ -10,12 +10,13 @@ from fastapi.testclient import TestClient
 
 from app import PROJECT_ROOT
 from app.datastore import db_models
-from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE
+from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE, BASIC_COOKIE_2
 
 StrToSoup = Callable[[str], BeautifulSoup]
 pytestmark = pytest.mark.anyio
 
 
+# ----------------------------- Helper Functions -----------------------------
 @pytest.fixture(scope="session")
 def html_to_file() -> Callable[[str], None]:  # pragma: no cover
     """Write the html response to a file."""
@@ -40,6 +41,7 @@ def str_to_soup() -> StrToSoup:  # pragma: no cover
     return _string_to_soup
 
 
+# ----------------------------- Logged In Users ------------------------------
 @pytest.fixture()
 async def logged_in_basic_user(
     test_client: TestClient,
@@ -70,6 +72,39 @@ async def set_basic_user_login_cookie(
     else:
         response = log_in_user(test_client, user)
         BASIC_COOKIE.update(dict(response.cookies))
+    return user
+
+
+@pytest.fixture()
+async def logged_in_basic_user_2(
+    test_client: TestClient,
+    basic_user_2: db_models.User,
+) -> AsyncGenerator[db_models.User, None]:
+    """Log in and return the basic user."""
+    yield await set_basic_user_2_login_cookie(test_client, basic_user_2)
+    test_client.cookies.clear()
+
+
+@pytest.fixture()
+async def logged_in_basic_user_2_module(
+    test_client: TestClient,
+    basic_user_2_module: db_models.User,
+) -> AsyncGenerator[db_models.User, None]:
+    """Log in and return the module-scoped basic user."""
+    yield await set_basic_user_2_login_cookie(test_client, basic_user_2_module)
+    test_client.cookies.clear()
+
+
+async def set_basic_user_2_login_cookie(
+    test_client: TestClient,
+    user: db_models.User,
+) -> db_models.User:
+    """Log in and return the user."""
+    if BASIC_COOKIE_2:
+        test_client.cookies.update(BASIC_COOKIE_2)
+    else:
+        response = log_in_user(test_client, user)
+        BASIC_COOKIE_2.update(dict(response.cookies))
     return user
 
 

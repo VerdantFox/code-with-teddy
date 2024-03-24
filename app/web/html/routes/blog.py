@@ -318,16 +318,6 @@ class LoggedInCommentForm(Form):
     )
 
 
-class EditCommentForm(LoggedInCommentForm):
-    """Form for editing a comment when logged in."""
-
-    name = StringField(
-        "Display name",
-        description="Anonymous Cat... (100 chars max)",
-        validators=[validators.Optional(), validators.Length(min=1, max=100)],
-    )
-
-
 class NotLoggedInCommentForm(LoggedInCommentForm):
     """Form for creating a comment when not logged in."""
 
@@ -349,25 +339,27 @@ class NotLoggedInCommentForm(LoggedInCommentForm):
     )
 
 
-@router.get("/blog/get-comment/{comment_id}", response_model=None)
+@router.get("/blog/comment/{comment_id}", response_model=None)
 async def get_comment(
     request: Request, db: DBSession, comment_id: int, current_user: LoggedInUserOptional
 ) -> _TemplateResponse:
-    """Return a comment. Called when canceling a comment edit."""
+    """Return a comment partial. Called when canceling a comment edit."""
     comment = await blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
+    await db.refresh(comment, attribute_names=["user"])
     return templates.TemplateResponse(
         COMMENT_TEMPLATE,
         {constants.REQUEST: request, constants.CURRENT_USER: current_user, "comment": comment},
     )
 
 
-@router.get("/blog/comment/{comment_id}", response_model=None)
+@router.get("/blog/comment/{comment_id}/edit", response_model=None)
 async def comment_edit_get(
     request: Request, db: DBSession, comment_id: int, current_user: LoggedInUserOptional
 ) -> _TemplateResponse:
     """Return page partial to edit a comment."""
     comment = await blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
     if not blog_handler.can_edit_comment(current_user=current_user, comment=comment):
+        await db.refresh(comment, attribute_names=["user"])
         return templates.TemplateResponse(
             COMMENT_TEMPLATE,
             {
@@ -380,6 +372,7 @@ async def comment_edit_get(
         )
     name = comment.name or comment.user.full_name
     form = NotLoggedInCommentForm.load({"name": name, "content": comment.md_content})
+    await db.refresh(comment, attribute_names=["user"])
     return templates.TemplateResponse(
         COMMENT_FORM_TEMPLATE,
         {
@@ -418,7 +411,7 @@ async def comment_post_preview(
         input_data = blog_handler.CommentInputPreview(
             **form_data_dict, user_id=user_id, bp_id=bp_id
         )
-    except ValidationError:
+    except ValidationError:  # pragma: no cover (not sure this is reachable)
         return HTMLResponse()
     comment = blog_handler.generate_comment(input_data)
     return templates.TemplateResponse(
@@ -558,7 +551,7 @@ async def comment_blog_post(
 
 
 @router.post("/blog/comment/{comment_id}", response_model=None)
-async def edit_comment(
+async def comment_edit_post(
     request: Request,
     db: DBSession,
     comment_id: int,
