@@ -769,7 +769,7 @@ async def upload_blog_post_media(
     """Upload media for a blog post."""
     form_data = await request.form()
     form_data_dict = {
-        "name": form_data["name"],
+        "name": form_data.get("name"),
         "media": media,
     }
     form = BlogPostMediaForm.load(form_data_dict)

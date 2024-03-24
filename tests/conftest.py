@@ -127,7 +127,7 @@ async def _clean_db_function(
 ) -> AsyncGenerator[None, None]:
     """Delete all data from the database after the function."""
     yield
-    await _delete_all_data(db_session, db_builder)
+    await delete_all_data(db_session, db_builder)
     _clear_cookies()
 
 
@@ -137,7 +137,7 @@ async def _clean_db_except_users(
 ) -> AsyncGenerator[None, None]:
     """Delete all data from the database except users after the function."""
     yield
-    await _delete_all_data(db_session, db_builder, skip_tables={"users"})
+    await delete_all_data(db_session, db_builder, skip_tables={"users"})
 
 
 @pytest.fixture(name="clean_db_module", scope="module")
@@ -146,7 +146,7 @@ async def _clean_db_module(
 ) -> AsyncGenerator[None, None]:
     """Delete all data from the database after the module."""
     yield
-    await _delete_all_data(db_session_module, db_builder)
+    await delete_all_data(db_session_module, db_builder)
     _clear_cookies()
 
 
@@ -164,7 +164,7 @@ def _make_session(db_builder: DBBuilder) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def _delete_all_data(
+async def delete_all_data(
     session: AsyncSession, db_builder: DBBuilder, skip_tables: Iterable[str] | None = None
 ) -> None:
     """Delete all data from the database."""

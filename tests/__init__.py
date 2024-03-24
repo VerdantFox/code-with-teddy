@@ -1,7 +1,12 @@
 from collections.abc import Sequence
+from pathlib import Path
 
 import pytest
 from pydantic import BaseModel
+
+TEST_ROOT_PATH = Path(__file__).parent
+TEST_DATA_PATH = TEST_ROOT_PATH / "data"
+TEST_MEDIA_DATA_PATH = TEST_DATA_PATH / "media"
 
 
 class TestCase(BaseModel, arbitrary_types_allowed=True):

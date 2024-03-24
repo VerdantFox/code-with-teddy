@@ -1,8 +1,11 @@
 """media_handler: service for handling media files."""
+
+from collections.abc import Iterable
 from enum import Enum
 from pathlib import Path
 from typing import Any, Protocol
 
+import PIL
 from fastapi import UploadFile
 from PIL import Image
 from werkzeug.utils import secure_filename
@@ -12,7 +15,15 @@ from app.web.html.const import STATIC_DIR
 AVATAR_UPLOAD_FOLDER = STATIC_DIR / "media" / "avatars"
 BLOG_UPLOAD_FOLDER = STATIC_DIR / "media" / "blog"
 for path in (AVATAR_UPLOAD_FOLDER, BLOG_UPLOAD_FOLDER):
-    path.mkdir(exist_ok=True)
+    path.mkdir(parents=True, exist_ok=True)
+
+
+CONTENT_TYPE_MAP = {
+    "image/svg+xml": "svg",
+}
+SUFFIX_MAP = {
+    "svgxml": "svg",
+}
 
 
 class MediaType(str, Enum):
@@ -86,19 +97,36 @@ def save_media(media: UploadFile, name: str) -> tuple[str, str]:
 
 def save_image(name: str, image_file: MediaFileProtocol) -> str:
     """Save an image, and its webp version."""
-    og_image_path = BLOG_UPLOAD_FOLDER / name
-    pil_save(
-        pic=image_file,
-        filepath=og_image_path,
-        max_width=1200,
-        max_height=1200,
-        quality=90,
-    )
-    webp_image_path = convert_image(og_image_path)
-    if compare_image_sizes(og_image_path, webp_image_path):
-        webp_image_path.unlink()
-    images = (image for image in (webp_image_path, og_image_path) if image.exists())
+    og_image_path = BLOG_UPLOAD_FOLDER / _fix_name_suffix(name)
+
+    try:
+        pil_save(
+            pic=image_file,
+            filepath=og_image_path,
+            max_width=1200,
+            max_height=1200,
+            quality=90,
+        )
+    except PIL.UnidentifiedImageError:
+        # Save file without pillow processing
+        og_image_path.write_bytes(image_file.read())
+        images: Iterable[Path] = (og_image_path,)
+    else:
+        webp_image_path = convert_image(og_image_path)
+        if compare_image_sizes(og_image_path, webp_image_path):
+            webp_image_path.unlink()
+        images = (path for path in (webp_image_path, og_image_path) if path.exists())
     return ",".join(get_path_str_from_static(image) for image in images)
+
+
+def _fix_name_suffix(name: str) -> str:
+    """Fix a name for weird suffixes."""
+    parts = name.rsplit(".", 1)
+    if len(parts) == 1:
+        return name
+    start, suffix = parts
+    mapped_suffix = SUFFIX_MAP.get(suffix)
+    return f"{start}.{mapped_suffix}" if mapped_suffix else name
 
 
 def save_video(name: str, video: MediaFileProtocol) -> str:
@@ -139,10 +167,12 @@ def get_media_type_from_file(file: UploadFile) -> MediaType:
 
 def get_suffix(file: UploadFile) -> str:
     """Get the suffix of a filename."""
-    if not file.content_type:
-        msg = "File has no content type."
+    parts = str(file.filename).rsplit(".", 1)
+    if len(parts) == 1:
+        msg = f"File {file.filename} has no suffix"
         raise ValueError(msg)
-    return file.content_type.split("/")[-1].lower()
+    _, suffix = parts
+    return suffix.casefold()
 
 
 def get_path_str_from_static(path: Path) -> str:
@@ -169,7 +199,7 @@ def rebuild_path_from_static(path_str: str) -> Path:
 def get_media_type_from_suffix(suffix: str) -> MediaType:
     """Get the media type from a suffix string."""
     suffix = suffix.casefold()
-    if suffix in {"jpg", "jpeg", "png", "gif", "webp", "svg"}:
+    if suffix in {"jpg", "jpeg", "png", "gif", "webp", "svg", "svgxml"}:
         return MediaType.IMAGE
     if suffix in {"mp4", "webm"}:
         return MediaType.VIDEO

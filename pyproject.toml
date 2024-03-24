@@ -102,6 +102,8 @@ dev = [
     "pytest",
     # Pytest-cov: coverage support for pytest
     "pytest-cov",
+    # Pytest-mock: mock support for pytest
+    "pytest-mock",
     # Rich: pretty terminal output
     "rich",
     # Ruff: fast all-in-one linter, written in Rust

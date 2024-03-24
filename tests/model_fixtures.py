@@ -1,6 +1,5 @@
 """model_fixtures: fixtures for loading db_models for tests."""
 
-
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -131,6 +130,39 @@ async def add_blog_post_cannot_comment_module(
     return response.blog_post
 
 
+@pytest.fixture(name="blog_post_with_media")
+async def add_blog_post_with_media(db_session: AsyncSession) -> db_models.BlogPost:
+    """Return a blog post with media added to the database."""
+    bp_input = test_models.basic_blog_post(title="Blog Post with Media")
+    response = await blog_handler.save_blog_post(db=db_session, data=bp_input)
+    bp = response.blog_post
+    assert bp
+    await blog_handler.commit_media_to_db(
+        db=db_session,
+        blog_post=bp,
+        name="Some media 1",
+        locations_str="some_location1.png",
+        media_type="image/png",
+    )
+    await blog_handler.commit_media_to_db(
+        db=db_session,
+        blog_post=bp,
+        name="Some media 2",
+        locations_str="some_location2.png",
+        media_type="image/png",
+    )
+    await blog_handler.commit_media_to_db(
+        db=db_session,
+        blog_post=bp,
+        name="Some media 3",
+        locations_str="some_location3.png",
+        media_type="image/png",
+        position=2,
+    )
+    await db_session.refresh(bp, attribute_names=["media"])
+    return bp
+
+
 @pytest.fixture(name="advanced_blog_post")
 async def add_advanced_blog_post(db_session: AsyncSession) -> db_models.BlogPost:
     """Return an advanced blog post added to the database."""
@@ -167,13 +199,6 @@ async def save_advanced_blog_post(
     bp_response = await blog_handler.save_blog_post(db=db_session, data=bp_input)
     bp = bp_response.blog_post
     assert bp
-    await blog_handler.commit_media_to_db(
-        db=db_session,
-        blog_post=bp,
-        name="Some media",
-        locations_str="some_location.png",
-        media_type="image/png",
-    )
     comment_input1 = blog_handler.SaveCommentInput(
         bp_id=bp.id,
         guest_id="guest_id_1",

@@ -431,7 +431,10 @@ async def reorder_media_for_blog_post(
     """Reorder media for a blog post."""
     stmt = select(db_models.BlogPostMedia).filter(db_models.BlogPostMedia.id == media_id)
     result = await db.execute(stmt)
-    media = result.scalars().one()
+    try:
+        media = result.scalars().one()
+    except sqlalchemy.exc.NoResultFound as e:
+        raise errors.BlogPostMediaNotFoundError from e
     media.position = position
     await db.commit()
     return await get_bp_from_id(db=db, bp_id=bp_id)
@@ -446,7 +449,10 @@ async def delete_media_from_blog_post(
     blog_post = await get_bp_from_id(db=db, bp_id=bp_id)
     stmt = select(db_models.BlogPostMedia).filter(db_models.BlogPostMedia.id == media_id)
     result = await db.execute(stmt)
-    media = result.scalars().one()
+    try:
+        media = result.scalars().one()
+    except sqlalchemy.exc.NoResultFound as e:
+        raise errors.BlogPostMediaNotFoundError from e
     media_locations = media.locations_to_list()
     for location in media_locations:
         media_handler.del_media_from_path_str(location)
@@ -464,12 +470,14 @@ def _save_bp_media(name: str, blog_post_slug: str, media: UploadFile) -> tuple[s
     )
 
 
-async def commit_media_to_db(
+async def commit_media_to_db(  # noqa: PLR0913 (too-many-arguments)
     db: AsyncSession,
+    *,
     blog_post: db_models.BlogPost,
     name: str,
     locations_str: str,
     media_type: str,
+    position: int | None = None,
 ) -> db_models.BlogPost:
     """Commit a blog post media to the database."""
     bp_media_object = db_models.BlogPostMedia(
@@ -478,6 +486,7 @@ async def commit_media_to_db(
         locations=locations_str,
         media_type=media_type,
         created_timestamp=datetime.now().astimezone(timezone.utc),
+        position=position,
     )
     db.add(bp_media_object)
     await db.commit()
