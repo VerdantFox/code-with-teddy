@@ -345,7 +345,7 @@ async def get_comment(
 ) -> _TemplateResponse:
     """Return a comment partial. Called when canceling a comment edit."""
     comment = await blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
-    await db.refresh(comment, attribute_names=["user"])
+    await db.refresh(comment)
     return templates.TemplateResponse(
         COMMENT_TEMPLATE,
         {constants.REQUEST: request, constants.CURRENT_USER: current_user, "comment": comment},
@@ -359,7 +359,7 @@ async def comment_edit_get(
     """Return page partial to edit a comment."""
     comment = await blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
     if not blog_handler.can_edit_comment(current_user=current_user, comment=comment):
-        await db.refresh(comment, attribute_names=["user"])
+        await db.refresh(comment)
         return templates.TemplateResponse(
             COMMENT_TEMPLATE,
             {
@@ -372,7 +372,7 @@ async def comment_edit_get(
         )
     name = comment.name or comment.user.full_name
     form = NotLoggedInCommentForm.load({"name": name, "content": comment.md_content})
-    await db.refresh(comment, attribute_names=["user"])
+    await db.refresh(comment)
     return templates.TemplateResponse(
         COMMENT_FORM_TEMPLATE,
         {
@@ -404,7 +404,7 @@ async def comment_post_preview(
     if form.content.errors:
         return HTMLResponse()
     if current_user.is_authenticated:
-        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
+        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used for mypy)
         form_data_dict["name"] = current_user.full_name or current_user.username
     user_id = current_user.id if current_user.is_authenticated else None
     try:
@@ -460,7 +460,7 @@ async def comment_blog_post(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     if current_user.is_authenticated:
-        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used)
+        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used mypy)
         form_data_dict["name"] = current_user.full_name or current_user.username
     user_id = current_user.id if current_user.is_authenticated else None
     try:
@@ -507,29 +507,7 @@ async def comment_blog_post(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    saved_comment_response = await blog_handler.save_new_comment(db, input_data)
-
-    if not saved_comment_response.success:
-        for error_field, error_msg in saved_comment_response.field_errors.items():
-            form[error_field].errors.extend(error_msg)
-        FlashMessage(
-            title=ERROR_SAVING_COMMENT,
-            text=saved_comment_response.err_msg,
-            category=FlashCategory.ERROR,
-        ).flash(request)
-        return templates.TemplateResponse(
-            COMMENTS_TEMPLATE,
-            {
-                constants.REQUEST: request,
-                constants.CURRENT_USER: current_user,
-                constants.FORM: form,
-                constants.MESSAGE: FormErrorMessage(text=saved_comment_response.err_msg),
-                BLOG_POST: bp,
-                "comment_preview": comment,
-                LIKED: liked,
-            },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        )
+    await blog_handler.save_new_comment(db, input_data)
     await db.refresh(bp)
     FlashMessage(
         title="Comment saved!",
@@ -550,8 +528,8 @@ async def comment_blog_post(
     return response
 
 
-@router.post("/blog/comment/{comment_id}", response_model=None)
-async def comment_edit_post(
+@router.patch("/blog/comment/{comment_id}", response_model=None)
+async def comment_edit_patch(
     request: Request,
     db: DBSession,
     comment_id: int,
@@ -596,7 +574,7 @@ async def comment_edit_post(
         comment = await blog_handler.update_existing_comment(
             db=db, comment=comment, md_content=md_content, current_user=current_user
         )
-    except Exception:
+    except Exception:  # pragma: no cover (not sure this is reachable with proper db setup)
         logger.exception("Error updating comment")
         FlashMessage(
             title="Error updating comment",
@@ -615,6 +593,7 @@ async def comment_edit_post(
         title="Comment updated!",
         category=FlashCategory.SUCCESS,
     ).flash(request)
+    await db.refresh(comment)
     return templates.TemplateResponse(
         COMMENT_TEMPLATE,
         {
@@ -735,6 +714,7 @@ async def edit_bp_post(
     if not response.success or not response.blog_post:
         for error_field, error_msg in response.field_errors.items():
             form[error_field].errors.extend(error_msg)
+        await db.refresh(current_user)
         return templates.TemplateResponse(
             EDIT_BP_TEMPLATE,
             {

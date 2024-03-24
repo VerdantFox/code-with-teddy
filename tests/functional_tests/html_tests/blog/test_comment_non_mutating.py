@@ -12,7 +12,7 @@ PREVIEW = "&mdash;(preview)"
 
 @pytest.fixture(autouse=True)
 async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
-    """Clean the database after each test."""
+    """Clean the database after the module completes."""
 
 
 def test_get_comment(
@@ -109,7 +109,7 @@ CONTENT = "content"
 # Field values
 PERRIN = "Perrin Aybara"
 PERRIN_EMAIL = "perrin@email.com"
-BASIC_CONTENT = "some content"
+BASIC_CONTENT_MD = "some content"
 BASIC_CONTENT_HTML = "<p>some content</p>"
 BLANK = ""
 TRUE = "true"
@@ -215,8 +215,19 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             CHECK_ME: BLANK,
             NOT_ROBOT: TRUE,
             NAME: PERRIN,
-            EMAIL: EMAIL,
-            CONTENT: BASIC_CONTENT,
+            EMAIL: PERRIN_EMAIL,
+            CONTENT: BASIC_CONTENT_MD,
+        },
+        expected_strings=[PREVIEW, PERRIN, BASIC_CONTENT_HTML],
+    ),
+    GuestCommentPreviewTestCase(
+        id="basic_with_bad_email",
+        data={
+            CHECK_ME: BLANK,
+            NOT_ROBOT: TRUE,
+            NAME: PERRIN,
+            EMAIL: "not-an-email",  # Should succeed still
+            CONTENT: BASIC_CONTENT_MD,
         },
         expected_strings=[PREVIEW, PERRIN, BASIC_CONTENT_HTML],
     ),
@@ -227,7 +238,7 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             NOT_ROBOT: TRUE,
             NAME: PERRIN,
             EMAIL: BLANK,
-            CONTENT: BASIC_CONTENT,
+            CONTENT: BASIC_CONTENT_MD,
         },
         expected_strings=[PREVIEW, PERRIN, BASIC_CONTENT_HTML],
     ),
@@ -237,8 +248,8 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             CHECK_ME: TRUE,
             NOT_ROBOT: BLANK,
             NAME: PERRIN,
-            EMAIL: EMAIL,
-            CONTENT: BASIC_CONTENT,
+            EMAIL: PERRIN_EMAIL,
+            CONTENT: BASIC_CONTENT_MD,
         },
         expected_strings=[PREVIEW, PERRIN, BASIC_CONTENT_HTML],
     ),
@@ -248,8 +259,8 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             CHECK_ME: BLANK,
             NOT_ROBOT: TRUE,
             NAME: BLANK,
-            EMAIL: EMAIL,
-            CONTENT: BASIC_CONTENT,
+            EMAIL: PERRIN_EMAIL,
+            CONTENT: BASIC_CONTENT_MD,
         },
         expected_strings=[PREVIEW, BASIC_CONTENT_HTML],
     ),
@@ -259,7 +270,7 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             CHECK_ME: BLANK,
             NOT_ROBOT: TRUE,
             NAME: PERRIN,
-            EMAIL: EMAIL,
+            EMAIL: PERRIN_EMAIL,
             CONTENT: BLANK,
         },
         is_blank=True,
@@ -270,7 +281,7 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             CHECK_ME: BLANK,
             NOT_ROBOT: TRUE,
             NAME: PERRIN,
-            EMAIL: EMAIL,
+            EMAIL: PERRIN_EMAIL,
             CONTENT: ADVANCED_CONTENT_MD,
         },
         expected_strings=[PREVIEW, PERRIN, ADVANCED_CONTENT_HTML],
@@ -282,8 +293,8 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             CHECK_ME: BLANK,
             NOT_ROBOT: TRUE,
             NAME: BLANK,
-            EMAIL: EMAIL,
-            CONTENT: BASIC_CONTENT,
+            EMAIL: PERRIN_EMAIL,
+            CONTENT: BASIC_CONTENT_MD,
         },
         expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         expected_strings=["Something went wrong with the form submission."],
@@ -294,7 +305,7 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             CHECK_ME: BLANK,
             NOT_ROBOT: TRUE,
             NAME: PERRIN,
-            EMAIL: EMAIL,
+            EMAIL: PERRIN_EMAIL,
             CONTENT: NEFARIOUS_MD,
         },
         expected_strings=[PREVIEW, PERRIN, NEFARIOUS_HTML],
@@ -333,7 +344,7 @@ def test_comment_post_preview_as_logged_in_user(
         NOT_ROBOT: TRUE,
         NAME: logged_in_basic_user_module.full_name,
         EMAIL: logged_in_basic_user_module.email,
-        CONTENT: BASIC_CONTENT,
+        CONTENT: BASIC_CONTENT_MD,
     }
     response = test_client.post(f"/blog/{bp.id}/comment-preview", data=data)
     assert response.status_code == status.HTTP_200_OK

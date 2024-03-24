@@ -129,6 +129,8 @@ def update_toc(toc: str) -> str:
     """Update the table of contents HTML."""
     toc_soup = BeautifulSoup(toc, HTML_PARSER)
     toc_element = toc_soup.find("div", {"class": "toc"})
+    if not toc_element:  # Something went wrong...
+        return ""
     update_element(
         element=toc_element,
         name="nav",

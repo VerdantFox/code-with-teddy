@@ -6,6 +6,9 @@ from fastapi.testclient import TestClient
 
 from app.datastore import db_models
 
+BP_NOT_FOUND = "Blog post not found"
+ERROR_404 = "404 Error"
+
 
 @pytest.fixture(autouse=True)
 async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
@@ -117,8 +120,8 @@ def test_get_unpublished_blog_post_as_guest_fails(
     bp = unpublished_blog_post_module
     response = test_client.get(f"/blog/{bp.slug}")
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert "404 Error" in response.text
-    assert "Blog post not found" in response.text
+    assert ERROR_404 in response.text
+    assert BP_NOT_FOUND in response.text
 
 
 @pytest.mark.usefixtures("logged_in_basic_user_module")
@@ -130,8 +133,8 @@ def test_get_unpublished_blog_post_as_user_fails(
     bp = unpublished_blog_post_module
     response = test_client.get(f"/blog/{bp.slug}")
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert "404 Error" in response.text
-    assert "Blog post not found" in response.text
+    assert ERROR_404 in response.text
+    assert BP_NOT_FOUND in response.text
 
 
 @pytest.mark.usefixtures("logged_in_admin_user_module")
@@ -183,3 +186,22 @@ def test_get_comments_disabled_blog_post_no_comment_option_as_admin(
     assert response.status_code == status.HTTP_200_OK
     assert bp.title in response.text
     assert "Submit a comment" in response.text
+
+
+def test_get_missing_blogpost_fails(test_client: TestClient):
+    """Test getting a missing blog post."""
+    response = test_client.get("/blog/missing-blog-post")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert ERROR_404 in response.text
+    assert BP_NOT_FOUND in response.text
+
+
+def test_get_blog_post_with_old_slug_redirects(
+    test_client: TestClient, advanced_blog_post_module: db_models.BlogPost
+):
+    """Test getting a blog post with an old slug."""
+    bp = advanced_blog_post_module
+    old_slug = bp.old_slugs[0]
+    response = test_client.get(f"/blog/{old_slug.slug}")
+    assert response.status_code == status.HTTP_200_OK
+    assert bp.title in response.text

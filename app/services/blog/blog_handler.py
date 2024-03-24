@@ -204,11 +204,24 @@ async def get_bp_from_slug(db: AsyncSession, slug: str) -> db_models.BlogPost:
 async def _get_bp_from_slug_history(db: AsyncSession, slug: str) -> db_models.BlogPost:
     """Get a blog post from its slug history."""
     try:
-        stmt = select(db_models.OldBlogPostSlug).filter(db_models.OldBlogPostSlug.slug == slug)
+        stmt = (
+            select(db_models.OldBlogPostSlug)
+            .options(
+                selectinload(db_models.OldBlogPostSlug.blog_post)
+                .selectinload(db_models.BlogPost.comments)
+                .selectinload(db_models.BlogPostComment.user),
+                selectinload(db_models.OldBlogPostSlug.blog_post).selectinload(
+                    db_models.BlogPost.tags
+                ),
+            )
+            .filter(db_models.OldBlogPostSlug.slug == slug)
+        )
         result = await db.execute(stmt)
-        return result.scalars().one().blog_post
+        slug_object = result.scalars().one()
     except sqlalchemy.exc.NoResultFound as e:
         raise errors.BlogPostNotFoundError from e
+    else:
+        return slug_object.blog_post
 
 
 async def save_blog_post(db: AsyncSession, data: SaveBlogInput) -> SaveBlogResponse:
@@ -576,7 +589,10 @@ async def get_comment_from_id(db: AsyncSession, comment_id: int) -> db_models.Bl
     try:
         stmt = (
             select(db_models.BlogPostComment)
-            .options(selectinload(db_models.BlogPostComment.blog_post))
+            .options(
+                selectinload(db_models.BlogPostComment.blog_post),
+                selectinload(db_models.BlogPostComment.user),
+            )
             .filter(db_models.BlogPostComment.id == comment_id)
         )
         result = await db.execute(stmt)

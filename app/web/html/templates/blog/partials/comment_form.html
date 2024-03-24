@@ -40,7 +40,7 @@
       <form
         class="text-lg"
         {% if is_edit %}
-          hx-post="{{ url_for('html:comment_edit_post', comment_id=comment_preview.id) }}"
+          hx-patch="{{ url_for('html:comment_edit_patch', comment_id=comment_preview.id) }}"
           hx-target="#{{ comment_form_id }}"
           hx-target-error="#{{ comment_form_id }}"
         {% else %}

@@ -312,6 +312,14 @@ async def add_advanced_blog_post(db_session: AsyncSession) -> db_models.BlogPost
     return await save_advanced_blog_post(db_session)
 
 
+@pytest.fixture(name="advanced_blog_post_with_user")
+async def add_advanced_blog_post_with_user(
+    db_session: AsyncSession, basic_user: db_models.User
+) -> db_models.BlogPost:
+    """Return an advanced blog post added to the database."""
+    return await save_advanced_blog_post(db_session, user=basic_user)
+
+
 @pytest.fixture(name="advanced_blog_post_module", scope="module")
 async def add_advanced_blog_post_module(db_session_module: AsyncSession) -> db_models.BlogPost:
     """Return an advanced blog post added to the database."""
@@ -350,6 +358,9 @@ async def save_advanced_blog_post(
     )
     comment_response1 = await blog_handler.save_new_comment(db=db_session, data=comment_input1)
     assert comment_response1.comment
+    old_slug = db_models.OldBlogPostSlug(slug="old-slug-1", blog_post_id=bp.id)
+    db_session.add(old_slug)
+    await db_session.commit()
 
     if user:
         comment_input2 = blog_handler.SaveCommentInput(
@@ -360,7 +371,7 @@ async def save_advanced_blog_post(
         comment_response2 = await blog_handler.save_new_comment(db=db_session, data=comment_input2)
         assert comment_response2.comment
 
-    await db_session.refresh(bp, attribute_names=["comments"])
+    await db_session.refresh(bp, attribute_names=["comments", "old_slugs"])
     return bp
 
 

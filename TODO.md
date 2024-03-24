@@ -31,6 +31,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] For blog images (and all other pages image)
   - [ ] For descriptions on all pages
   - [ ] Search what other metadata should be provided
+- [ ] Index site (add sitemap.xml, robots.txt, etc.)
 - [ ] Look up extra security desired
   - [x] CSP
   - [ ] etc.
