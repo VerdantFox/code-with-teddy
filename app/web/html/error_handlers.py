@@ -63,6 +63,7 @@ def register_error_handlers(app: FastAPI) -> None:
                 detail=error.detail,
                 status_code=error.status_code,
             ),
+            status_code=status.HTTP_302_FOUND,
         )
 
     @app.exception_handler(RequestValidationError)

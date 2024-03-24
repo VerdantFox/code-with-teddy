@@ -389,7 +389,10 @@ async def _create_bp_save_sqlalchemy_error_response(
     await db.rollback()
     err = str(e)
     msg = ERROR_SAVING_BP
-    if 'duplicate key value violates unique constraint "ix_blog_posts_slug"' in err:
+
+    if ("duplicate key value violates unique constraint" in err) and (
+        "ix_blog_posts_slug" in err or "ix_blog_posts_title" in err
+    ):
         field_errors["title"].append("Title already exists")
     else:
         msg = err

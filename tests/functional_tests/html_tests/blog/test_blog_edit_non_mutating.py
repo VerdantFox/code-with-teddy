@@ -103,8 +103,9 @@ def test_live_edit_blog_post_as_basic_user_fails(test_client: TestClient):
     """Test that a basic user cannot live edit a blog post."""
     response = test_client.post(LIVE_EDIT_ENDPOINT, data=DEFAULT_DATA)
 
-    # This should be 403... not sure why it's 405. The method + route is allowed
-    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert "403 Error" in response.text
+    assert "You do not have permission to perform this action" in response.text
 
 
 @pytest.mark.usefixtures("logged_in_admin_user_module")
