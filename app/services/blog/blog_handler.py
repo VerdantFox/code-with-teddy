@@ -394,7 +394,7 @@ async def _create_bp_save_sqlalchemy_error_response(
         "ix_blog_posts_slug" in err or "ix_blog_posts_title" in err
     ):
         field_errors["title"].append("Title already exists")
-    else:
+    else:  # pragma: no cover (don't know what other errors could happen)
         msg = err
     return SaveBlogResponse(
         success=False,

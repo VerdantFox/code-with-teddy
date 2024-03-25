@@ -112,6 +112,7 @@ BASIC_BLOG_POST = {
     BlogPostInputKeys.IS_PUBLISHED: True,
     BlogPostInputKeys.DESCRIPTION: "This is a test blog post.",
     BlogPostInputKeys.CONTENT: "This is the content of a test blog post.",
+    BlogPostInputKeys.THUMBNAIL_URL: "https://foo/bar.png",
 }
 
 

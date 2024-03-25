@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.datastore import db_models
 from tests import TestCase
+from tests.data import models as test_models
 
 
 @pytest.fixture(autouse=True)
@@ -72,18 +73,36 @@ DEFAULT_DATA = {
     IS_NEW: FALSE,
     TITLE: TITLE_VAL,
     TAGS: TAGS_VAL,
-    CAN_COMMENT: TRUE,
-    IS_PUBLISHED: TRUE,
+    CAN_COMMENT: FALSE,
+    IS_PUBLISHED: FALSE,
     DESCRIPTION: DESCRIPTION_MD,
     CONTENT: CONTENT_MD,
     THUMBNAIL_URL: BLANK,
 }
+OG_TITLE = test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.TITLE]
+OG_DESCRIPTION = test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.DESCRIPTION]
+OG_CONTENT = test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.CONTENT]
+OG_THUMBNAIL_URL = test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.THUMBNAIL_URL]
 
 EDIT_POST_TEST_CASES = [
     EditPostTestCase(
         id="happy_path",
         data=DEFAULT_DATA,
         expected_strings=[TITLE_VAL, DESCRIPTION_MD, CONTENT_MD, CONTENT_HTML],
+    ),
+    EditPostTestCase(
+        id="opposites",
+        data={
+            IS_NEW: FALSE,
+            TITLE: OG_TITLE,
+            TAGS: BLANK,
+            CAN_COMMENT: TRUE,
+            IS_PUBLISHED: TRUE,
+            DESCRIPTION: OG_DESCRIPTION,
+            CONTENT: OG_CONTENT,
+            THUMBNAIL_URL: OG_THUMBNAIL_URL,
+        },
+        expected_strings=[OG_TITLE, OG_DESCRIPTION, OG_CONTENT],
     ),
     EditPostTestCase(
         id="no_data",
