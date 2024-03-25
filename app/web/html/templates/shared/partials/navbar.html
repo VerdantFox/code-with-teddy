@@ -213,7 +213,7 @@
                     role="menuitem"
                     tabindex="-1"
                     hx-post="{{ url_for('html:logout') }}"
-                    hx-vals='{"redirect_url": "{{ request.url }}"}'
+                    hx-vals='{"next": "{{ request.url }}"}'
                     hx-target="body"
                     hx-swap="outerHTML"
                   >

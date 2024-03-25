@@ -19,20 +19,21 @@ class UserModelKeys(str, enum.Enum):
     TIMEZONE = "timezone"
     IS_ACTIVE = "is_active"
     AVATAR_LOCATION = "avatar_location"
-    PASSWORD_HASH = "password_hash"  # noqa: S105 (hardcoded-password)
+    PASSWORD_HASH = "password_hash"
     GOOGLE_OAUTH_ID = "google_oauth_id"
     GITHUB_OAUTH_ID = "github_oauth_id"
     ROLE = "role"
-    PASSWORD = "password"  # noqa: S105 (hardcoded-password)
+    PASSWORD = "password"
 
 
+PASSWORD_VAL = "password1"
 BASIC_USER = {
     UserModelKeys.USERNAME: "test_user",
     UserModelKeys.EMAIL: "test@email.com",
     UserModelKeys.FULL_NAME: "Test User",
     UserModelKeys.IS_ACTIVE: True,
-    UserModelKeys.PASSWORD: "password",
-    UserModelKeys.PASSWORD_HASH: auth.hash_password("password"),
+    UserModelKeys.PASSWORD: PASSWORD_VAL,
+    UserModelKeys.PASSWORD_HASH: auth.hash_password(PASSWORD_VAL),
     UserModelKeys.ROLE: Role.USER,
 }
 
@@ -52,8 +53,8 @@ ADMIN_USER = {
     UserModelKeys.FULL_NAME: "Admin User",
     UserModelKeys.IS_ACTIVE: True,
     UserModelKeys.ROLE: Role.ADMIN,
-    UserModelKeys.PASSWORD: "password",
-    UserModelKeys.PASSWORD_HASH: auth.hash_password("password"),
+    UserModelKeys.PASSWORD: PASSWORD_VAL,
+    UserModelKeys.PASSWORD_HASH: auth.hash_password(PASSWORD_VAL),
 }
 
 

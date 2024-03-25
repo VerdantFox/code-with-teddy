@@ -9,6 +9,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.datastore import db_models
+from tests.data import models as test_models
 from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE, BASIC_COOKIE_2
 
 StrToSoup = Callable[[str], BeautifulSoup]
@@ -134,7 +135,7 @@ def log_in_user(
     """Log in a user and return the response."""
     login_data: dict[str, str] = {
         "username_or_email": user.username,
-        "password": "password",
+        "password": test_models.PASSWORD_VAL,
     }
     response = test_client.post("/auth/token", data=login_data)
     assert response.status_code == status.HTTP_200_OK

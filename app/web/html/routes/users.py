@@ -41,12 +41,12 @@ class LoginForm(Form):
         "Username or Email",
         description="awesome@email.com",
         render_kw={"autocomplete": "username"},
-        validators=[validators.Length(min=3, max=25)],
+        validators=[validators.Length(min=3, max=100)],
     )
     password: PasswordField = PasswordField(
         "Password",
         render_kw={"autocomplete": "current-password"},
-        validators=[validators.Length(min=8, max=25)],
+        validators=[validators.Length(min=8, max=100)],
     )
     redirect_url: HiddenField = HiddenField()
 
@@ -54,13 +54,13 @@ class LoginForm(Form):
 @router.get("/login", response_model=None)
 async def login_get(
     request: Request,
-    username: Annotated[str | None, Query()] = None,
+    username_or_email: Annotated[str | None, Query()] = None,
     redirect_url: Annotated[str | None, Query(alias="next")] = None,
 ) -> _TemplateResponse:
     """Return the login page for GET requests."""
     login_form = LoginForm()
-    if username:
-        login_form.username_or_email.data = username
+    if username_or_email:
+        login_form.username_or_email.data = username_or_email
     if redirect_url:
         login_form.redirect_url.data = redirect_url
     return templates.TemplateResponse(
@@ -134,28 +134,28 @@ class RegisterUserForm(Form):
         "Email",
         description="awesome@email.com",
         render_kw={"autocomplete": "username"},
-        validators=[validators.Length(min=1, max=25)],
+        validators=[validators.Length(min=1, max=100)],
     )
     username: StringField = StringField(
         "Username",
         description="awesome_username",
-        validators=[validators.Length(min=3, max=25)],
+        validators=[validators.Length(min=3, max=100)],
     )
     name: StringField = StringField(
         "Full Name",
         description="John Doe",
-        validators=[validators.Length(min=1, max=25)],
+        validators=[validators.Length(min=1, max=100)],
     )
     password: PasswordField = PasswordField(
         "Password",
         render_kw={"autocomplete": "new-password"},
-        validators=[validators.Length(min=8, max=25)],
+        validators=[validators.Length(min=8, max=100)],
     )
     confirm_password: PasswordField = PasswordField(
         "Confirm Password",
         render_kw={"autocomplete": "new-password"},
         validators=[
-            validators.Length(min=8, max=25),
+            validators.Length(min=8, max=100),
             validators.EqualTo("password", message="Passwords must match"),
         ],
     )
@@ -227,7 +227,7 @@ async def register_post(
     ).flash(request)
     return RedirectResponse(
         request.url_for("html:login_get").include_query_params(
-            username=user_model.username,
+            username_or_email=user_model.email,
             redirect_url=register_form.redirect_url.data,
         ),
         status_code=status.HTTP_302_FOUND,
@@ -238,7 +238,7 @@ async def register_post(
 async def logout(request: Request) -> RedirectResponse:
     """Log the user out and redirect to the home page."""
     form_data = await request.form()
-    redirect_url = str(form_data.get("redirect_url", "/"))
+    redirect_url = str(form_data.get("next", "/"))
     response = RedirectResponse(
         redirect_url,
         status_code=status.HTTP_303_SEE_OTHER,
@@ -260,21 +260,21 @@ class UserSettingsForm(Form):
     email: StringField = StringField(
         "Email",
         description="new@email.com",
-        validators=[validators.Length(min=1, max=25)],
+        validators=[validators.Length(min=1, max=100)],
     )
     username: StringField = StringField(
         "Username",
         description="my_new_username",
-        validators=[validators.Length(min=3, max=25)],
+        validators=[validators.Length(min=3, max=100)],
     )
     name: StringField = StringField(
         "Full Name",
         description="John Doe",
-        validators=[validators.Length(min=1, max=25)],
+        validators=[validators.Length(min=1, max=100)],
     )
     password: PasswordField = PasswordField(
         "Update Password",
-        validators=[validators.Length(min=8, max=25), validators.optional()],
+        validators=[validators.Length(min=8, max=100), validators.optional()],
     )
     confirm_password: PasswordField = PasswordField(
         "Confirm Updated Password",

@@ -283,6 +283,7 @@ unfixable = [
     "ANN003", # Missing type annotation for **kwargs
     "ANN201", # Missing return type annotation for function
     "S101",   # assert-used
+    "S105",   # Passwords should not be hard-coded
     "E501",   # line-too-long
 ]
 "**/__init__.py" = ["D104"]  # Missing docstring in public package
