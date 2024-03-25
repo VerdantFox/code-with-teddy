@@ -1,4 +1,5 @@
 """flash_messages: Flash messages for the HTML web package."""
+
 from enum import Enum
 from typing import cast
 

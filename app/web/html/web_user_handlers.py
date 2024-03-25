@@ -1,4 +1,5 @@
 """web_user_handlers: helper functions for working with web users."""
+
 from fastapi import Response
 
 from app import constants

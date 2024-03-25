@@ -1,4 +1,5 @@
 """Auto-generated Alembic script."""
+
 import subprocess
 from pathlib import Path
 from typing import Annotated

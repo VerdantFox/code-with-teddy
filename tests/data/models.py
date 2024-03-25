@@ -128,9 +128,9 @@ def basic_blog_post(**kwargs: Any) -> blog_handler.SaveBlogInput:
 ADVANCED_BLOG_POST = BASIC_BLOG_POST.copy()
 ADVANCED_BLOG_POST[BlogPostInputKeys.TITLE] = "Advanced Blog Post"
 ADVANCED_BLOG_POST[BlogPostInputKeys.TAGS] = ["test", "python"]
-ADVANCED_BLOG_POST[
-    BlogPostInputKeys.THUMBNAIL_URL
-] = "https://upload.wikimedia.org/wikipedia/en/0/00/WoT01_TheEyeOfTheWorld.jpg"
+ADVANCED_BLOG_POST[BlogPostInputKeys.THUMBNAIL_URL] = (
+    "https://upload.wikimedia.org/wikipedia/en/0/00/WoT01_TheEyeOfTheWorld.jpg"
+)
 ADVANCED_BLOG_POST[BlogPostInputKeys.LIKES] = 32
 ADVANCED_BLOG_POST[BlogPostInputKeys.VIEWS] = 123
 

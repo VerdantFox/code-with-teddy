@@ -1,4 +1,5 @@
 """errors: Errors for the HTML web package."""
+
 from fastapi import APIRouter, Request, status
 from pydantic import BaseModel
 from starlette.templating import _TemplateResponse

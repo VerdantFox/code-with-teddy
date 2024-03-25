@@ -1,4 +1,5 @@
 """permissions: Permissions for the app."""
+
 from collections.abc import Callable
 from enum import Enum
 from functools import wraps

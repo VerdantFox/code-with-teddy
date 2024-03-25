@@ -1,4 +1,5 @@
 """responses: Potential responses for the API."""
+
 from fastapi import status
 
 UNAUTHORIZED_RESPONSE = {

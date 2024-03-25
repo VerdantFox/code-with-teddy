@@ -1,4 +1,5 @@
 """wtforms_fixes: Updated WTForm fields to handle better input transformation."""
+
 from typing import Any
 
 from wtforms import BooleanField as WTFBoolField

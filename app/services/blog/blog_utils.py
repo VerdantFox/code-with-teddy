@@ -1,4 +1,5 @@
 """blog_utils: blog service utility functions."""
+
 import math
 import re
 

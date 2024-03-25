@@ -1,4 +1,5 @@
 """web_models: Pydantic models for the web app."""
+
 from pydantic import BaseModel, EmailStr
 
 import app.web.field_types as ft

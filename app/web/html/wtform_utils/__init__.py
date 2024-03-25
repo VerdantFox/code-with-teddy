@@ -1,4 +1,5 @@
 """__init__: wtform_utils."""
+
 from typing import Any, Self
 
 from fastapi.datastructures import FormData

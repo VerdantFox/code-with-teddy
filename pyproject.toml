@@ -115,8 +115,9 @@ dev = [
     # Typer: CLI toolkit
     "typer[all]",
     # Types-*: type stubs for external libraries
-    "types-pytz",
+    "types-bleach",
     "types-markdown",
+    "types-pytz",
 ]
 
 [project.urls]
@@ -202,6 +203,9 @@ skip_covered = true  # Don't show fully covered files in the report
 [tool.ruff]
 line-length= 100
 target-version = "py310"
+
+
+[tool.ruff.lint]
 # Rules to run
 select = [
     "A",     # flake8-builtins

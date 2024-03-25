@@ -1,6 +1,5 @@
 """test_main: Test the GET pages on the main site."""
 
-
 from fastapi import status
 from fastapi.testclient import TestClient
 

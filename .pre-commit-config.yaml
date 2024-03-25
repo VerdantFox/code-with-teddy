@@ -27,7 +27,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.1.6"
+    rev: "v0.3.4"
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes", "--exit-non-zero-on-fix"]
@@ -39,14 +39,14 @@ repos:
       - id: blacken-docs
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.9.0.6
+    rev: v0.10.0.1
     hooks:
       - id: shellcheck
         # Seems to be broken on python 3.11
         language_version: python3.10
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.11.0
+    rev: v0.12.1
     hooks:
       - id: markdownlint-cli2
 
@@ -56,7 +56,7 @@ repos:
       - id: hadolint-docker
 
   - repo: https://github.com/awebdeveloper/pre-commit-stylelint
-    rev: "4200758"
+    rev: "0.0.2"
     hooks:
       - id: stylelint
         additional_dependencies:
@@ -79,14 +79,14 @@ repos:
 
   # Mypy is fairly slow, so put towards the end
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.7.0"
+    rev: "v1.9.0"
     hooks:
       - id: mypy
         additional_dependencies:
-          - pydantic==2.5.1
-          - types-pytz==2023.3.1.1
-          - types-markdown==3.5.0.20240106
-          - types-bleach==6.1.0.1
+          - pydantic==2.6.4
+          - types-bleach==6.1.0.20240311
+          - types-markdown==3.6.0.20240316
+          - types-pytz==2024.1.0.20240203
 
   # - repo: local
   #   hooks:

@@ -1,4 +1,5 @@
 """main: FastAPI application for HTML frontend."""
+
 import base64
 import secrets
 from collections.abc import Awaitable, Callable

@@ -1,4 +1,5 @@
 """Auto-generated Alembic script."""
+
 from logging.config import fileConfig
 
 from alembic import context

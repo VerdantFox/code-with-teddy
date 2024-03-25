@@ -1,4 +1,5 @@
 """custom_validators: Custom validators for WTForms."""
+
 import re
 from collections.abc import Callable
 from typing import Any
