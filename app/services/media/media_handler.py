@@ -36,11 +36,11 @@ class MediaType(str, Enum):
 class MediaFileProtocol(Protocol):
     """Protocol for image file."""
 
-    def seek(self, *args: Any, **kwargs: Any) -> int:
+    def seek(self, *args: Any, **kwargs: Any) -> int:  # pragma: no cover
         """Seek."""
         ...
 
-    def read(self, *args: Any, **kwargs: Any) -> bytes:
+    def read(self, *args: Any, **kwargs: Any) -> bytes:  # pragma: no cover
         """Read."""
         ...
 

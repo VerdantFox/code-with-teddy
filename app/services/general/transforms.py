@@ -26,17 +26,23 @@ def too_bool_validator(v: Any, _: ValidationInfo) -> bool:
 CoercedBool = Annotated[bool, BeforeValidator(too_bool_validator)]
 
 
-def to_list(string: Any, *, lowercase: bool = False) -> list[str]:
-    """Convert a list-like string to a list.
+def to_list(obj: Any, *, lowercase: bool = False) -> list[str]:
+    # sourcery skip: assign-if-exp, reintroduce-else, swap-if-else-branches, use-named-expression
+    """Convert a list-like object to a list.
 
     Also, convert iterables to lists.
     Lowercase list items.
     """
-    if not string:
+    if not obj:
         return []
-    if isinstance(string, list | tuple | set | Generator):
-        return list(string)
-    string_list = string.strip(" []()").split(",")
+    if not isinstance(obj, list | tuple | set | Generator | str):
+        err_msg = f"Expected a list-like object, got {type(obj)}"
+        raise TypeError(err_msg)
+    if isinstance(obj, list | tuple | set | Generator):
+        return list(obj)
+    string_list = obj.strip().strip("[]()").split(",")
+    if string_list == [""]:
+        return []
     if lowercase:
         return [item.strip().strip("\"'").casefold() for item in string_list]
     return [item.strip().strip("\"'") for item in string_list]
