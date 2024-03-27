@@ -49,13 +49,17 @@ async def upload_avatar(pic: UploadFile, name: str) -> str:
     """Upload an avatar file."""
     name = secure_filename(f"{name}.{get_suffix(pic)}")
     path = AVATAR_UPLOAD_FOLDER / name
-    pil_save(
-        pic=pic.file,
-        filepath=path,
-        max_width=600,
-        max_height=600,
-        quality=90,
-    )
+    try:
+        pil_save(
+            pic=pic.file,
+            filepath=path,
+            max_width=600,
+            max_height=600,
+            quality=90,
+        )
+    except PIL.UnidentifiedImageError:
+        # Save file without pillow processing
+        path.write_bytes(await pic.read())
     return get_path_str_from_static(path)
 
 

@@ -8,6 +8,7 @@ from fastapi import APIRouter, Query, Request, UploadFile, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import (
+    EmailField,
     FileField,
     HiddenField,
     PasswordField,
@@ -130,11 +131,11 @@ async def login_post(
 class RegisterUserForm(Form):
     """Form for user registration page."""
 
-    email: StringField = StringField(
+    email: EmailField = EmailField(
         "Email",
         description="awesome@email.com",
         render_kw={"autocomplete": "username"},
-        validators=[validators.Length(min=1, max=100)],
+        validators=[validators.Length(min=1, max=100), validators.Email()],
     )
     username: StringField = StringField(
         "Username",
@@ -228,7 +229,7 @@ async def register_post(
     return RedirectResponse(
         request.url_for("html:login_get").include_query_params(
             username_or_email=user_model.email,
-            redirect_url=register_form.redirect_url.data,
+            next=register_form.redirect_url.data,
         ),
         status_code=status.HTTP_302_FOUND,
     )
@@ -257,10 +258,10 @@ AVATAR_EXTENSIONS = ["jpg", "jpeg", "png", "svg", "webp"]
 class UserSettingsForm(Form):
     """Form for user settings page."""
 
-    email: StringField = StringField(
+    email: EmailField = EmailField(
         "Email",
         description="new@email.com",
-        validators=[validators.Length(min=1, max=100)],
+        validators=[validators.Length(min=1, max=100), validators.Email()],
     )
     username: StringField = StringField(
         "Username",
@@ -334,6 +335,7 @@ async def user_settings_post(
     user_details = dict(form_data) | {"avatar_upload": avatar_upload}
     form = UserSettingsForm.load(user_details)
     if not form.validate():
+        await db.refresh(current_user)
         return templates.TemplateResponse(
             "users/settings.html",
             {
@@ -351,10 +353,11 @@ async def user_settings_post(
         await db.commit()
     except sqlalchemy.exc.IntegrityError as e:
         await db.rollback()
-        if "email" in str(e):
+        if "ix_users_email" in str(e):
             form.email.errors.append("Email already exists for another account.")
-        if "username" in str(e):
+        if "ix_users_username" in str(e):
             form.username.errors.append("Username taken.")
+        await db.refresh(current_user)
         return templates.TemplateResponse(
             "users/settings.html",
             {
@@ -363,6 +366,7 @@ async def user_settings_post(
                 constants.FORM: form,
                 constants.CURRENT_USER: current_user,
             },
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
     await db.refresh(current_user)
 

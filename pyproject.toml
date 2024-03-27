@@ -75,7 +75,7 @@ dependencies = [
     # werkzeug: WSGI utility library (also useful utilities for our ASGI app)
     "werkzeug",
     # WTForms: web forms library
-    "WTForms",
+    "wtforms[email]",
 ]
 
 [project.optional-dependencies]
