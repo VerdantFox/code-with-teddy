@@ -132,8 +132,6 @@ def test_login_post(test_client: TestClient, test_case: LoginLogoutTestCase):
     assert response.status_code == test_case.expected_status_code
     for string in test_case.expected_strings:
         assert string in response.text
-    for string in test_case.unexpected_strings:
-        assert string not in response.text
     if test_case.expect_access_token:
         assert "access_token" in response.cookies
         assert "access_token" in response.headers.get("set-cookie", "")

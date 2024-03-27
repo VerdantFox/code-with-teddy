@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 from app.datastore import db_models
 from tests.data import models as test_models
-from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE, BASIC_COOKIE_2
+from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE
 
 StrToSoup = Callable[[str], BeautifulSoup]
 pytestmark = pytest.mark.anyio
@@ -63,16 +63,6 @@ async def set_basic_user_login_cookie(
 
 
 @pytest.fixture()
-async def logged_in_basic_user_2(
-    test_client: TestClient,
-    basic_user_2: db_models.User,
-) -> AsyncGenerator[db_models.User, None]:
-    """Log in and return the basic user."""
-    yield await set_basic_user_2_login_cookie(test_client, basic_user_2)
-    test_client.cookies.clear()
-
-
-@pytest.fixture()
 async def logged_in_basic_user_2_module(
     test_client: TestClient,
     basic_user_2_module: db_models.User,
@@ -87,11 +77,7 @@ async def set_basic_user_2_login_cookie(
     user: db_models.User,
 ) -> db_models.User:
     """Log in and return the user."""
-    if BASIC_COOKIE_2:
-        test_client.cookies.update(BASIC_COOKIE_2)
-    else:
-        response = log_in_user(test_client, user)
-        BASIC_COOKIE_2.update(dict(response.cookies))
+    log_in_user(test_client, user)
     return user
 
 

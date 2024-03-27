@@ -21,40 +21,42 @@ class CustomTestClient(TestClient):
     def get(self, *args, to_file: bool = False, **kwargs) -> httpx.Response:
         """Make a GET request to the app."""
         response = super().get(*args, **kwargs)
-        if to_file:
+        if to_file:  # pragma: no cover
             self._to_file(response)
         return response
 
     def post(self, *args, to_file: bool = False, **kwargs) -> httpx.Response:
         """Make a POST request to the app."""
         response = super().post(*args, **kwargs)
-        if to_file:
+        if to_file:  # pragma: no cover (only for debugging)
             self._to_file(response)
         return response
 
-    def put(self, *args, to_file: bool = False, **kwargs) -> httpx.Response:
+    def put(  # pragma: no cover (no PUT routes yet)
+        self, *args, to_file: bool = False, **kwargs
+    ) -> httpx.Response:
         """Make a PUT request to the app."""
         response = super().put(*args, **kwargs)
-        if to_file:
+        if to_file:  # pragma: no cover (only for debugging)
             self._to_file(response)
         return response
 
     def patch(self, *args, to_file: bool = False, **kwargs) -> httpx.Response:
         """Make a PATCH request to the app."""
         response = super().patch(*args, **kwargs)
-        if to_file:
+        if to_file:  # pragma: no cover (only for debugging)
             self._to_file(response)
         return response
 
     def delete(self, *args, to_file: bool = False, **kwargs) -> httpx.Response:
         """Make a DELETE request to the app."""
         response = super().delete(*args, **kwargs)
-        if to_file:
+        if to_file:  # pragma: no cover (only for debugging)
             self._to_file(response)
         return response
 
     @staticmethod
-    def _to_file(response: httpx.Response) -> None:
+    def _to_file(response: httpx.Response) -> None:  # pragma: no cover (only for debugging)
         """Write the response to a file."""
         filename = "html_response.html"
         path = PROJECT_ROOT / filename

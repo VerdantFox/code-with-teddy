@@ -58,11 +58,9 @@ ADMIN_USER = {
 }
 
 
-def admin_user(**kwargs: Any) -> db_models.User:
+def admin_user() -> db_models.User:
     """Return an admin user."""
     user_dict = {key.value: value for key, value in ADMIN_USER.items()}
-    for key, value in kwargs.items():
-        user_dict[key] = value
     user_dict.pop(UserModelKeys.PASSWORD.value)
     return db_models.User(**user_dict)
 
@@ -135,9 +133,7 @@ ADVANCED_BLOG_POST[BlogPostInputKeys.LIKES] = 32
 ADVANCED_BLOG_POST[BlogPostInputKeys.VIEWS] = 123
 
 
-def advanced_blog_post(**kwargs: Any) -> blog_handler.SaveBlogInput:
+def advanced_blog_post() -> blog_handler.SaveBlogInput:
     """Return an advanced blog post."""
     blog_post_dict = {key.value: value for key, value in ADVANCED_BLOG_POST.items()}
-    for key, value in kwargs.items():
-        blog_post_dict[key] = value
     return blog_handler.SaveBlogInput(**blog_post_dict)
