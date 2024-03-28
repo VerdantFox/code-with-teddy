@@ -7,6 +7,7 @@ from pydantic import BaseModel
 TEST_ROOT_PATH = Path(__file__).parent
 TEST_DATA_PATH = TEST_ROOT_PATH / "data"
 TEST_MEDIA_DATA_PATH = TEST_DATA_PATH / "media"
+TEST_EXAMPLE_BLOGS_PATH = TEST_DATA_PATH / "example_blog_posts"
 
 
 class TestCase(BaseModel, arbitrary_types_allowed=True):

@@ -42,19 +42,20 @@ def calc_read_mins(content: str, image_count: int = 0) -> int:
 def strip_markdown(md: str) -> str:
     """Strip markdown of weird syntax (for HTML meta description)."""
     # Remove images
-    regex = r"\!\[.*?\)"
-    md = re.sub(regex, "", md)
+    regex = r"\!\[(.*?)\].*?\)"
+    md = re.sub(regex, r"\1", md)
     # Remove <picture> tags
     regex = r"<picture>.*?</picture>"
-    md = re.sub(regex, "", md)
+    md = re.sub(regex, "", md, flags=re.DOTALL)
     # Remove HTML classes
     regex = r"\{\:.*?\}"
     md = re.sub(regex, "", md)
     # Remove links
     regex = r"\[(.*?)\]\(.*?\)"
     md = re.sub(regex, r"\1", md)
-    # Remove random "#"
-    md = md.replace("#", "")
+    # Convert markdown headers to sentences
+    regex = r"^#+\s*(.*?)\s*$"
+    md = re.sub(regex, lambda m: m.group(1).capitalize() + ".", md, flags=re.MULTILINE)
     # Replace white space with single space and return
     return " ".join(md.split())
 

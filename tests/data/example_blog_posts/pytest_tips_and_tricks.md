@@ -23,7 +23,7 @@ we're going to be covering today:
 9. Using pytest-cov
 
 All of the code discussed in this article can be found in the following
-[GitHub repository](https://github.com/VerdantFox/pytest_examples){: target="\_blank", rel="noopener noreferrer" }
+[GitHub repository](https://github.com/VerdantFox/pytest_examples){: target="_blank", rel="noopener noreferrer" }
 I created. To run the code, you'll need `pytest` and `pytest-cov`, which you
 can install with `pip install pytest` and `pip install pytest-cov`.
 I recommend doing so in a virtual environment.
