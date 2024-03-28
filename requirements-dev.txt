@@ -94,9 +94,9 @@ beautifulsoup4==4.12.3 \
 bleach==6.1.0 \
     --hash=sha256:0a31f1837963c41d46bbf1331b8778e1308ea0791db03cc4e7357b97cf42a8fe \
     --hash=sha256:3225f354cfc436b9789c66c4ee030194bee0568fbf9cbdad3bc8b5c26c5f12b6
-build==1.1.1 \
-    --hash=sha256:8ed0851ee76e6e38adce47e4bee3b51c771d86c64cf578d0c2245567ee200e73 \
-    --hash=sha256:8eea65bb45b1aac2e734ba2cc8dad3a6d97d97901a395bd0ed3e7b46953d2a31
+build==1.2.0 \
+    --hash=sha256:49df7f8e1e74d345fe71e54f5d56423b2111eda89e3da53a2c18392954dade1d \
+    --hash=sha256:6105465d9b233433ce8ffa151c760f674446ba766af0290fc14bfa32aef92a04
     # via pip-tools
 certifi==2024.2.2 \
     --hash=sha256:0569859f95fc761b18b45ef421b1290a0f65f147e92a1e5eb3e635f9a5e4e66f \
@@ -452,9 +452,9 @@ h11==0.14.0 \
     # via
     #   httpcore
     #   uvicorn
-httpcore==1.0.4 \
-    --hash=sha256:ac418c1db41bade2ad53ae2f3834a3a0f5ae76b56cf5aa497d2d033384fc7d73 \
-    --hash=sha256:cb2839ccfcba0d2d3c1131d3c3e26dfc327326fbe7a5dc0dbfe9f6c9151bb022
+httpcore==1.0.5 \
+    --hash=sha256:34a38e2f9291467ee3b44e89dd52615370e152954ba21721378a87b2960f7a61 \
+    --hash=sha256:421f18bac248b25d310f3cacd198d55b8e6125c107797b609ff9b7a6ba7991b5
     # via httpx
 httptools==0.6.1 \
     --hash=sha256:00d5d4b68a717765b1fabfd9ca755bd12bf44105eeb806c03d1962acd9b8e563 \
@@ -811,9 +811,9 @@ psycopg-pool==3.2.1 \
     --hash=sha256:060b551d1b97a8d358c668be58b637780b884de14d861f4f5ecc48b7563aafb7 \
     --hash=sha256:6509a75c073590952915eddbba7ce8b8332a440a31e77bba69561483492829ad
     # via psycopg
-pyasn1==0.5.1 \
-    --hash=sha256:4439847c58d40b1d0a573d07e3856e95333f1976294494c325775aeca506eb58 \
-    --hash=sha256:6d391a96e59b23130a5cfa74d6fd7f388dbbe26cc8f1edf39fdddf08d9d6676c
+pyasn1==0.6.0 \
+    --hash=sha256:3a35ab2c4b5ef98e17dfdec8ab074046fbda76e281c5a706ccd82328cfc8f64c \
+    --hash=sha256:cca4bb0f2df5504f02f6f8a775b6e416ff9b0b3b16f7ee80b5a3153d9b804473
     # via
     #   python-jose
     #   rsa
@@ -1137,9 +1137,9 @@ starlette==0.36.3 \
     --hash=sha256:13d429aa93a61dc40bf503e8c801db1f1bca3dc706b10ef2434a36123568f044 \
     --hash=sha256:90a671733cfb35771d8cc605e0b679d23b992f8dcfad48cc60b38cb29aeb7080
     # via fastapi
-typer==0.10.0 \
-    --hash=sha256:597f974754520b091665f993f88abdd088bb81c56b3042225434ced0b50a788b \
-    --hash=sha256:b8a587aa06d3c5422c09c2e9935eb80b4c9de8605fd5ab702b2f92d72246ca48
+typer==0.11.0 \
+    --hash=sha256:049cc47bef39f46b043eddd9165492209fdd9bc7d79afa7ba9cc5cd017caa817 \
+    --hash=sha256:a6ce173c0f03d3a41b49c0a945874cc489e91f88faabf76517b2b91c670fcde7
 types-bleach==6.1.0.20240311 \
     --hash=sha256:1e65b16ab56d61c1d963f53a8dc44e9de50c6c44e3e267e2d3ae76fa41484c8e \
     --hash=sha256:bd2bc2d57b677c44d0439f3cfdb98759f61200477fa1b602f6dc668e71f0ab7c

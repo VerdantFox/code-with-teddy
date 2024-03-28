@@ -15,5 +15,6 @@ uv pip sync requirements-dev.txt
 
 if [[ $* == *--node* ]]; then  # --node flag
     echo "Updating node packages"
+    ncu -u
     npm update
 fi
