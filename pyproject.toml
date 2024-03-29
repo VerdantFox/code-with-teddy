@@ -80,6 +80,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    # Aiohttp: async HTTP client/server
+    "aiohttp",
     # Alembic: SQLAlchemy migration tool
     "alembic",
     # Anyio: async library

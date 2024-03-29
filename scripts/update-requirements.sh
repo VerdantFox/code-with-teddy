@@ -13,8 +13,13 @@ uv pip compile --upgrade --generate-hashes --output-file=requirements-dev.txt --
 echo "Syncing venv with requirements-dev.txt..."
 uv pip sync requirements-dev.txt
 
-if [[ $* == *--node* ]]; then  # --node flag
+if [[ $* == *--node* ]] || [[ $* == *--all* ]]; then  # --node or --all flag
     echo "Updating node packages"
     ncu -u
     npm update
+fi
+
+if [[ $* == *--libs* ]] || [[ $* == *--all* ]]; then  # --libs or --all flag
+    echo "Updating librarie bundles"
+    python -m scripts.bundler
 fi

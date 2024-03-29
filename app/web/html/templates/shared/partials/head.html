@@ -44,6 +44,13 @@
   } else {
     document.documentElement.classList.remove("dark")
   }
+
+  // HTMX Config
+  // These settings remove the smooth scrolling and the delay on the settle
+  // when hx-boost is used. It removes the annoying scroll to the top of the
+  // page when a new page is loaded.
+  htmx.config.defaultSettleDelay = 0
+  htmx.config.scrollBehavior = "auto"
 </script>
 
 {% include 'shared/partials/favicon.html' %}

@@ -269,13 +269,13 @@ button.swal2-confirm.swal2-styled {
 }
 
 /* Simple-notify overwrites */
-.notify {
+.sn-notify {
   @apply dark:bg-grayscale-800;
 }
-.notify__title {
+.sn-notify-title {
   @apply dark:text-white;
 }
-.notify__text {
+.sn-notify-text {
   @apply dark:text-white;
 }
 
