@@ -53,32 +53,34 @@
     x-transition:leave.opacity.duration.500ms
   >
     <div
-      class="mx-auto max-w-6xl relative flex justify-between items-center gap-4"
+      class="mx-auto max-w-6xl relative flex justify-between items-center gap-4 h-14"
     >
       <!-- Home link image (left) -->
       <div class="flex flex-1 g" title="Code With Teddy">
-        <a
-          aria-label="Home"
-          class="pointer-events-auto flex items-center justify-center gap-2 text-lg font-semibold"
-          href="{{ url_for('html:about') }}"
-        >
-          <div
-            :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
-            class="h-12 w-12 rounded-full hover:bg-primary-white/90 dark:hover:bg-grayscale-700 p-1 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 backdrop-blur hvoer:dark:bg-grayscale-800/90 hover:dark:ring-white/10 flex items-center justify-center transition-all duration-300"
+        {% if request.url != request.base_url %}
+          <a
+            aria-label="Home"
+            class="pointer-events-auto flex items-center justify-center gap-2 text-lg font-semibold"
+            href="{{ url_for('html:about') }}"
           >
-            <img
-              alt=""
-              fetchpriority="high"
-              decoding="async"
-              data-nimg="1"
-              class="rounded-full bg-offset-300 object-cover dark:bg-offset-300 h-10 w-10 transition duration-500"
-              sizes="2.25rem"
-              src="{{ url_for('html:static', path='/media/shared/avatar.png') }}"
-              height="768"
-              width="768"
-            />
-          </div>
-        </a>
+            <div
+              :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
+              class="h-12 w-12 rounded-full hover:bg-primary-white/90 dark:hover:bg-grayscale-700 p-1 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 backdrop-blur hvoer:dark:bg-grayscale-800/90 hover:dark:ring-white/10 flex items-center justify-center transition-all duration-300"
+            >
+              <img
+                alt=""
+                fetchpriority="high"
+                decoding="async"
+                data-nimg="1"
+                class="rounded-full bg-offset-300 object-cover dark:bg-offset-300 h-10 w-10 transition duration-500"
+                sizes="2.25rem"
+                src="{{ url_for('html:static', path='/media/shared/avatar.png') }}"
+                height="768"
+                width="768"
+              />
+            </div>
+          </a>
+        {% endif %}
       </div>
 
       <!-- Nav links -- large screen (center) -->
