@@ -13,7 +13,7 @@ from sqlalchemy_utils.functions import database_exists, drop_database
 from app.datastore.database import get_engine
 from app.services.general.transforms import to_bool
 from scripts.start_local_postgres import DBBuilder
-from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE
+from tests import ADMIN_COOKIE, ADMIN_TOKEN, BASIC_COOKIE, BASIC_TOKEN
 
 load_dotenv()
 pytestmark = pytest.mark.anyio
@@ -128,7 +128,7 @@ async def _clean_db_function(
     """Delete all data from the database after the function."""
     yield
     await delete_all_data(db_session, db_builder)
-    _clear_cookies()
+    _clear_tokens()
 
 
 @pytest.fixture(name="clean_db_except_users")
@@ -147,7 +147,7 @@ async def _clean_db_module(
     """Delete all data from the database after the module."""
     yield
     await delete_all_data(db_session_module, db_builder)
-    _clear_cookies()
+    _clear_tokens()
 
 
 # -------------------------------------------------------
@@ -178,7 +178,9 @@ async def delete_all_data(
     await session.commit()
 
 
-def _clear_cookies() -> None:
-    """Clear cookies from the test client."""
+def _clear_tokens() -> None:
+    """Clear token caches."""
     BASIC_COOKIE.clear()
     ADMIN_COOKIE.clear()
+    BASIC_TOKEN.clear()
+    ADMIN_TOKEN.clear()

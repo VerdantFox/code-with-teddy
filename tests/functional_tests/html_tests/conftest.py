@@ -9,8 +9,8 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.datastore import db_models
+from tests import ADMIN_COOKIE, BASIC_COOKIE
 from tests.data import models as test_models
-from tests.functional_tests.html_tests.const import ADMIN_COOKIE, BASIC_COOKIE
 
 StrToSoup = Callable[[str], BeautifulSoup]
 pytestmark = pytest.mark.anyio

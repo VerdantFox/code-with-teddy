@@ -10,6 +10,12 @@ TEST_MEDIA_DATA_PATH = TEST_DATA_PATH / "media"
 TEST_EXAMPLE_BLOGS_PATH = TEST_DATA_PATH / "example_blog_posts"
 
 
+ADMIN_COOKIE: dict[str, str] = {}
+BASIC_COOKIE: dict[str, str] = {}
+ADMIN_TOKEN: dict[str, str] = {}
+BASIC_TOKEN: dict[str, str] = {}
+
+
 class TestCase(BaseModel, arbitrary_types_allowed=True):
     """TestCase baseclass for parametrized tests."""
 
