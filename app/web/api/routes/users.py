@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import sqlalchemy
 from fastapi import APIRouter, status
 from sqlalchemy import select
 
@@ -83,12 +84,23 @@ async def create_user(
         username=user_in.username,
         email=user_in.email,
         full_name=user_in.full_name,
-        hashed_password=auth.hash_password(user_in.password),
+        password_hash=auth.hash_password(user_in.password),
         role=Role.USER,
         is_active=True,
+        timezone=user_in.timezone,
+        avatar_location=user_in.avatar_location,
     )
     db.add(user_model)
-    await db.commit()
+    try:
+        await db.commit()
+    except sqlalchemy.exc.IntegrityError as e:
+        if "ix_users_username" in str(e):
+            err_msg = f"User with username '{user_in.username}' already exists."
+            raise errors.UserAlreadyExistsError(err_msg) from e
+        if "ix_users_email" in str(e):
+            err_msg = f"User with email '{user_in.email}' already exists."
+            raise errors.UserAlreadyExistsError(err_msg) from e
+        raise errors.UserAlreadyExistsError from e  # pragma: no cover (should be caught above)
     await db.refresh(user_model)
     return user_model
 
@@ -106,11 +118,23 @@ async def update_current_user(
 ) -> db_models.User:
     """Update the current user."""
     for field, value in user_in.model_dump(exclude_unset=True).items():
+        if field == "role" and not current_user.is_admin:
+            err_msg = "Cannot update role field"
+            raise errors.UserPermissionsError(err_msg)
         if field == "password":
-            field = "hashed_password"  # noqa: PLW2901 (redefined-loop-name)
+            field = "password_hash"  # noqa: PLW2901 (redefined-loop-name)
             value = auth.hash_password(value)  # noqa: PLW2901 (redefined-loop-name)
         setattr(current_user, field, value)
-    await db.commit()
+    try:
+        await db.commit()
+    except sqlalchemy.exc.IntegrityError as e:
+        if "ix_users_username" in str(e):
+            err_msg = f"User with username '{user_in.username}' already exists."
+            raise errors.UserAlreadyExistsError(err_msg) from e
+        if "ix_users_email" in str(e):
+            err_msg = f"User with email '{user_in.email}' already exists."
+            raise errors.UserAlreadyExistsError(err_msg) from e
+        raise errors.UserAlreadyExistsError from e  # pragma: no cover (should be caught above)
     await db.refresh(current_user)
     return current_user
 
@@ -130,11 +154,23 @@ async def update_user(
     """Update a user."""
     user_model = await _get_user_by_id(current_user=current_user, user_id=user_id, db=db)
     for field, value in user_in.model_dump(exclude_unset=True).items():
+        if field == "role" and not current_user.is_admin:
+            err_msg = "Cannot update role field"
+            raise errors.UserPermissionsError(err_msg)
         if field == "password":
-            field = "hashed_password"  # noqa: PLW2901 (redefined-loop-name)
+            field = "password_hash"  # noqa: PLW2901 (redefined-loop-name)
             value = auth.hash_password(value)  # noqa: PLW2901 (redefined-loop-name)
         setattr(user_model, field, value)
-    await db.commit()
+    try:
+        await db.commit()
+    except sqlalchemy.exc.IntegrityError as e:
+        if "ix_users_username" in str(e):
+            err_msg = f"User with username '{user_in.username}' already exists."
+            raise errors.UserAlreadyExistsError(err_msg) from e
+        if "ix_users_email" in str(e):
+            err_msg = f"User with email '{user_in.email}' already exists."
+            raise errors.UserAlreadyExistsError(err_msg) from e
+        raise errors.UserAlreadyExistsError from e  # pragma: no cover (should be caught above)
     await db.refresh(user_model)
     return user_model
 

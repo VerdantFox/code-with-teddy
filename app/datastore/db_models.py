@@ -57,6 +57,12 @@ class Base(AsyncAttrs, DeclarativeBase):
         str100: String(100),
     }
 
+    def to_dict(self) -> dict:
+        """Return the model as a dictionary."""
+        data = self.__dict__.copy()
+        data.pop("_sa_instance_state")
+        return data
+
 
 # --------- User models ---------
 class User(Base, mixins.AuthUserMixin):

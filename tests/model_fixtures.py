@@ -27,6 +27,16 @@ async def add_basic_user_module(db_session_module: AsyncSession) -> db_models.Us
     return user
 
 
+@pytest.fixture(name="basic_user_2")
+async def add_basic_user_2(db_session_module: AsyncSession) -> db_models.User:
+    """Return a basic user added to the database, module scoped."""
+    user = test_models.basic_user(
+        username="test_user_2", email="test2@email.com", full_name="Test User 2"
+    )
+    await add_user(db_session_module, user)
+    return user
+
+
 @pytest.fixture(name="basic_user_2_module", scope="module")
 async def add_basic_user_2_module(db_session_module: AsyncSession) -> db_models.User:
     """Return a basic user added to the database, module scoped."""

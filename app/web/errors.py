@@ -61,3 +61,10 @@ class UserPermissionsError(WebError):
 
     detail = "You do not have permission to perform this action"
     status_code = status.HTTP_403_FORBIDDEN
+
+
+class UserAlreadyExistsError(WebError):
+    """User already exists."""
+
+    detail = "User already exists"
+    status_code = status.HTTP_409_CONFLICT
