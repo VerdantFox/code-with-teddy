@@ -20,6 +20,12 @@ if [[ $* == *--node* ]] || [[ $* == *--all* ]]; then  # --node or --all flag
 fi
 
 if [[ $* == *--libs* ]] || [[ $* == *--all* ]]; then  # --libs or --all flag
-    echo "Updating librarie bundles"
+    echo "Updating static library bundles"
     python -m scripts.bundler
+fi
+
+if [[ $* == *--pre-commit* ]] || [[ $* == *--all* ]]; then  # --pre-commit or --all flag
+    echo "Updating pre-commit hooks"
+    pre-commit autoupdate
+    python -m scripts.update_pre_commit_add_deps
 fi
