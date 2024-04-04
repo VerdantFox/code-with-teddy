@@ -1,3 +1,4 @@
+import enum
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -8,6 +9,16 @@ TEST_ROOT_PATH = Path(__file__).parent
 TEST_DATA_PATH = TEST_ROOT_PATH / "data"
 TEST_MEDIA_DATA_PATH = TEST_DATA_PATH / "media"
 TEST_EXAMPLE_BLOGS_PATH = TEST_DATA_PATH / "example_blog_posts"
+
+
+class Environment(str, enum.Enum):
+    """Enum for environment types."""
+
+    LOCAL = "LOCAL"
+    PROD = "PROD"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 ADMIN_COOKIE: dict[str, str] = {}

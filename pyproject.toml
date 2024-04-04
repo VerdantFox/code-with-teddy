@@ -96,6 +96,8 @@ dev = [
     "mypy",
     # Pip-tools: dependency management
     "pip-tools",
+    # Playwright: browser automation
+    "playwright",
     # Pre-commit: git pre-commit hooks
     "pre-commit",
     # Pynput: keyboard listener
@@ -106,8 +108,12 @@ dev = [
     "pytest-cov",
     # Pytest-mock: mock support for pytest
     "pytest-mock",
+    # Pytest-playwright: Playwright support for pytest
+    "pytest-playwright",
     # Pyyaml: YAML parser
     "pyyaml",
+    # Requests: HTTP client
+    "requests",
     # Rich: pretty terminal output
     "rich",
     # Ruff: fast all-in-one linter, written in Rust
@@ -123,6 +129,7 @@ dev = [
     "types-markdown",
     "types-pyyaml",
     "types-pytz",
+    "types-requests",
 ]
 
 [project.urls]

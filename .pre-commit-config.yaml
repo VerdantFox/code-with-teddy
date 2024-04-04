@@ -46,7 +46,7 @@ repos:
         language_version: python3.10
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.12.1
+    rev: v0.13.0
     hooks:
       - id: markdownlint-cli2
 
@@ -92,6 +92,7 @@ repos:
           - types-markdown==3.6.0.20240316
           - types-pyyaml==6.0.12.20240311
           - types-pytz==2024.1.0.20240203
+          - types-requests==2.31.0.20240403
 
   # - repo: local
   #   hooks:
