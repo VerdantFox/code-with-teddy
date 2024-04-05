@@ -9,13 +9,4 @@
     {{ render_partial('shared/partials/forms/field.html', field=form.confirm_password) }}
   </div>
   {{ render_partial('shared/partials/forms/submit_button.html', text="Register", class="max-lg:w-full") }}
-  <p class="mt-12">
-    Already have an account?
-    <a
-      href="{{ url_for('html:login_get') }}{% if form.redirect_url.data %}?next={{ form.redirect_url.data }}{% endif %}"
-      class="text-teal-600 hover:text-teal-700 hover:underline underline-offset-4"
-    >
-      Log in here...
-    </a>
-  </p>
 </form>

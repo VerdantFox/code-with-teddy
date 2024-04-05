@@ -21,26 +21,38 @@ BASIC_PAGE_TEST_CASES = [
     BasicPageTestCase(
         id="about",
         endpoint="",
-        title="About | Teddy Williams",
+        title="About",
         h1="Web Alchemist & Python Craftsman",
     ),
     BasicPageTestCase(
         id="projects",
         endpoint="/projects",
-        title="Projects | Teddy Williams",
+        title="Projects",
         h1="Tech Playground",
     ),
     BasicPageTestCase(
         id="experience",
         endpoint="/experience",
-        title="Experience | Teddy Williams",
+        title="Experience",
         h1="Professional Journey",
     ),
     BasicPageTestCase(
         id="blog",
         endpoint="/blog",
-        title="Blog | Teddy Williams",
+        title="Blog",
         h1="Code Chronicles",
+    ),
+    BasicPageTestCase(
+        id="login",
+        endpoint="/login",
+        title="Login",
+        h1="Sign In",
+    ),
+    BasicPageTestCase(
+        id="register",
+        endpoint="/register",
+        title="Register",
+        h1="Register",
     ),
 ]
 
@@ -49,9 +61,10 @@ BASIC_PAGE_TEST_CASES = [
 def test_page_essentials(
     page_session: Page, ui_details: UIDetails, test_case: BasicPageTestCase
 ) -> None:
-    """Test the about page."""
+    """Test some expectations about pre-determined pages."""
     page = helpers.goto(page_session, f"{ui_details.url}{test_case.endpoint}")
-    expect(page).to_have_title(test_case.title)
+    full_title = f"{test_case.title} | Teddy Williams"
+    expect(page).to_have_title(full_title)
     expect(page.locator("h1")).to_have_text(test_case.h1)
     helpers.assert_page_links_work(page)
 
@@ -63,11 +76,22 @@ def test_dark_mode(page_session: Page, ui_details: UIDetails) -> None:
     body_locator = page.locator("body")
     dark_class = re.compile(r"dark")  # Need regex or match *all* classes
     dark_bg_color = "rgb(28, 25, 23)"
+
+    # Initial state is light mode
     expect(html_locator).not_to_have_class(dark_class)
     expect(body_locator).not_to_have_css("background-color", dark_bg_color)
+
+    # Toggle to dark mode
     page.get_by_label("Switch to dark theme").click()
     expect(html_locator).to_have_class(dark_class)
     expect(body_locator).to_have_css("background-color", dark_bg_color)
+
+    # Dark mode should persist across pages
+    page.goto(f"{ui_details.url}/experience")
+    expect(html_locator).to_have_class(dark_class)
+    expect(body_locator).to_have_css("background-color", dark_bg_color)
+
+    # Toggle back to light mode
     page.get_by_label("Switch to light theme").click()
     expect(html_locator).not_to_have_class(dark_class)
     expect(body_locator).not_to_have_css("background-color", dark_bg_color)

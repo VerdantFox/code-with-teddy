@@ -6,6 +6,15 @@
     <div class="section-container pt-40 pb-72">
       <h1 class="text-4xl mt-10 mb-10 font-bold">Register</h1>
       {{ render_partial('users/partials/register_form.html', request=request, form=form, message=message) }}
+      <p class="mt-12">
+        Already have an account?
+        <a
+          href="{{ url_for('html:login_get') }}{% if form.redirect_url.data %}?next={{ form.redirect_url.data }}{% endif %}"
+          class="link"
+        >
+          Log in here...
+        </a>
+      </p>
     </div>
   </section>
 {% endblock content %}
