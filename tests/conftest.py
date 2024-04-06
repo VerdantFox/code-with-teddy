@@ -49,15 +49,20 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         "Run UI playwright tests against the specified environment. Options:" f" {environments}"
     )
     parser.addoption("--playwright", action="store", help=help_msg)
+    help_msg = "Run all tests including integration and playwright end-to-end tests."
+    parser.addoption("--all", action="store_true", help=help_msg)
 
 
 def pytest_ignore_collect(collection_path: Path, config: pytest.Config) -> bool:
     """Return True to prevent considering this path for collection.
 
-    - `--integration`: run `api_tests`
-    - `--playwright`: run `playwright_tests`
-    - not specified: run all non-integration tests
+    - `--all`: run all tests (against local environment)
+    - `--integration=ENV`: only run integration tests (against ENV environment)
+    - `--playwright=ENV`: only run playwright end-to-end tests (against ENV environment)
+    - not specified: only run all unit/functional tests
     """
+    if config.getoption("--all"):
+        return False
     run_integration = bool(config.getoption("--integration"))
     if "integration_tests" in collection_path.parts:
         return not run_integration

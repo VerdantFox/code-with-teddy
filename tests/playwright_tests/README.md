@@ -25,7 +25,15 @@ To run the tests:
 pytest --playwright ENVIRONMENT
 ```
 
-Where `ENVIRONMENT` is one of `LOCAL` or `PROD`. You can also add the following options:
+Where `ENVIRONMENT` is one of `LOCAL` or `PROD`. Or you can run:
+
+```bash
+pytest --all
+```
+
+This will run all the functional/unit tests, integration tests and Playwright end-to-end tests against the `LOCAL` environment.
+
+You can also add the following options:
 
 - `--headed`: Run the tests in headed mode.
 - `--slowmo=MILLISECONDS`: Slow down the tests by the specified number of milliseconds.

@@ -119,19 +119,24 @@ def fixture_get_integration_environment(request: pytest.FixtureRequest) -> UIDet
     basic_password = os.environ.get("BASIC_PASSWORD", "")
     admin_username = os.environ.get("ADMIN_USERNAME", "")
     admin_password = os.environ.get("ADMIN_PASSWORD", "")
-    if not all([basic_username, basic_password, admin_username, admin_password]):
+    if not all(
+        [basic_username, basic_password, admin_username, admin_password]
+    ):  # pragma: no cover
         err_msg = (
             "BASIC_USERNAME, BASIC_PASSWORD, ADMIN_USERNAME, and ADMIN_PASSWORD"
             " must be set in the environment."
         )
         raise ValueError(err_msg)
 
-    integration_env_opt = str(request.config.getoption("--playwright")).upper()
+    all_opt = request.config.getoption("--all")
+    playwright_opt = str(request.config.getoption("--playwright")).upper()
+    env_opt = "LOCAL" if all_opt else playwright_opt  # pragma: no branch
+
     try:
-        environment = Environment[integration_env_opt]
-    except KeyError as e:
+        environment = Environment[env_opt]
+    except KeyError as e:  # pragma: no cover
         msg = (
-            f"Invalid environment: {integration_env_opt!r}. "
+            f"Invalid environment: {env_opt!r}. "
             f"Valid environments are: {[e.name for e in Environment]}"
         )
         raise pytest.UsageError(msg) from e

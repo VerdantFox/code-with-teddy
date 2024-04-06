@@ -2,7 +2,6 @@
 
 from playwright.sync_api import Page, expect
 
-from tests.playwright_tests import helpers
 from tests.playwright_tests.conftest import UIDetails
 
 
@@ -60,10 +59,10 @@ def test_login_by_modal(page: Page, ui_details: UIDetails):
     expect(page.get_by_role("heading", name="Code Chronicles")).to_be_visible()
 
 
-def test_login_modal_navigation(page_session: Page, ui_details: UIDetails):
+def test_login_modal_navigation(page: Page, ui_details: UIDetails):
     """Test the login modal navigation."""
     url = f"{ui_details.url}/blog"
-    page = helpers.goto(page_session, url)
+    page.goto(url)
 
     # Open the login modal.
     page.get_by_label("User details").click()
