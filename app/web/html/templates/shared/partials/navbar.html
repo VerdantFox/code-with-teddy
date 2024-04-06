@@ -62,6 +62,7 @@
             aria-label="Home"
             class="pointer-events-auto flex items-center justify-center gap-2 text-lg font-semibold"
             href="{{ url_for('html:about') }}"
+            @focus="showNav = true"
           >
             <div
               :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
@@ -111,6 +112,7 @@
                 @click="selected = !selected; smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"
                 :class="selected ? 'text-primary-600 dark:text-primary-400' : ''"
                 class="relative block px-3 py-2 hover:text-primary-600 dark:hover:text-primary-400"
+                @focus="showNav = true"
                 >{{ nav_item.get("name") }}
                 <span
                   :class="selected & (!navAtTop | hover) ? 'from-primary-600/0 via-primary-600/40 to-primary-600/0 dark:from-primary-400/0 dark:via-primary-400/40 dark:to-primary-400/0' : ''"
@@ -148,6 +150,7 @@
               @click.away="menuOpen = false"
               class="pointer-events-auto mr-2 flex items-center justify-center"
               @scroll.window="menuOpen = false"
+              @keydown.escape.window="menuOpen = false"
             >
               <button
                 type="button"
@@ -156,6 +159,7 @@
                 :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
                 class="group rounded-full  p-1.5 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
                 title="User details"
+                @focus="showNav = true"
               >
                 {{ render_partial('users/partials/avatar.html', class="h-8 w-8 object-cover rounded-full fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300", request=request, current_user=current_user, user_icon='user-circle') }}
               </button>
@@ -168,7 +172,7 @@
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="user-menu-button"
-                  tabindex="-1"
+                  x-trap.inert="menuOpen && showNav"
                 >
                   <p
                     class="block px-4 py-2 text-md text-gray-800 dark:text-white w-full text-left font-bold"
@@ -185,7 +189,7 @@
                         href="{{ extra['href'] }}"
                         class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left flex justify-start items-center gap-2"
                         role="menuitem"
-                        tabindex="-1"
+                        @focus="showNav = true"
                       >
                         {% if extra['icon'] %}
                           <span>
@@ -203,7 +207,7 @@
                     href="{{ url_for('html:user_settings_get') }}"
                     class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left flex justify-start items-center gap-2"
                     role="menuitem"
-                    tabindex="-1"
+                    @focus="showNav = true"
                   >
                     <span>
                       {{ render_partial('shared/partials/icons/user-gear.html', class="h-5 w-5") }}
@@ -213,11 +217,12 @@
                   <a
                     class="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 w-full text-left flex justify-start items-center gap-2 cursor-pointer"
                     role="menuitem"
-                    tabindex="-1"
+                    href=""
                     hx-post="{{ url_for('html:logout') }}"
                     hx-vals='{"next": "{{ request.url }}"}'
                     hx-target="body"
                     hx-swap="outerHTML"
+                    @focus="showNav = true"
                   >
                     <span>
                       {{ render_partial('shared/partials/icons/sign-out.html', class="h-5 w-5") }}
@@ -234,7 +239,7 @@
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="user-menu-button"
-                  tabindex="-1"
+                  x-trap.inert="menuOpen && showNav"
                 >
                   <span
                     class="block text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 flex justify-between items-center gap-1 pr-4"
@@ -242,7 +247,6 @@
                     <button
                       class="flex-grow flex items-center gap-2 pl-4 py-2 w-full text-left"
                       role="menuitem"
-                      tabindex="-1"
                       id="user-menu-item-0"
                       @click="loginModalOpen = true"
                     >
@@ -257,6 +261,7 @@
                       data-tippy-theme="light-border"
                       data-tippy-delay="[100, 200]"
                       data-tippy-content="<strong>Why login?</strong><br>Login is for blog-post commenting and interacting with certain projects. If you aren't using those features, don't worry about it. 🙂"
+                      @focus="showNav = true"
                     >
                       {{ render_partial('shared/partials/icons/question.html', class="h-7 w-7 stroke-grayscale-500 dark:stroke-grayscale-300  fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:group-hover:stroke-primary-300 transition-all duration-300") }}
                     </button>
@@ -277,6 +282,7 @@
               :class="navAtTop ? '' : 'bg-white/90 shadow-lg shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:ring-white/10'"
               class="group rounded-full  px-2 py-2 backdrop-blur dark:hover:ring-white/20 hover:bg-white/90 hover:shadow-lg hover:shadow-grayscale-800/5 hover:ring-1 hover:ring-grayscale-900/5 hover:dark:bg-grayscale-800/90 transition-all duration-300"
               :title="darkMode ? 'Switch to light theme' : 'Switch to dark theme'"
+              @focus="showNav = true"
             >
               {{ render_partial('shared/partials/icons/sun.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600  dark:group-hover:fill-primary-400 transition-all duration-300", xshow="!darkMode") }}
               {{ render_partial('shared/partials/icons/moon-stars.html', class="h-6 w-6 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 dark:group-hover:fill-primary-400 transition-all duration-300", xshow="darkMode") }}

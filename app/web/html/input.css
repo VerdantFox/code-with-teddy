@@ -6,6 +6,7 @@
   /* Start scrollbar styling */
   /* stylelint-disable no-descending-specificity -- incorrectly applied rule here */
   /* Start light theme scrollbars */
+  /* WHY AREN'T MAIN SCROLLBARS STYLED? */
   * {
     scrollbar-color: #a8a29e #e7e5e4;
   }
@@ -78,6 +79,11 @@
 
   /* Start dark theme scrollbars */
   /* Works on Firefox */
+  /* This top selector applies the 'dark' color-scheme to the main scrollbar */
+  .dark {
+    scrollbar-color: #292524 #44403c;
+  }
+  /* This next selector applies the 'dark' color-scheme to all other scrollbars on the page */
   .dark * {
     scrollbar-color: #292524 #44403c;
   }
