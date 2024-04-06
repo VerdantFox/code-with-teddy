@@ -4,8 +4,8 @@ import re
 
 from playwright.sync_api import Page, expect
 
-from tests.playwright_tests import helpers
-from tests.playwright_tests.conftest import UIDetails
+from tests.playwright_tests import UIDetails, helpers
+from tests.playwright_tests.blog import cache_blog_articles
 
 
 def test_blog_list_compact_view_and_advanced_search_on_off(
@@ -14,6 +14,7 @@ def test_blog_list_compact_view_and_advanced_search_on_off(
     """Test the blog list page functionality."""
     url = f"{ui_details.url}/blog"
     page.goto(url)
+    cache_blog_articles(page)
 
     # Assert the blog list is in compact view by default
     expect(page.get_by_label("Compact view")).to_be_checked()
@@ -97,3 +98,14 @@ def test_go_to_article(page_session: Page, ui_details: UIDetails) -> None:
 
     # Check that the article page is visible
     expect(first_article_heading_locator).to_be_visible()
+
+
+def test_admin_sees_create_button(login_admin_session_page: Page, ui_details: UIDetails) -> None:
+    """Test the blog list page functionality."""
+    page = login_admin_session_page
+    url = f"{ui_details.url}/blog"
+    helpers.goto(page, url)
+
+    # Assert the admin user sees the create button
+    page.get_by_label("User details").click()
+    expect(page.get_by_role("menuitem", name="Create Blog Post")).to_be_visible()

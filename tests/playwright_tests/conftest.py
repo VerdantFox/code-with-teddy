@@ -2,7 +2,6 @@
 
 import os
 from collections.abc import Generator
-from dataclasses import dataclass
 from typing import Any
 
 import dotenv
@@ -10,72 +9,54 @@ import pytest
 from playwright.sync_api import Browser, Page
 
 from tests import Environment
-
-ENVIRONMENT_MAP = {
-    Environment.LOCAL: "http://localhost:8000",
-    Environment.PROD: "https://not-yet-determined.com",
-}
-
-
-@dataclass
-class UIDetails:
-    """Class to hold authentication details."""
-
-    url: str
-    basic_username: str
-    basic_password: str
-    admin_username: str
-    admin_password: str
-
-
-@pytest.fixture(scope="session", name="browser")
-def fixture_browser(browser: Browser) -> Browser:
-    """Create a browser context for the session."""
-    return browser
+from tests.playwright_tests import ENVIRONMENT_MAP, UIDetails
 
 
 @pytest.fixture(scope="session", name="page_session")
 def fixture_page_session(browser: Browser) -> Generator[Page, Any, Any]:
-    """Create a browser context for the session."""
+    """Create a browser context for the session.
+
+    This fixture is for a non-logged in session.
+    """
     context = browser.new_context()
     yield context.new_page()
     context.close()
 
 
-@pytest.fixture(scope="session", name="login_basic_session")
+@pytest.fixture(scope="session", name="login_basic_session_page")
 def fixture_session_basic_login(
     ui_details: UIDetails,
     browser: Browser,
-) -> Generator[tuple[Page, str], Any, Any]:
+) -> Generator[Page, Any, Any]:
     """Login to the UI as a basic user once per session."""
     context = browser.new_context()
     page = context.new_page()
     login_basic(page=page, ui_details=ui_details)
-    yield page, ui_details.url
+    yield page
     context.close()
 
 
-@pytest.fixture(scope="session", name="login_admin_session")
+@pytest.fixture(scope="session", name="login_admin_session_page")
 def fixture_session_admin_login(
     ui_details: UIDetails,
     browser: Browser,
-) -> Generator[tuple[Page, str], Any, Any]:
+) -> Generator[Page, Any, Any]:
     """Login to the UI as an admin user once per session."""
     context = browser.new_context()
     page = context.new_page()
     login_admin(page=page, ui_details=ui_details)
-    yield page, ui_details.url
+    yield page
     context.close()
 
 
-@pytest.fixture(name="login_basic_once")
+@pytest.fixture(name="login_basic_once_page")
 def fixture_login_basic_once(
     ui_details: UIDetails,
     page: Page,
-) -> tuple[Page, str]:
+) -> Page:
     """Login to the UI as a basic user once per test."""
     login_basic(page=page, ui_details=ui_details)
-    return page, ui_details.url
+    return page
 
 
 def login_basic(page: Page, ui_details: UIDetails) -> None:

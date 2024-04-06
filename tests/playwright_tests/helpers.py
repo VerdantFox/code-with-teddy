@@ -4,13 +4,20 @@ from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor
 
 import requests
+import tenacity
 from playwright.sync_api import Page
 
 
+@tenacity.retry(wait=tenacity.wait_fixed(0.1), stop=tenacity.stop_after_attempt(10))
 def goto(page: Page, url: str) -> Page:
-    """Go to a page iff not already on that page."""
+    """Go to a page iff not already on that page.
+
+    Retry logic because get a playwright connection error sometimes,
+    especially right after a login; reason unknown.
+    """
     if page.url == url:
         return page
+
     page.goto(url)
     return page
 

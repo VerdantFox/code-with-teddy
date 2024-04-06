@@ -164,26 +164,29 @@ def update_toc(toc: str) -> str:
     # Add title comments and contact sections
     title = BeautifulSoup(
         (
+            '<li class="flex flex-col gap-4">'
             '<a class="link px-2 py-1 rounded-lg"'
             ' @click="tocOpen = false; allowTocClose = false;"'
-            ' href="#">Title</a>'
+            ' href="#">Title</a></li>'
         ),
         HTML_PARSER,
     )
     toc_list_outer.insert(0, title)
     about = BeautifulSoup(
         (
+            '<li class="flex flex-col gap-4">'
             '<a class="link px-2 py-1 rounded-lg"'
             ' @click="tocOpen = false; allowTocClose = false;"'
-            ' href="#about-the-author">About the author</a>'
+            ' href="#about-the-author">About the author</a></li>'
         ),
         HTML_PARSER,
     )
     comments = BeautifulSoup(
         (
+            '<li class="flex flex-col gap-4">'
             '<a class="link px-2 py-1 rounded-lg"'
             ' @click="tocOpen = false; allowTocClose = false;"'
-            ' href="#comments">Comments</a>'
+            ' href="#comments">Comments</a></li>'
         ),
         HTML_PARSER,
     )

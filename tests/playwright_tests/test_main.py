@@ -95,3 +95,21 @@ def test_dark_mode(page_session: Page, ui_details: UIDetails) -> None:
     page.get_by_label("Switch to light theme").click()
     expect(html_locator).not_to_have_class(dark_class)
     expect(body_locator).not_to_have_css("background-color", dark_bg_color)
+
+
+def test_navbar_visibility(page_session: Page, ui_details: UIDetails) -> None:
+    """Test the navbar visibility when scrolling up and down the page."""
+    page = helpers.goto(page_session, ui_details.url)
+    navbar_locator = page.get_by_label("Main Navigation", exact=True)
+    # Navbar visible
+    expect(navbar_locator).to_be_in_viewport()
+
+    # Scroll down
+    for _ in range(3):
+        page.mouse.wheel(delta_x=0, delta_y=100)
+    expect(navbar_locator).not_to_be_in_viewport()
+
+    # Scroll back up
+    for _ in range(3):
+        page.mouse.wheel(delta_x=0, delta_y=-100)
+    expect(navbar_locator).to_be_in_viewport()

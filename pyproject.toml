@@ -122,6 +122,8 @@ dev = [
     "setuptools",
     # SQLAlchemy-utils: utility functions for SQLAlchemy
     "sqlalchemy-utils",
+    # Tenacity: retrying library
+    "tenacity",
     # Typer: CLI toolkit
     "typer[all]",
     # Types-*: type stubs for external libraries
