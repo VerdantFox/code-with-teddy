@@ -8,6 +8,7 @@
     {{ key }}="{{ val }}"
   {% endfor %}
   {% if onsubmit %}@submit="{{ onsubmit }}"{% endif %}
+  {% if id %}id="{{ id }}"{% endif %}
 >
   {{ text }}
 </button>

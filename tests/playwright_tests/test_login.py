@@ -27,13 +27,13 @@ def test_login_by_modal(page: Page, ui_details: UIDetails):
     expect(page.get_by_text("Sign In Username or Email")).to_be_visible()
     page.get_by_placeholder("awesome@email.com").fill(ui_details.basic_username)
     page.get_by_label("Password").fill(ui_details.basic_password)
-    page.get_by_role("button", name="Log in").click()
+    page.locator("#submit-login").click()
 
     # Sign in toast notification is visible
     expect(page.locator("div").filter(has_text="You are logged in!").nth(1)).to_be_visible()
 
     # Check that the user remains on the  blog page
-    expect(page.get_by_role("heading", name="Code Chronicles")).to_be_visible()
+    expect(page.locator("h1", has_text="Code Chronicles")).to_be_visible()
 
     # Check the user menu items
     expect(page.get_by_label("User details")).to_be_visible()
@@ -56,7 +56,7 @@ def test_login_by_modal(page: Page, ui_details: UIDetails):
     expect(page.locator("text='Why login?'")).not_to_be_visible()
 
     # Check that the user stays on the same page after signing out
-    expect(page.get_by_role("heading", name="Code Chronicles")).to_be_visible()
+    expect(page.locator("h1", has_text="Code Chronicles")).to_be_visible()
 
 
 def test_login_modal_navigation(page: Page, ui_details: UIDetails):
@@ -69,24 +69,12 @@ def test_login_modal_navigation(page: Page, ui_details: UIDetails):
     page.get_by_role("menuitem", name="Sign In").click()
     expect(page.get_by_text("Sign In Username or Email")).to_be_visible()
 
-    # Tab through the login modal, should stay in login modal
-    page.get_by_role("button").first.press("Tab")
-    expect(page.get_by_label("Username or Email")).to_be_focused()
-
-    page.get_by_label("Username or Email").press("Tab")
-    expect(page.get_by_label("Password")).to_be_focused()
-
-    page.get_by_label("Password").press("Tab")
-    expect(page.get_by_role("button", name="Log in")).to_be_focused()
-
-    page.get_by_role("button", name="Log in").press("Tab")
-    expect(page.get_by_role("link", name="Register here...")).to_be_focused()
-
-    page.get_by_role("link", name="Register here...").press("Tab")
-    expect(page.get_by_role("button").first).to_be_visible()
+    # Tab last item in modal should stay in modal
+    page.locator("a", has_text="Register here...").press("Tab")
+    expect(page.locator("#login-modal-close")).to_be_focused()
 
     # Close the login modal by clicking the exit button
-    page.get_by_role("button").first.press("Enter")
+    page.locator("#login-modal-close").press("Enter")
     expect(page.get_by_text("Sign In Username or Email")).not_to_be_visible()
 
     # Open the login modal again

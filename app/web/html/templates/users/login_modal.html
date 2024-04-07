@@ -10,7 +10,11 @@
   <div
     class="relative mx-auto max-w-xl rounded-xl mt-16 border-2 border-grayscale-700 dark:border-transparent shadow-xl"
   >
-    <button @click="loginModalOpen = false" class="absolute top-5 right-5 z-50">
+    <button
+      id="login-modal-close"
+      @click="loginModalOpen = false"
+      class="absolute top-5 right-5 z-50"
+    >
       {{ render_partial('shared/partials/icons/x.html', class="w-6 h-6 fill-grayscale-800 dark:fill-gray-100 hover:fill-primary-700 dark:hover:fill-primary-400") }}
     </button>
     <div
