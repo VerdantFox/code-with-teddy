@@ -85,7 +85,7 @@
           {% if is_edit %}
             {# Cancel button #}
             <button
-              class="btn-sm btn-outline"
+              class="btn-sm btn-outline cancel-comment-btn"
               hx-get="{{ url_for('html:get_comment', comment_id=comment_preview.id) }}"
               hx-target="#{{ comment_form_id }}"
               hx-target-error="#{{ comment_form_id }}"

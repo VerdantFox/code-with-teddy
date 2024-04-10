@@ -3,7 +3,7 @@
 {% endif %}
 <button
   type="submit"
-  class="{% if not overwrite_btn_class %}btn-sm btn-filled{% endif %} {{ class }}"
+  class="{% if not overwrite_btn_class %}btn-sm btn-filled{% endif %} submit-btn {{ class }}"
   {% for key, val in extra_fields.items() %}
     {{ key }}="{{ val }}"
   {% endfor %}

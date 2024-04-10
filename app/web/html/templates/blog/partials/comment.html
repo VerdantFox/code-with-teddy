@@ -5,7 +5,7 @@
     id="comment-{{ comment_id }}"
     class="relative htmx-fade-out-150ms htmx-fade-in-300ms{% if is_preview %}
       ring-2 ring-offset-500 rounded-lg
-    {% endif %}"
+    {% endif %} comment"
   >
     <div
       class="flex gap-2 bg-grayscale-100 dark:bg-grayscale-800 p-8 rounded-lg"
@@ -81,7 +81,7 @@
           <!-- Reply -->
           <button
             type="button"
-            class="group"
+            class="group reply-comment-btn"
             data-tippy-theme="light-border"
             @click="copyToInput(replyText, 'content')"
           >
@@ -91,7 +91,7 @@
             <!-- Edit -->
             <button
               type="button"
-              class="group"
+              class="group edit-comment-btn"
               hx-get="{{ url_for('html:comment_edit_get', comment_id=comment.id) }}"
               hx-target="#comment-{{ comment.id }}"
               hx-target-error="#comment-{{ comment.id }}"
@@ -106,7 +106,7 @@
             <button
               id="delete-comment-btn-{{ comment.id }}"
               type="button"
-              class="group"
+              class="group delete-comment-btn"
               hx-delete="{{ url_for('html:delete_comment', comment_id=comment.id) }}"
               hx-target="#comment-{{ comment.id }}"
               hx-target-error="#comment-{{ comment.id }}"

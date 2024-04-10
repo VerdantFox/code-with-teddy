@@ -2,10 +2,10 @@
 
 A list of stuff that needs to get done for the project, roughly in order of importance.
 
-- [ ] Write tests
-  - [ ] functional tests against FastAPI
-  - [ ] unit tests for high-value, low-level functions
-  - [ ] playwright end-to-end tests
+- [x] Write tests
+  - [x] functional tests against FastAPI
+  - [x] unit tests for high-value, low-level functions
+  - [x] playwright end-to-end tests
   - [ ] Integration tests (maybe)
   - [ ] Locust stress tests
 - [ ] Add resume to "experience" page
