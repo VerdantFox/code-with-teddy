@@ -70,6 +70,12 @@ This will start an instance of `tailwind` that will build the CSS and watch for 
 
 Tests are written in Python with pytest. They include functional tests against the FastAPI endpoints, unit tests against key functions, and end-to-end tests using Playwright.
 
+To run the playwright tests, you'll need to first install the playwright browsers:
+
+```bash
+playwright install
+```
+
 To run tests use one of the following commands:
 
 ```bash

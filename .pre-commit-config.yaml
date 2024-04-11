@@ -11,7 +11,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=3000"]
@@ -92,7 +92,7 @@ repos:
           - types-markdown==3.6.0.20240316
           - types-pyyaml==6.0.12.20240311
           - types-pytz==2024.1.0.20240203
-          - types-requests==2.31.0.20240403
+          - types-requests==2.31.0.20240406
 
   # - repo: local
   #   hooks:

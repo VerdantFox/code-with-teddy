@@ -82,5 +82,6 @@ def test_login_modal_navigation(page: Page, ui_details: UIDetails):
     page.get_by_role("menuitem", name="Sign In").click()
 
     # Close the login modal by clicking outside the modal
+    page.wait_for_timeout(200)
     page.get_by_text("Sign In Username or Email").click(position={"x": -25, "y": -25}, force=True)
     expect(page.get_by_text("Sign In Username or Email")).not_to_be_visible()
