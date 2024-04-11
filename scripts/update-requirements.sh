@@ -19,7 +19,7 @@ if [[ $* == *--node* ]] || [[ $* == *--all* ]]; then  # --node or --all flag
     npm update
 fi
 
-if [[ $* == *--libs* ]] || [[ $* == *--all* ]]; then  # --libs or --all flag
+if [[ $* == *--static* ]] || [[ $* == *--all* ]]; then  # --static or --all flag
     echo "Updating static library bundles"
     python -m scripts.bundler
 fi

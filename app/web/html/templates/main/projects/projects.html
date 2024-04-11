@@ -7,12 +7,11 @@
     <div class="section-container py-52">
       <h1 class="text-6xl font-bold mb-16">Tech Playground</h1>
       <p class="text-2xl max-w-3xl">
-        Welcome to my portfolio! I'm excited to share a glimpse of my creative
-        journey through some of these fun side projects I've crafted over the
-        years. Each project has been a valuable learning experience,
-        contributing to my growth as a developer. Feel free to click on each
-        project to explore its details and the story behind its creation. Enjoy
-        the ride!
+        I'm excited to share a glimpse of my creative journey through some of
+        these fun side projects I've crafted over the years. Each project has
+        been a valuable learning experience, contributing to my growth as a
+        developer. Feel free to click on each project to explore its details and
+        the story behind its creation. Enjoy the ride!
       </p>
     </div>
   </section>
@@ -22,88 +21,7 @@
       class="mx-auto max-w-7xl px-8 grid grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-1 gap-10 mb-36"
     >
       {% for _ in range(5) %}
-        <article
-          class="w-full rounded-xl overflow-hidden shadow-lg border-2 dark:border-grayscale-800 dark:bg-grayscale-800 hover:-translate-y-2 hover:shadow-xl transition-transform duration-500 flex flex-col max-md:flex-row max-xs:flex-col"
-        >
-          <div
-            class="inline-block flex justify-center items-center mb-2 h-full"
-          >
-            <picture>
-              {#
-              <source
-              srcset="
-                {{ url_for('html:static', path='/media/main/about/grid/' + image + '.webp') }}
-              "
-              type="image/webp"
-              />
-            #}
-              <source
-                :srcset="darkMode ? '{{ url_for('html:static', path='/media/main/projects/website-dark.png') }}' : '{{ url_for('html:static', path='/media/main/projects/website-light.png') }}'"
-                type="image/png"
-              />
-              <img
-                :src="darkMode ? '{{ url_for('html:static', path='/media/main/projects/website-dark.png') }}' : '{{ url_for('html:static', path='/media/main/projects/website-light.png') }}'"
-                alt="{{ description }}"
-                title="{{ description }}"
-                class="w-full"
-                width="840"
-                height="840"
-              />
-            </picture>
-          </div>
-          <div class="p-4">
-            <h2 class="text-2xl mb-4 font-semibold">Portfolio Website</h2>
-            <p class="text-lg mb-6">
-              This website was a blast to make. In preparation for it I learned
-              some great front-end best practices and tools including Tailwind
-              CSS and Alpine.js.
-            </p>
-            <div class="flex gap-8 mb-4">
-              <a
-                href="http://"
-                target="_blank"
-                rel="noopener noreferrer"
-                {# class="btn-filled px-6 py-2 text-md flex items-start justify-center gap-1" #}
-                class="link flex items-start justify-center gap-1"
-                ><span>Visit</span>
-                {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
-              >
-              <a
-                href="http://"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="link flex items-start justify-center gap-1"
-                ><span>GitHub</span>
-                {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
-              >
-            </div>
-            <p id="technologies-label-{{ loop.index }}" class="screenreader">
-              Technologies used
-            </p>
-            <ul
-              aria-labelledby="technologies-label-{{ loop.index }}"
-              class="flex gap-2 flex-wrap"
-            >
-              {%
-                set tags = [
-                "python",
-                "FastAPI",
-                "TailwindCSS",
-                "Alpine.js",
-                "Docker",
-
-                ]
-              %}
-              {% for tag in tags %}
-                <li
-                  class="px-3 py-0.5 bg-offset-700 text-white font-semibold rounded-full text-sm flex justify-center items-center"
-                >
-                  {{ tag }}
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </article>
+        {{ render_partial('main/projects/sections/website.html', request=request) }}
       {% endfor %}
     </div>
   </section>

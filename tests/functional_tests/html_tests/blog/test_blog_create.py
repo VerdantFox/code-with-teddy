@@ -153,7 +153,7 @@ picture caption</p>
 
 ADVANCED_CONTENT_TOC_NAV = """\
 <nav class="not-prose" id="toc">
-<ul class="flex flex-col gap-4"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#">Title</a>
+<ul class="flex flex-col gap-4"><li class="flex flex-col gap-4"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#">Title</a></li>
 <li class="flex flex-col gap-4"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-1">Header 1</a><ul class="flex flex-col gap-4 ml-6">
 <li class="flex flex-col gap-4"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-2">Header 2</a><ul class="flex flex-col gap-4 ml-6">
 <li class="flex flex-col gap-4"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-3">Header 3</a></li>
@@ -162,7 +162,7 @@ ADVANCED_CONTENT_TOC_NAV = """\
 <li class="flex flex-col gap-4"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#blog-123-header-starts-with-numbers">123 Header starts with numbers</a></li>
 </ul>
 </li>
-<a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#about-the-author">About the author</a><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#comments">Comments</a></ul>
+<li class="flex flex-col gap-4"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#about-the-author">About the author</a></li><li class="flex flex-col gap-4"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#comments">Comments</a></li></ul>
 </nav>"""
 
 
