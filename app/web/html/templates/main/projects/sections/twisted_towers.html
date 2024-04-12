@@ -1,34 +1,30 @@
 <article
   class="w-full rounded-xl overflow-hidden shadow-lg border-2 dark:border-grayscale-800 dark:bg-grayscale-800 hover:-translate-y-2 hover:shadow-xl transition-transform duration-500 flex flex-col max-md:flex-row max-xs:flex-col"
 >
-  <div class="inline-block flex justify-center items-center mb-2 h-full">
-    <picture>
-      {#
-        <source
-        srcset="
-          {{ url_for('html:static', path='/media/main/about/grid/' + image + '.webp') }}
-        "
-        type="image/webp"
-        />
-      #}
-      <source
-        :srcset="darkMode ? '{{ url_for('html:static', path='/media/main/projects/website-dark.png') }}' : '{{ url_for('html:static', path='/media/main/projects/website-light.png') }}'"
-        type="image/png"
-      />
-      <img
-        :src="darkMode ? '{{ url_for('html:static', path='/media/main/projects/website-dark.png') }}' : '{{ url_for('html:static', path='/media/main/projects/website-light.png') }}'"
-        alt="Landing page for this website"
-        class="w-full"
-        width="840"
-        height="840"
-      />
-    </picture>
-  </div>
-  <div class="p-4">
-    <h2 class="text-2xl mb-4 font-semibold">Portfolio Website</h2>
+  {%
+    set images = [
+    (
+    url_for('html:static', path='/media/main/projects/games-twisted-towers1.png'),
+    'Twisted Towers game screenshot'
+    ),
+    (
+    url_for('html:static', path='/media/main/projects/games-twisted-towers2.png'),
+    'Twisted Towers game screenshot'
+    ),
+    (
+    url_for('html:static', path='/media/main/projects/games-twisted-towers3.png'),
+    'Twisted Towers game screenshot'
+    ),
+    ]
+  %}
+  {{ render_partial('shared/partials/components/carousel_tight.html', images=images) }}
+
+  <div class="p-4 mt-auto">
+    <h2 class="text-2xl mb-4 font-semibold">Twisted Towers</h2>
     <p class="text-lg mb-6">
-      This website was a blast to make. In preparation for it I learned some
-      great front-end best practices and tools.
+      Twisted Towers is a game I made using PyGame early in my coding career.
+      It's a tower defense game where you must defend your base from waves of
+      enemies.
     </p>
     <div class="flex gap-8 mb-4">
       <a
@@ -59,11 +55,7 @@
       {%
         set tags = [
         ("Python", "https://www.python.org"),
-        ("FastAPI", "https://fastapi.tiangolo.com"),
-        ("TailwindCSS", "https://tailwindcss.com"),
-        ("Alpine.js", "https://alpinejs.dev"),
-        ("HTMX", "https://htmx.org"),
-        ("Docker", "https://www.docker.com"),
+        ("PyGame", "https://github.com/pygame/pygame"),
         ]
       %}
       {% for tag, href in tags %}
