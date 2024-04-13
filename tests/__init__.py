@@ -1,4 +1,5 @@
 import enum
+import re
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -9,6 +10,10 @@ TEST_ROOT_PATH = Path(__file__).parent
 TEST_DATA_PATH = TEST_ROOT_PATH / "data"
 TEST_MEDIA_DATA_PATH = TEST_DATA_PATH / "media"
 TEST_EXAMPLE_BLOGS_PATH = TEST_DATA_PATH / "example_blog_posts"
+
+REQUIREMENTS_DEV_PATH = Path(__file__).parent.parent / "requirements-dev.txt"
+REQUIREMENTS_DEV_TEXT = REQUIREMENTS_DEV_PATH.read_text()
+PYDANTIC_VERSION = re.search(r"pydantic==(\d+\.\d+)", REQUIREMENTS_DEV_TEXT)[1]  # type: ignore[index]
 
 
 class Environment(str, enum.Enum):
