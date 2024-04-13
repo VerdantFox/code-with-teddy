@@ -52,20 +52,27 @@
           /
           <span>
             <span class="inline-flex items-center gap-1">
-              <span>{{ "{:,}".format(blog_post.views) }}</span>
+              <span
+                id="view-count"
+                hx-get="{{ url_for('html:view_blog_post', bp_id=blog_post.id) }}"
+                hx-trigger="load"
+              >
+                {{ "{:,}".format(blog_post.views) }}
+              </span>
               {{ render_partial('shared/partials/icons/eye.html', class="h-6 w-6 inline-block", title="views") }} </span
             >,&nbsp;
             <span class="inline-flex items-center gap-1">
-              <span>{{ "{:,}".format(blog_post.likes) }}</span>
+              <span id="likes-count">{{ "{:,}".format(blog_post.likes) }}</span>
               {{ render_partial('shared/partials/icons/heart.html', class="h-5 w-5 inline-block", title="likes") }}</span
             >,&nbsp;
             <span class="inline-flex items-center gap-1">
-              <span>{{ "{:,}".format(blog_post.comments|length) }}</span>
+              <span id="comments-count">
+                {{ "{:,}".format(blog_post.comments|length) }}
+              </span>
               {{ render_partial('shared/partials/icons/chat-circle-text.html', class="h-5 w-5 inline-block", title="comments") }}</span
             >
           </span>
         </p>
-
         <p class="max-xs:text-lg">
           Last Updated:
           <span

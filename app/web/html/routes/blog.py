@@ -55,6 +55,7 @@ COMMENT_FORM_TEMPLATE = "blog/partials/comment_form.html"
 MEDIA_FORM = "media_form"
 COMMENT_FORM = "comment_form"
 LIKED_POSTS_COOKIE = "liked_posts"  # Sets a cookie with a list of liked posts, by id
+VIEWED_POSTS_COOKIE = "viewed_posts"  # Sets a cookie with a list of viewed posts, by id
 ERROR_SAVING_COMMENT = "Error saving comment"
 
 
@@ -242,6 +243,11 @@ def _get_liked_posts_from_cookie(request: Request) -> set[int]:
     return {int(id_) for id_ in request.cookies.get(LIKED_POSTS_COOKIE, "").split(",") if id_}
 
 
+def _get_viewed_posts_from_cookie(request: Request) -> set[int]:
+    """Get the viewed posts from the cookie."""
+    return {int(id_) for id_ in request.cookies.get(VIEWED_POSTS_COOKIE, "").split(",") if id_}
+
+
 @router.get("/blog/{slug}", response_model=None)
 async def read_blog_post(
     request: Request, current_user: LoggedInUserOptional, db: DBSession, slug: str
@@ -270,6 +276,28 @@ async def read_blog_post(
         },
     )
     web_user_handlers.set_guest_user_id_cookie(guest_id=current_user.guest_id, response=response)
+    return response
+
+
+@router.get("/blog/{bp_id}/view", response_model=None)
+async def view_blog_post(request: Request, db: DBSession, bp_id: int) -> HTMLResponse:
+    """Increment the view count for a blog post."""
+    bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
+    viewed_posts = _get_viewed_posts_from_cookie(request)
+    if bp.id in viewed_posts:
+        return HTMLResponse(content=f"{bp.views:,}")
+    bp = await blog_handler.increment_bp_views(db=db, bp=bp)
+    viewed_posts.add(bp.id)
+    viewed_posts_str = ",".join(str(id_) for id_ in sorted(viewed_posts))
+    response = HTMLResponse(content=f"{bp.views:,}")
+    response.set_cookie(
+        VIEWED_POSTS_COOKIE,
+        viewed_posts_str,
+        max_age=constants.ONE_YEAR_IN_SECONDS,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+    )
     return response
 
 

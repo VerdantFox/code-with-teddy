@@ -506,6 +506,14 @@ async def toggle_blog_post_like(
     return bp
 
 
+async def increment_bp_views(db: AsyncSession, bp: db_models.BlogPost) -> db_models.BlogPost:
+    """Increment blog post views by one."""
+    bp.views = db_models.BlogPost.views + 1
+    await db.commit()
+    await db.refresh(bp)
+    return bp
+
+
 async def save_new_comment(db: AsyncSession, data: SaveCommentInput) -> SaveCommentResponse:
     """Save a blog post comment."""
     comment = generate_comment(data=data)
