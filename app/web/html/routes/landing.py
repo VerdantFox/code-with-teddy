@@ -1,5 +1,6 @@
 """landing: HTML routes for landing."""
 
+import aiocache
 from fastapi import APIRouter, Request
 from starlette.templating import _TemplateResponse
 
@@ -9,13 +10,9 @@ from app.web.html.const import templates
 # ----------- Routers -----------
 router = APIRouter(tags=["landing"])
 
-# headers = {  noqa: ERA001 (commented-out-code)
-#     "HX-Replace-Url": str(request.url_for("html:about")),
-#     "HX-Refresh": "true",
-# }  noqa: ERA001 (commented-out-code)
-
 
 @router.get("/", response_model=None)
+@aiocache.cached(key="constant")
 async def about(
     request: Request,
 ) -> _TemplateResponse:
@@ -27,6 +24,7 @@ async def about(
 
 
 @router.get("/projects", response_model=None)
+@aiocache.cached(key="constant")
 async def projects(
     request: Request,
 ) -> _TemplateResponse:
@@ -38,6 +36,7 @@ async def projects(
 
 
 @router.get("/experience", response_model=None)
+@aiocache.cached(key="constant")
 async def experience(
     request: Request,
 ) -> _TemplateResponse:

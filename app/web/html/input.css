@@ -84,7 +84,7 @@
   }
 
   .link-underlined {
-    @apply link border-b border-grayscale-200 hover:border-primary-500 dark:border-grayscale-600 dark:hover:border-primary-500 active:border-primary-400 dark:active:border-primary-600;
+    @apply link border-b border-grayscale-300 hover:border-primary-500 dark:border-grayscale-600 dark:hover:border-primary-500 active:border-primary-400 dark:active:border-primary-600;
   }
 
   .tippy-box {

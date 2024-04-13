@@ -26,6 +26,8 @@ maintainers = [
 # established by PyPA:
 #   https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [
+    # Aiocache
+    "aiocache",
     # Asyncpg: PostgreSQL database adapter
     "asyncpg",
     # Bcrypt: password hashing library
