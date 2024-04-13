@@ -1,6 +1,9 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
 {% set page_title = "Blog" %}
+<!-- prettier-ignore-start -->
+{% block meta_description %}Teddy Williams' blog. The page includes a list of blog posts that can be searched. Click on a blog post title to go to that blog post.{% endblock meta_description %}
+<!-- prettier-ignore-end -->
 {%
   set admin_extras = [
   {"href": url_for("html:create_bp_get"),

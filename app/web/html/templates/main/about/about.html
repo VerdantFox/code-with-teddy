@@ -1,6 +1,9 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 1 %}
 {% set page_title = "About" %}
+<!-- prettier-ignore-start -->
+{% block meta_description %}Teddy Williams' Portfolio application. This 'about' page describes Teddy as a programmer and as a person. It includes such insights as his software development philosophies, fun facts about him, and descriptions his favorite tools.{% endblock meta_description %}
+<!-- prettier-ignore-end -->
 
 {% block content %}
   {% include "/main/about/sections/landing.html" %}
