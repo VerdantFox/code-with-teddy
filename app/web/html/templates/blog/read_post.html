@@ -1,6 +1,9 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
 {% set page_title = blog_post.title %}
+<!-- prettier-ignore-start -->
+{% block meta_description %}{{ blog_post.read_mins }} min read | {{ strip_markdown(blog_post.markdown_description) }}{% endblock meta_description %}
+<!-- prettier-ignore-end -->
 {%
   set admin_extras = [
   {"href": url_for("html:edit_bp_get", bp_id=blog_post.id),

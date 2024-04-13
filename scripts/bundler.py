@@ -1,6 +1,7 @@
 """bundler: get static files from CDNs and bundle them into files to host locally."""
 
 import asyncio
+import re
 from pathlib import Path
 
 import aiohttp
@@ -176,6 +177,7 @@ async def get_and_update_content(dependency: Dependency) -> None:
     async with aiohttp.ClientSession() as session, session.get(url) as resp:
         resp.raise_for_status()
         content = await resp.text()
+    content = strip_source_map(content)
     if dependency.minify:
         content = await minify(content)
     assert content
@@ -195,6 +197,13 @@ async def minify(content: str) -> str:
     ):
         resp.raise_for_status()
         return await resp.text()
+
+
+def strip_source_map(content: str) -> str:
+    """Strip the source map from the content."""
+    content = re.sub(r"/\*#\s*sourceMappingURL=.*\.map\s*\*/", "", content)
+    content = re.sub(r"//#\s*sourceMappingURL=.*\.map", "", content)
+    return content.strip()
 
 
 def write_to_files(dependencies: dict[str, Dependency]) -> None:

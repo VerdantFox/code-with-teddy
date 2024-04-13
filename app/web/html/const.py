@@ -7,6 +7,8 @@ from urllib.parse import quote
 import jinja_partials
 from fastapi.templating import Jinja2Templates
 
+from app.services.blog.blog_utils import strip_markdown
+
 html = Path(__file__).parent.parent / "html"
 TEMPLATES_DIR = html / "templates"
 STATIC_DIR = html / "static"
@@ -34,3 +36,4 @@ def shorten(
 
 templates.env.globals["shorten"] = shorten
 templates.env.globals["abs"] = abs
+templates.env.globals["strip_markdown"] = strip_markdown
