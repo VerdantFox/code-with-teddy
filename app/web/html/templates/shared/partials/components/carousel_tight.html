@@ -63,8 +63,8 @@
     <!-- Prev Button -->
     <div class="absolute left-2 top-1/2 -translate-y-1/2">
       <div
-        class="flex items-center justify-center rounded-full bg-grayscale-400/50"
-        :class="{ 'hover:bg-grayscale-300/60 transition duration-300': !atBeginning }"
+        class="flex items-center justify-center rounded-full bg-grayscale-50/50"
+        :class="{ 'hover:bg-offset-200/50 transition duration-300': !atBeginning }"
       >
         <button
           x-on:click="prev"
@@ -76,7 +76,7 @@
           <span aria-hidden="true">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-12 w-12 text-grayscale-600"
+              class="h-12 w-12 text-grayscale-700"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -116,8 +116,8 @@
     <!-- Next Button -->
     <div class="absolute right-2 top-1/2 -translate-y-1/2">
       <div
-        class="flex items-center justify-center rounded-full bg-grayscale-400/50"
-        :class="{ 'hover:bg-grayscale-300/60 transition duration-300': !atEnd }"
+        class="flex items-center justify-center rounded-full bg-grayscale-50/50"
+        :class="{ 'hover:bg-offset-200/50 transition duration-300': !atEnd }"
       >
         <button
           x-on:click="next"
@@ -129,7 +129,7 @@
           <span aria-hidden="true">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-12 w-12 text-grayscale-600"
+              class="h-12 w-12 text-grayscale-700"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

@@ -1,0 +1,51 @@
+{# NEEDED: images, title, description, visit_href, github_href, tags  #}
+<article
+  class="w-full rounded-xl overflow-hidden shadow-lg border-2 dark:border-grayscale-800 dark:bg-grayscale-800 hover:-translate-y-2 hover:shadow-xl transition-transform duration-500 flex flex-col max-md:flex-row max-xs:flex-col"
+>
+  {% if images | length == 1 %}
+    {% set href, alt = images[0] %}
+    <img src="{{ href }}" alt="{{ alt }}" class="w-full" />
+  {% else %}
+    {{ render_partial('shared/partials/components/carousel_tight.html', images=images) }}
+  {% endif %}
+
+  <div class="p-4 mt-auto">
+    <h2 class="text-2xl mb-4 font-semibold">{{ title }}</h2>
+    <p class="text-lg mb-6">{{ description }}</p>
+    <div class="flex gap-8 mb-4">
+      <a
+        href="{{ visit_href }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link flex items-start justify-center gap-1"
+        ><span>Visit</span>
+        {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
+      >
+      <a
+        href="{{ github_href }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link flex items-start justify-center gap-1"
+        ><span>GitHub</span>
+        {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
+      >
+    </div>
+    <p id="technologies-label-website" class="screenreader">
+      Technologies used
+    </p>
+    <ul
+      aria-labelledby="technologies-label-website"
+      class="flex gap-2 flex-wrap"
+    >
+      {% for tag, href in tags %}
+        <li
+          class="px-3 py-0.5 bg-offset-700 text-white font-semibold rounded-full text-sm flex justify-center items-center"
+        >
+          <a href="{{ href }}" target="_blank" rel="noopener noreferrer"
+            >{{ tag }}</a
+          >
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</article>

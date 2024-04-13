@@ -1,72 +1,28 @@
-<article
-  class="w-full rounded-xl overflow-hidden shadow-lg border-2 dark:border-grayscale-800 dark:bg-grayscale-800 hover:-translate-y-2 hover:shadow-xl transition-transform duration-500 flex flex-col max-md:flex-row max-xs:flex-col"
->
-  {%
-    set images = [
-    (
-    url_for('html:static', path='/media/main/projects/games-twisted-towers1.png'),
-    'Twisted Towers game screenshot'
-    ),
-    (
-    url_for('html:static', path='/media/main/projects/games-twisted-towers2.png'),
-    'Twisted Towers game screenshot'
-    ),
-    (
-    url_for('html:static', path='/media/main/projects/games-twisted-towers3.png'),
-    'Twisted Towers game screenshot'
-    ),
-    ]
-  %}
-  {{ render_partial('shared/partials/components/carousel_tight.html', images=images) }}
-
-  <div class="p-4 mt-auto">
-    <h2 class="text-2xl mb-4 font-semibold">Twisted Towers</h2>
-    <p class="text-lg mb-6">
-      Twisted Towers is a game I made using PyGame early in my coding career.
-      It's a tower defense game where you must defend your base from waves of
-      enemies.
-    </p>
-    <div class="flex gap-8 mb-4">
-      <a
-        href="{{ url_for('html:about') }}"
-        target="_blank"
-        rel="noopener noreferrer"
-        {# class="btn-filled px-6 py-2 text-md flex items-start justify-center gap-1" #}
-        class="link flex items-start justify-center gap-1"
-        ><span>Visit</span>
-        {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
-      >
-      <a
-        href="https://github.com/VerdantFox/code-with-teddy"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="link flex items-start justify-center gap-1"
-        ><span>GitHub</span>
-        {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
-      >
-    </div>
-    <p id="technologies-label-website" class="screenreader">
-      Technologies used
-    </p>
-    <ul
-      aria-labelledby="technologies-label-website"
-      class="flex gap-2 flex-wrap"
-    >
-      {%
-        set tags = [
-        ("Python", "https://www.python.org"),
-        ("PyGame", "https://github.com/pygame/pygame"),
-        ]
-      %}
-      {% for tag, href in tags %}
-        <li
-          class="px-3 py-0.5 bg-offset-700 text-white font-semibold rounded-full text-sm flex justify-center items-center"
-        >
-          <a href="{{ href }}" target="_blank" rel="noopener noreferrer"
-            >{{ tag }}</a
-          >
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-</article>
+{# NEEDED: images, title, description, visit_href, github_href, tags  #}
+{%
+  set images = [
+  (
+  url_for('html:static', path='/media/main/projects/games-twisted-towers1.png'),
+  'Twisted Towers game screenshot'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/games-twisted-towers2.png'),
+  'Twisted Towers game screenshot'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/games-twisted-towers3.png'),
+  'Twisted Towers game screenshot'
+  ),
+  ]
+%}
+{% set title = "Twisted Towers" %}
+{% set description = "Twisted Towers is a game I made using PyGame early in my coding career. It's a tower defense game where you must defend your base from waves of enemies." %}
+{% set visit_href = "/not-exist-yet" %}
+{% set github_href = "https://github.com/VerdantFox/TwistedTowers" %}
+{%
+  set tags = [
+  ("Python", "https://www.python.org"),
+  ("PyGame", "https://github.com/pygame/pygame"),
+  ]
+%}
+{{ render_partial('main/projects/sections/project_template.html', images=images, title=title, description=description, visit_href=visit_href, github_href=github_href, tags=tags) }}
