@@ -5,7 +5,7 @@ tags: python, fastapi, flask, html, css, javascript, uvicorn, gunicorn, jinja2, 
 
 ## Introduction
 
-<picture><source srcset="http://localhost:8000/static/media/local/blog/hot-reload.png" type="image/webp"><img src="http://localhost:8000/static/media/blog/hot-reload--asdf.png" alt="Hot reload" title="Hot reload"></picture>
+<picture><source srcset="http://localhost:8000/static/media/local/blog/hot-reload.png" type="image/webp"><img src="http://localhost:8000/static/media/local/blog/hot-reload.png" alt="Hot reload" title="Hot reload"></picture>
 
 Getting instant feedback for code changes is essential when developing a web application. Typical workflows for Python web applications involve a _hot-reload_ functionality for the development **web server** that will automatically restart the server when changes to **python** files are detected. However, the server _will not_ automatically restart when changes to **HTML**, **CSS**, or **JavaScript** files are detected. When those files are updated, you _must_ manually restart the server for the changes to occur. Moreover, this typical workflow _will not_ automatically refresh your **web browser** when you update files, so you _must_ manually refresh the web page to see the changes.
 

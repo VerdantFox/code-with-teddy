@@ -12,9 +12,9 @@ from tests import Environment
 from tests.playwright_tests import ENVIRONMENT_MAP, UIDetails
 
 
-@pytest.fixture(scope="session", name="page_session")
-def fixture_page_session(browser: Browser) -> Generator[Page, Any, Any]:
-    """Create a browser context for the session.
+@pytest.fixture(scope="session", name="page_session_session")
+def fixture_page_session_session(browser: Browser) -> Generator[Page, Any, Any]:
+    """Create a session scoped page.
 
     This fixture is for a non-logged in session.
     """
@@ -23,8 +23,27 @@ def fixture_page_session(browser: Browser) -> Generator[Page, Any, Any]:
     context.close()
 
 
-@pytest.fixture(scope="session", name="login_basic_session_page")
-def fixture_session_basic_login(
+@pytest.fixture(name="page_session")
+def fixture_page_session(page_session_session: Page) -> Generator[Page, Any, Any]:
+    """Ensure the console is empty after each test for the session-scoped page."""
+    page = page_session_session
+    console_msgs = []
+    page.on("console", lambda msg: console_msgs.append(msg.text))
+    yield page
+    assert not console_msgs
+
+
+@pytest.fixture()
+def page(page: Page) -> Generator[Page, Any, Any]:
+    """Ensure the console is empty after each test for the function-scoped page."""
+    console_msgs = []
+    page.on("console", lambda msg: console_msgs.append(msg.text))
+    yield page
+    assert not console_msgs
+
+
+@pytest.fixture(scope="session", name="login_basic_session_page_session")
+def fixture_session_basic_login_session(
     ui_details: UIDetails,
     browser: Browser,
 ) -> Generator[Page, Any, Any]:
@@ -36,8 +55,20 @@ def fixture_session_basic_login(
     context.close()
 
 
-@pytest.fixture(scope="session", name="login_admin_session_page")
-def fixture_session_admin_login(
+@pytest.fixture(name="login_basic_session_page")
+def fixture_session_basic_login(
+    login_basic_session_page_session: Page,
+) -> Generator[Page, Any, Any]:
+    """Ensure the console is empty after each test for the basic login session-scoped page."""
+    page = login_basic_session_page_session
+    console_msgs = []
+    page.on("console", lambda msg: console_msgs.append(msg.text))
+    yield page
+    assert not console_msgs
+
+
+@pytest.fixture(scope="session", name="login_admin_session_page_session")
+def fixture_session_admin_login_session(
     ui_details: UIDetails,
     browser: Browser,
 ) -> Generator[Page, Any, Any]:
@@ -49,14 +80,29 @@ def fixture_session_admin_login(
     context.close()
 
 
+@pytest.fixture(name="login_admin_session_page")
+def fixture_session_admin_login(
+    login_admin_session_page_session: Page,
+) -> Generator[Page, Any, Any]:
+    """Ensure the console is empty after each test for the admin login session-scoped page."""
+    page = login_admin_session_page_session
+    console_msgs = []
+    page.on("console", lambda msg: console_msgs.append(msg.text))
+    yield page
+    assert not console_msgs
+
+
 @pytest.fixture(name="login_basic_once_page")
 def fixture_login_basic_once(
     ui_details: UIDetails,
     page: Page,
-) -> Page:
+) -> Generator[Page, Any, Any]:
     """Login to the UI as a basic user once per test."""
     login_basic(page=page, ui_details=ui_details)
-    return page
+    console_msgs = []
+    page.on("console", lambda msg: console_msgs.append(msg.text))
+    yield page
+    assert not console_msgs
 
 
 def login_basic(page: Page, ui_details: UIDetails) -> None:

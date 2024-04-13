@@ -62,7 +62,10 @@ def test_page_essentials(
     page_session: Page, ui_details: UIDetails, test_case: BasicPageTestCase
 ) -> None:
     """Test some expectations about pre-determined pages."""
-    page = helpers.goto(page_session, f"{ui_details.url}{test_case.endpoint}")
+    page = page_session
+    page.goto(f"{ui_details.url}{test_case.endpoint}")
+    # Repeat to catch any console errors from double page loads
+    page.goto(f"{ui_details.url}{test_case.endpoint}")
     full_title = f"{test_case.title} | Teddy Williams"
     expect(page).to_have_title(full_title)
     expect(page.locator("h1")).to_have_text(test_case.h1)

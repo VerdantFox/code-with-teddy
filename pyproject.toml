@@ -26,7 +26,7 @@ maintainers = [
 # established by PyPA:
 #   https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [
-    # Aiocache
+    # Aiocache: async cache library (temporarily stopped using because it broke html script nonce)
     "aiocache",
     # Asyncpg: PostgreSQL database adapter
     "asyncpg",
