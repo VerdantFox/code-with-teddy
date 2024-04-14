@@ -19,7 +19,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Connect 4 (remake first)
   - [ ] Moth hunt
   - [ ] File renamer
-- [ ] Show/hide password button for login
+- [x] Show/hide password button for login
 - [ ] Set up Oauth2 authentication (google and github)
 - [ ] Set up secrets with keyring
   - [ ] Move any existing hardcoded secrets to keyring (fresh secrets obviously)

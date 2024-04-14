@@ -34,6 +34,7 @@ def shorten(
     return text
 
 
-templates.env.globals["shorten"] = shorten
 templates.env.globals["abs"] = abs
+templates.env.globals["hasattr"] = hasattr
+templates.env.globals["shorten"] = shorten
 templates.env.globals["strip_markdown"] = strip_markdown
