@@ -13,7 +13,7 @@ from starlette.responses import Response
 from app.web.html import flash_messages
 from app.web.html.const import STATIC_DIR, templates
 from app.web.html.error_handlers import register_error_handlers
-from app.web.html.routes import auth, blog, errors, portfolio, users
+from app.web.html.routes import auth, blog, errors, portfolio, sitemap, users
 
 # TODO: Change this to a secret key and store it in secrets.
 SESSION_SECRET = "SUPER-SECRET-KEY"  # noqa: S105 (hardcoded-password-string)
@@ -53,7 +53,7 @@ class CSPMiddleware(BaseHTTPMiddleware):
 app = FastAPI()
 app.add_middleware(CSPMiddleware)
 
-routes = (auth, blog, errors, portfolio, users)
+routes = (auth, blog, errors, portfolio, users, sitemap)
 for route in routes:
     app.include_router(route.router)
 
