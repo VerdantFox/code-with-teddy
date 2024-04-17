@@ -11,10 +11,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Theodore Williams" />
     <meta
       name="description"
       content="{% block meta_description %}{% endblock meta_description %}"
     />
+    {% block og_metadata %}{% endblock og_metadata %}
     {% include 'shared/partials/head.html' %}
     {% block custom_css %}
     {% endblock custom_css %}

@@ -1,6 +1,16 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
 {% set page_title = "Blog" %}
+{% block og_metadata %}
+  <meta property="og:title" content="Teddy's Blog" />
+  <meta property="og:description" content="Teddy Williams' blog." />
+  <meta property="og:type" content="website" />
+  <meta
+    property="og:image"
+    content="{{ url_for('html:static', path='/media/shared/avatar.png') }}"
+  />
+  <meta property="og:url" content="{{ url_for('html:list_blog_posts') }}" />
+{% endblock og_metadata %}
 <!-- prettier-ignore-start -->
 {% block meta_description %}Teddy Williams' blog. The page includes a list of blog posts that can be searched. Click on a blog post title to go to that blog post.{% endblock meta_description %}
 <!-- prettier-ignore-end -->

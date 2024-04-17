@@ -27,10 +27,10 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Emails for blog post comments
   - [ ] Emails for recover password
   - [ ] Supply domain to whoever so emails don't go to spam
-- [ ] Update HTML head metadata
-  - [ ] For blog images (and all other pages image)
-  - [ ] For descriptions on all pages
-  - [ ] Search what other metadata should be provided
+- [x] Update HTML head metadata
+  - [x] For blog images (and all other pages image)
+  - [x] For descriptions on all pages
+  - [x] Search what other metadata should be provided
 - [ ] Index site (add sitemap.xml, robots.txt, etc.)
 - [ ] Look up extra security desired
   - [x] CSP

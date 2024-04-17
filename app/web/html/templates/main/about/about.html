@@ -1,8 +1,21 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 1 %}
 {% set page_title = "About" %}
+{% block og_metadata %}
+  <meta property="og:title" content="Teddy's Portfolio" />
+  <meta
+    property="og:description"
+    content="Teddy Williams' portfolio application."
+  />
+  <meta property="og:type" content="website" />
+  <meta
+    property="og:image"
+    content="{{ url_for('html:static', path='/media/shared/avatar.png') }}"
+  />
+  <meta property="og:url" content="{{ url_for('html:about') }}" />
+{% endblock og_metadata %}
 <!-- prettier-ignore-start -->
-{% block meta_description %}Teddy Williams' Portfolio application. This 'about' page describes Teddy as a programmer and as a person. It includes such insights as his software development philosophies, fun facts about him, and descriptions his favorite tools.{% endblock meta_description %}
+{% block meta_description %}Teddy Williams' portfolio application. This 'about' page describes Teddy as a programmer and as a person. It includes such insights as his software development philosophies, fun facts about him, and descriptions his favorite tools.{% endblock meta_description %}
 <!-- prettier-ignore-end -->
 
 {% block content %}

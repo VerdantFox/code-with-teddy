@@ -1,6 +1,37 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
 {% set page_title = blog_post.title %}
+{% if blog_post.thumbnail_location.startswith('/') %}
+  {% set thumbnail_location = url_for('html:static', path=blog_post.thumbnail_location) %}
+{% else %}
+  {% set thumbnail_location = blog_post.thumbnail_location %}
+{% endif %}
+{% block og_metadata %}
+  <meta property="og:title" content="{{ blog_post.title }}" />
+  <meta
+    property="og:description"
+    content="{{ blog_post.read_mins }} min read | {{ strip_markdown(blog_post.markdown_description) }}"
+  />
+  <meta property="og:image" content="{{ thumbnail_location }}" />
+  <meta
+    property="og:url"
+    content="{{ url_for('html:read_blog_post', slug=blog_post.slug) }}"
+  />
+  <meta property="og:type" content="article" />
+  <meta
+    property="article:published_time"
+    content="{{ blog_post.created_timestamp.isoformat() }}"
+  />
+  <meta
+    property="article:modified_time"
+    content="{{ blog_post.updated_timestamp.isoformat() }}"
+  />
+  <meta property="article:author" content="Teddy Williams" />
+  <meta property="article:section" content="Technology" />
+  {% for tag in blog_post.tags %}
+    <meta property="article:tag" content="{{ tag.tag }}" />
+  {% endfor %}
+{% endblock og_metadata %}
 <!-- prettier-ignore-start -->
 {% block meta_description %}{{ blog_post.read_mins }} min read | {{ strip_markdown(blog_post.markdown_description) }}{% endblock meta_description %}
 <!-- prettier-ignore-end -->
