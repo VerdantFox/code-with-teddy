@@ -1,5 +1,6 @@
 """sitemap: Sitemap route for the web application."""
 
+import aiocache
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from starlette.datastructures import URL
@@ -13,6 +14,7 @@ router = APIRouter(tags=["sitemap"])
 
 
 @router.get("/sitemap.xml", response_model=None)
+@aiocache.cached(key="constant")
 async def sitemap(request: Request, db: DBSession) -> HTMLResponse:
     """Return the sitemap page."""
     return HTMLResponse(
