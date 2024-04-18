@@ -1,0 +1,24 @@
+{# NEEDED: images, title, description, visit_href, github_href, tags  #}
+{%
+  set images = [
+  (
+  url_for('html:static', path='/media/main/projects/games-moth-hunt-1.png'),
+  'Moth Hunt game screenshot'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/games-moth-hunt-2.png'),
+  'Moth Hunt game screenshot'
+  ),
+  ]
+%}
+{% set title = "Moth hunt" %}
+{% set description = "Moth Hunt was the first game and one of the first programs I ever wrote. It's written in Scratch, a learner programming language created by MIT." %}
+{# Will create it locally in the future #}
+{% set visit_href = "/not/exist/yet" %}
+{% set github_href = "https://scratch.mit.edu/projects/166765459/editor/" %}
+{%
+  set tags = [
+  ("Scratch", "https://scratch.mit.edu")
+  ]
+%}
+{{ render_partial('main/projects/sections/project_template.html', images=images, title=title, description=description, visit_href=visit_href, github_href=github_href, tags=tags) }}

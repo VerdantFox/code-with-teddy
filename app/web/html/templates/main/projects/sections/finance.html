@@ -1,0 +1,44 @@
+{# NEEDED: images, title, description, visit_href, github_href, tags  #}
+{%
+  set images = [
+  (
+  url_for('html:static', path='/media/main/projects/finance-1.png'),
+  'Budget app from the finance project'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/finance-2.png'),
+  'Budget app charts from the finance project'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/finance-3.png'),
+  'Loan app from the finance project'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/finance-4.png'),
+  'Loan app charts from the finance project'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/finance-5.png'),
+  'Compound interest app from the finance project'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/finance-6.png'),
+  'Compound interest app charts from the finance project'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/finance-7.png'),
+  'Net worth app from the finance project'
+  ),
+  ]
+%}
+{% set title = "Finance Application" %}
+{% set description = "This is a fairly comprehensive finance application I wrote. It has budget, loan, compound interest, and net worth calculators." %}
+{% set visit_href = "https://verdantfox.com/finance/" %}
+{% set github_href = "https://github.com/VerdantFox/VerdantFlask/tree/master/app/routes/finance" %}
+{%
+  set tags = [
+  ("Python", "https://www.python.org"),
+  ("JavaScript (Vanilla)", "https://developer.mozilla.org/en-US/docs/Web/JavaScript"),
+  ]
+%}
+{{ render_partial('main/projects/sections/project_template.html', images=images, title=title, description=description, visit_href=visit_href, github_href=github_href, tags=tags) }}

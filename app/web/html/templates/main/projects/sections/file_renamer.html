@@ -1,0 +1,24 @@
+{# NEEDED: images, title, description, visit_href, github_href, tags  #}
+{%
+  set images = [
+  (
+  url_for('html:static', path='/media/main/projects/file-renamer-1.png'),
+  'File renamer app screenshot'
+  ),
+  (
+  url_for('html:static', path='/media/main/projects/file-renamer-2.png'),
+  'File renamer app screenshot'
+  ),
+  ]
+%}
+{% set title = "File Renamer" %}
+{% set description = "The File Renamer GUI is built with the Kivy GUI framework. It's a pretty simple app that takes in a few inputs (a prefix, a list of file extensions, and a folder) which it uses to rename all affected files (prefix_1.ext, prefix_2.ext, ...)" %}
+{% set visit_href = "/not-exist-yet" %}
+{% set github_href = "https://github.com/VerdantFox/file_renamer" %}
+{%
+  set tags = [
+  ("Python", "https://www.python.org"),
+  ("Kivy", "https://kivy.org"),
+  ]
+%}
+{{ render_partial('main/projects/sections/project_template.html', images=images, title=title, description=description, visit_href=visit_href, github_href=github_href, tags=tags) }}
