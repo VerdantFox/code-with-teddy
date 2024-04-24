@@ -59,7 +59,11 @@
         </p>
 
         <div class="flex items-center gap-6 mb-16 max-sm:flex-col">
-          <a href="" class="btn btn-filled max-sm:w-full">
+          <a
+            href="{{ url_for('html:static', path='/media/executables/TwistedTowers.zip') }}"
+            class="btn btn-filled max-sm:w-full"
+            download="TwistedTowers.zip"
+          >
             {{ render_partial('shared/partials/icons/download.html', class="h-6 w-6 ") }}
             Download Twisted Towers
           </a>

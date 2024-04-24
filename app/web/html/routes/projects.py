@@ -30,3 +30,14 @@ async def moth_hunt(
         "projects/moth_hunt.html",
         {constants.REQUEST: request},
     )
+
+
+@router.get("/file-renamer", response_model=None)
+async def file_renamer(
+    request: Request,
+) -> _TemplateResponse:
+    """Return the File Renamer project page."""
+    return templates.TemplateResponse(
+        "projects/file_renamer.html",
+        {constants.REQUEST: request},
+    )

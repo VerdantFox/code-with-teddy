@@ -1,0 +1,90 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 2 %}
+{% set page_title = "File Renamer" %}
+<!-- prettier-ignore-start -->
+{% block meta_description %}The File Renamer GUI is built with the Kivy GUI framework. It's a pretty simple app that takes in a few inputs (a prefix, a list of file extensions, and a folder) which it uses to rename all affected files (prefix_1.ext, prefix_2.ext, ...){% endblock meta_description %}
+<!-- prettier-ignore-end -->
+
+{% block content %}
+  <div x-data="{ readmeOpen: false }">
+    <section>
+      <div class="section-container mt-56 mb-28">
+        <h1 class="text-6xl font-bold mb-16 max-w-3xl text-center">
+          File Renamer
+        </h1>
+
+        <div class="max-w-3xl flex items-center justify-center mb-12">
+          <img
+            src="{{ url_for('html:static', path='/media/main/projects/file-renamer.gif') }}"
+            alt="File renamer app screenshot"
+          />
+        </div>
+
+        <p class="text-2xl max-w-3xl mb-12">
+          I built the File Renamer GUI with the
+          <a
+            href="https://kivy.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underlined"
+            >Kivy GUI framework</a
+          >. It's a simple app that takes in a few inputs (a prefix, a list of
+          file extensions, and a folder) and uses them to rename all affected
+          files (prefix_1.ext, prefix_2.ext, etc.)
+        </p>
+
+        <p class="text-2xl max-w-3xl">
+          The app is conveniently packaged to an executable with
+          <a
+            href="https://www.pyinstaller.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underlined"
+            >PyInstaller</a
+          >, enabling it to be run with a simple double-click. This means the
+          end user doesn't need to install Python, create a virtual environment,
+          update dependencies, or run from the command line. The app's code can
+          be found
+          <a
+            href="https://github.com/VerdantFox/file_renamer"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underlined"
+          >
+            at this GitHub repository</a
+          >. In the future, I plan to share blog posts on how to write Kivy
+          applications and how to package applications with PyInstaller. Stay
+          tuned for updates to this page with that info.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-container mb-36">
+        <h2 class="text-5xl font-bold mb-16 max-w-3xl">Downloads</h2>
+        <div class="flex flex-col gap-4 items-start">
+          <a
+            href="{{ url_for('html:static', path='/media/executables/file_renamer.exe') }}"
+            class="btn btn-filled w-[28rem] max-sm:w-full"
+            download="file_renamer.exe"
+          >
+            {{ render_partial('shared/partials/icons/download.html', class="h-6 w-6 ") }}
+            Download for Windows
+          </a>
+          <button class="btn btn-filled w-[28rem] max-sm:w-full" disabled>
+            {{ render_partial('shared/partials/icons/download.html', class="h-6 w-6 ") }}
+            Download for Mac (currently unavailable)
+          </button>
+          <a
+            href="{{ url_for('html:static', path='/media/executables/file_renamer_linux') }}"
+            class="btn btn-filled w-[28rem] max-sm:w-full"
+            download="file_renamer_linux"
+          >
+            {{ render_partial('shared/partials/icons/download.html', class="h-6 w-6 ") }}
+            Download for Linux
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+{% endblock content %}

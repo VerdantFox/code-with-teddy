@@ -54,6 +54,11 @@ GET_TEST_CASES = [
         endpoint="/moth-hunt",
         expected_text="Moth Hunt",
     ),
+    GetTestCase(
+        id="file_renamer",
+        endpoint="/file-renamer",
+        expected_text="File Renamer",
+    ),
 ]
 
 
