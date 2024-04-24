@@ -15,7 +15,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
 - [x] Blog comment edit history
 - [ ] Add projects to projects page (plus individual pages as needed)
   - [ ] Finance (complete first)
-  - [ ] Twisted towers
+  - [x] Twisted towers
   - [ ] Connect 4 (remake first)
   - [ ] Moth hunt
   - [ ] File renamer

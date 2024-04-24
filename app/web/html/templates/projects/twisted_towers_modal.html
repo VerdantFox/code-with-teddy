@@ -1,0 +1,220 @@
+<div
+  x-show="readmeOpen"
+  x-cloak
+  x-transition:enter.opacity.duration.200ms
+  x-trap.inert="readmeOpen"
+  @keydown.escape.window="readmeOpen = false"
+  class="fixed top-0 bottom-0 left-0 right-0 bg-white/50 dark:bg-gray-800/50 backdrop-blur"
+>
+  <article
+    @click.outside="readmeOpen = false"
+    class="fixed inset-0 top-6 bottom-6 p-6 bg-grayscale-50 dark:bg-grayscale-800 rounded-xl shadow-xl pointer-events-auto  transition mx-auto max-w-3xl blog-prose overflow-y-scroll"
+    id="readme-modal"
+  >
+    <h2>TwistedTowers</h2>
+    <p>A tower defense game built in python's Pygame library.</p>
+    <p>To start game launch main.exe (main).</p>
+    <p>
+      To start the game from source, launch main.py. Python 3, and Pygame 1.9.3
+      required.
+    </p>
+    <p>
+      In game, enemies will travel along the dirt path toward the castle. The
+      player can defend against enemies by building towers. Towers are
+      constructed by left-clicking circles on the ground, and then clicking the
+      adjacent circles that appear next to the first circle clicked. The game is
+      lost if enough enemies reach the castle. The game is won if the player
+      survives long enough for the hero mage to come to the rescue. Information
+      on enemies and towers can be found in tabs in the main menu.
+    </p>
+    <p>Have fun :-)</p>
+    <p>- VerdantFox</p>
+    <p>Code by Theodore Williams</p>
+    <h4>Visuals:</h4>
+    <p>Background by Theodore Williams</p>
+    <p>
+      All enemy images obtained from League of Legends, Riot Games, and edited
+      by Theodore Williams
+    </p>
+    <p>
+      Towers from pieced together from open source paint3D objects and edited by
+      Theodore Williams
+    </p>
+    <h4>Music:</h4>
+    <p>Anamalie by Kevin MacLeod is licensed under a Creative Commons</p>
+    <p>
+      Attribution license (<a
+        href="https://creativecommons.org/licenses/by/4.0/)"
+        target="_blank"
+        rel="noopener noreferrer"
+        >https://creativecommons.org/licenses/by/4.0/</a
+      >)
+    </p>
+    <p>
+      Source:
+      <a
+        href="http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500007"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500007</a
+      >
+    </p>
+    <p>
+      Artist:
+      <a
+        href="http://incompetech.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://incompetech.com/</a
+      >
+    </p>
+    <p>
+      Fall of the Solar King by Twin Musicom is licensed under a Creative
+      Commons
+    </p>
+    <p>
+      Attribution license (<a
+        href="https://creativecommons.org/licenses/by/4.0/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >https://creativecommons.org/licenses/by/4.0/</a
+      >)
+    </p>
+    <p>
+      Artist:
+      <a
+        href="http://www.twinmusicom.org/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://www.twinmusicom.org/</a
+      >
+    </p>
+    <p>
+      Amazing Plan - Silent Film Dark by Kevin MacLeod is licensed under a
+      Creative
+    </p>
+    <p>
+      Commons Attribution license (<a
+        href="https://creativecommons.org/licenses/by/4.0/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >https://creativecommons.org/licenses/by/4.0/</a
+      >)
+    </p>
+    <p>
+      Source:
+      <a
+        href="http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100737"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100737</a
+      >
+    </p>
+    <p>
+      Artist:
+      <a
+        href="http://incompetech.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://incompetech.com/</a
+      >
+    </p>
+    <p>
+      Hero Down by Kevin MacLeod is licensed under a Creative Commons
+      Attribution
+    </p>
+    <p>
+      license (<a
+        href="https://creativecommons.org/licenses/by/4.0/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >https://creativecommons.org/licenses/by/4.0/</a
+      >)
+    </p>
+    <p>
+      Source:
+      <a
+        href="http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100880"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100880</a
+      >
+    </p>
+    <p>
+      Artist:
+      <a href="http://incompetech.com/" target="_blank"
+        >http://incompetech.com/</a
+      >
+    </p>
+    <p>
+      Evil March by Kevin MacLeod is licensed under a Creative Commons
+      Attribution
+    </p>
+    <p>
+      license (<a
+        href="https://creativecommons.org/licenses/by/4.0/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >https://creativecommons.org/licenses/by/4.0/</a
+      >)
+    </p>
+    <p>
+      Source:
+      <a
+        href="http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100727"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100727</a
+      >
+    </p>
+    <p>
+      Artist:
+      <a
+        href="http://incompetech.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://incompetech.com/</a
+      >
+    </p>
+    <p>
+      Video Game Soldiers by Twin Musicom is licensed under a Creative Commons
+    </p>
+    <p>
+      Attribution license (<a
+        href="https://creativecommons.org/licenses/by/4.0/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >https://creativecommons.org/licenses/by/4.0/</a
+      >)
+    </p>
+    <p>
+      Source:
+      <a
+        href="http://www.twinmusicom.org/song/295/video-game-soldiers"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://www.twinmusicom.org/song/295/video-game-soldiers</a
+      >
+    </p>
+    <p>
+      Artist:
+      <a
+        href="http://www.twinmusicom.org"
+        target="_blank"
+        rel="noopener noreferrer"
+        >http://www.twinmusicom.org</a
+      >
+    </p>
+    <p>Warrior Strife by Jingle Punks</p>
+    <p>Action Hero by Jingle Punks</p>
+    <p>Bensound-epic - Bensound.com</p>
+    <p>Bensound-instinct - Bensound.com</p>
+
+    <button
+      class="absolute top-6 right-6 p-2 rounded-full border border-grayscale-700 dark:border-grayscale-100 hover:bg-offset-300 dark:hover:bg-grayscale-600 focus:bg-offset-300 dark:focus:bg-grayscale-600 focus:ring-4 ring-primary-600 transition duration-300"
+      @click="readmeOpen = false"
+    >
+      {{ render_partial('shared/partials/icons/x.html', class="h-6 w-6 ") }}
+    </button>
+  </article>
+</div>

@@ -1,0 +1,121 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 2 %}
+{% set page_title = "Twisted Towers" %}
+<!-- prettier-ignore-start -->
+{% block meta_description %}Twisted Towers is a desktop game created by Teddy Williams. It's a fun little tower defense game written in Python with Pygame.{% endblock meta_description %}
+<!-- prettier-ignore-end -->
+
+{% block content %}
+  <div x-data="{ readmeOpen: false }">
+    <section>
+      <div class="section-container mt-56 mb-36">
+        <h1 class="text-6xl font-bold mb-16">Twisted Towers</h1>
+        <p class="text-2xl max-w-3xl mb-12">
+          I wrote this game as my final project for Harvard's course,
+          <a
+            href="https://www.edx.org/course/cs50s-introduction-computer-science-harvardx-cs50x"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underlined"
+            >CS50</a
+          >, and I'd call it my first program written completely independently.
+          It helped me get a sense of how to transition to object-oriented
+          programming, as opposed to the mostly procedural programming I'd
+          learned up to that point. Twisted Towers is a
+          <a
+            href="https://en.wikipedia.org/wiki/Tower_defense"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underlined"
+            >tower defense</a
+          >
+          style game that I wrote with Python's Pygame library.
+        </p>
+        <div class="max-w-3xl">
+          <div class="mx-auto flex items-center justify-center">
+            <iframe
+              class="w-full h-96"
+              title="Twisted Towers YouTube description video"
+              src="https://www.youtube.com/embed/BZF5d-dr02E"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+            >
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-container mb-36">
+        <h2 class="text-5xl font-bold mb-16">Get the game</h2>
+        <p class="text-2xl max-w-3xl mb-16">
+          Twisted towers is a
+          <strong>Windows desktop application run as a .exe file</strong>. To
+          play, download the game as a zip file using the link provided below.
+          Then, extract the files and open the "Game Files" folder. Within this
+          folder is a file named "main.exe" (not main.py). Click this program to
+          run the game.
+        </p>
+
+        <div class="flex items-center gap-6 mb-16 max-sm:flex-col">
+          <a href="" class="btn btn-filled max-sm:w-full">
+            {{ render_partial('shared/partials/icons/download.html', class="h-6 w-6 ") }}
+            Download Twisted Towers
+          </a>
+          <button
+            @click="
+            readmeOpen = true;
+            setTimeout(function() {
+              document.getElementById('readme-modal').scrollTop = 0;
+            }, 50);
+            "
+            class="btn btn-outline max-sm:w-full"
+          >
+            {{ render_partial('shared/partials/icons/book.html', class="h-6 w-6 ") }}
+            Readme
+          </button>
+        </div>
+
+        <h3 class="text-4xl font-bold mb-8">Note</h3>
+        <p class="text-2xl max-w-3xl mb-12">
+          Unfortunately, I wrote this game with fixed dimensions without
+          considering smaller monitors (doh!). The game requires a Windows
+          computer with a monitor height of 760 pixels or greater to display
+          properly (otherwise the bottom of the screen is cut off).
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-container mb-36">
+        <h2 class="text-5xl font-bold mb-16">How to play</h2>
+        <p class="text-2xl max-w-3xl mb-12">
+          The goal of the game is to build and upgrade towers to shoot at the
+          oncoming horde of enemies traveling along the path toward the castle.
+          If an enemy is able to reach the castle, they will damage the castle.
+          Take enough damage and the castle will fall and everyone in it will
+          perish... so build those towers! You can build towers by clicking the
+          dirt patches on the ground, then clicking the circle that appears next
+          to it. You can then upgrade towers (up to 2x) into elemental towers by
+          clicking the circle located the tower's base and clicking the
+          elemental circle of your choice. Once constructed, towers will
+          automatically fire at passing enemies.
+        </p>
+        <p class="text-2xl max-w-3xl mb-12">
+          Earn money by killing monsters and use that money to build and upgrade
+          more towers to continue fighting off the horde. Survive long enough
+          for the hero mage to rally to your cause to win the game. You can
+          learn more about enemy types and tower types using in game menus from
+          the home screen. Furthermore, if you find things a bit too difficult
+          or too easy, you can adjust difficulty settings from a menu off the
+          home screen as well. For a quick overview with visuals, you can check
+          out my video below where I explain the game for the final project of
+          my class.
+        </p>
+      </div>
+    </section>
+
+    {{ render_partial('projects/twisted_towers_modal.html') }}
+  </div>
+{% endblock content %}

@@ -44,6 +44,11 @@ GET_TEST_CASES = [
         expected_text="404 Error",
         expected_status=status.HTTP_404_NOT_FOUND,
     ),
+    GetTestCase(
+        id="twisted_towers",
+        endpoint="/twisted-towers",
+        expected_text="Twisted Towers",
+    ),
 ]
 
 
