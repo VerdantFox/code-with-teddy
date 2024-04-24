@@ -43,7 +43,7 @@ class CSPMiddleware(BaseHTTPMiddleware):
         # HTMX struggles with non-unsafe-inline CSP script
         csp_policy = [
             f"default-src {SELF}",
-            "frame-src youtube.com www.youtube.com",
+            "frame-src youtube.com www.youtube.com scratch.mit.edu",
             f"style-src {SELF}  {FONTS_BUNNY} {UNSAFE_INLINE}",
             f"font-src {SELF} {FONTS_BUNNY}",
             f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL}",

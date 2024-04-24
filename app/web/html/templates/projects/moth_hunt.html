@@ -1,0 +1,52 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 2 %}
+{% set page_title = "Moth Hunt" %}
+<!-- prettier-ignore-start -->
+{% block meta_description %}Moth Hunt was the first game and one of the first programs I ever wrote. It's written in Scratch, a learner programming language created by MIT.{% endblock meta_description %}
+<!-- prettier-ignore-end -->
+
+{% block content %}
+  <div x-data="{ readmeOpen: false }">
+    <section>
+      <div class="section-container mt-56 mb-36">
+        <h1 class="text-6xl font-bold mb-16 max-w-3xl text-center">
+          Moth Hunt
+        </h1>
+        <div class="max-w-3xl flex items-center justify-center mb-12">
+          <iframe
+            width="485"
+            height="402"
+            title="Moth Hunt Game"
+            src="https://scratch.mit.edu/projects/embed/166765459/?autostart=false"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <p class="max-w-3xl mb-12 sm:hidden">
+          Sorry this game doesn't work on mobile browsers
+        </p>
+        <p class="text-2xl max-w-3xl mb-12">
+          <strong>Batty's Moth Hunt</strong> was the first game and one of the
+          first programs I ever wrote (back in 2017). It's written in
+          <a
+            href="https://scratch.mit.edu/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underlined"
+            >Scratch</a
+          >, a block-style, learner programming language created by MIT. If you
+          have someone interested in programming, I highly recommend pointing
+          them to this language as a first try. It was a fun experience that
+          excited me to learn to program with "real" programming languages.
+        </p>
+        <p class="text-2xl max-w-3xl mb-12">
+          In this desktop browser-based game, you play as a bat. You aim to hunt
+          down moths for dinner using echolocation to find your prey. While
+          hunting, you must avoid the owl hunting <em>you</em>. Aim your mouse
+          where you'd like Batty to travel and press
+          <strong>space bar</strong> to use his echolocation powers to reveal
+          moths and the owl in the night sky.
+        </p>
+      </div>
+    </section>
+  </div>
+{% endblock content %}

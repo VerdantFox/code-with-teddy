@@ -14,8 +14,19 @@ router = APIRouter(tags=["projects"])
 async def twisted_towers(
     request: Request,
 ) -> _TemplateResponse:
-    """Return the portfolio landing (about) page."""
+    """Return the Twisted Towers project page."""
     return templates.TemplateResponse(
         "projects/twisted_towers.html",
+        {constants.REQUEST: request},
+    )
+
+
+@router.get("/moth-hunt", response_model=None)
+async def moth_hunt(
+    request: Request,
+) -> _TemplateResponse:
+    """Return the Moth Hunt project page."""
+    return templates.TemplateResponse(
+        "projects/moth_hunt.html",
         {constants.REQUEST: request},
     )

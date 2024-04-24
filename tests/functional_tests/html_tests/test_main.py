@@ -49,6 +49,11 @@ GET_TEST_CASES = [
         endpoint="/twisted-towers",
         expected_text="Twisted Towers",
     ),
+    GetTestCase(
+        id="moth_hunt",
+        endpoint="/moth-hunt",
+        expected_text="Moth Hunt",
+    ),
 ]
 
 
