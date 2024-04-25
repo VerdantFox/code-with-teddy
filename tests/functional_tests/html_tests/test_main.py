@@ -7,6 +7,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from tests import TestCase
+from tests.functional_tests import BASE_URL
 
 
 @pytest.fixture(autouse=True)
@@ -79,5 +80,5 @@ def test_get_sitemap_xml_succeeds(test_client: TestClient):
     # Should parse as XML
     ElementTree.fromstring(response.text)  # noqa: S314 (xml-vulnerability)
     assert "urlset" in response.text
-    assert "<loc>https://www.code-with-teddy.com</loc>" in response.text
-    assert "<loc>https://www.code-with-teddy.com/blog/module-blog-post</loc>" in response.text
+    assert f"<loc>{BASE_URL}</loc>" in response.text
+    assert f"<loc>{BASE_URL}/blog/module-blog-post</loc>" in response.text

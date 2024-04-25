@@ -19,7 +19,8 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Connect 4 (remake first)
   - [x] Moth hunt
   - [x] File renamer
-  - [ ] Portfolio website
+  - [ ] Portfolio website (link to blog post about technologies)
+  - [ ] Analytics page (remake first)
 - [x] Show/hide password button for login
 - [ ] Set up Oauth2 authentication (google and github)
 - [ ] Set up secrets with keyring
@@ -39,7 +40,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
 - [ ] Deploy
   - [ ] Set up container orchestration
   - [ ] Set up deployment script
-  - [ ] Purchase domain
+  - [x] Purchase domain
   - [ ] Start DigitalOcean site
   - [ ] Update apt, get docker, git, etc.
   - [ ] Hook domain into real site
