@@ -11,7 +11,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.datastore import db_models
-from tests import PYDANTIC_VERSION, TestCase
+from tests import TestCase
 from tests.data import models as test_models
 from tests.functional_tests.api_tests.conftest import post_for_token
 
@@ -184,28 +184,24 @@ CREATE_USER_TEST_CASES = [
                     "loc": ["body", "username"],
                     "msg": "Field required",
                     "input": {},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/missing",
                 },
                 {
                     "type": "missing",
                     "loc": ["body", "email"],
                     "msg": "Field required",
                     "input": {},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/missing",
                 },
                 {
                     "type": "missing",
                     "loc": ["body", "full_name"],
                     "msg": "Field required",
                     "input": {},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/missing",
                 },
                 {
                     "type": "missing",
                     "loc": ["body", "password"],
                     "msg": "Field required",
                     "input": {},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/missing",
                 },
             ]
         },
@@ -222,7 +218,6 @@ CREATE_USER_TEST_CASES = [
                     "msg": "String should have at least 3 characters",
                     "input": "a",
                     "ctx": {"min_length": 3},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/string_too_short",
                 },
                 {
                     "type": "value_error",
@@ -239,7 +234,6 @@ CREATE_USER_TEST_CASES = [
                     "msg": "String should have at least 3 characters",
                     "input": "a",
                     "ctx": {"min_length": 3},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/string_too_short",
                 },
                 {
                     "type": "string_too_short",
@@ -247,7 +241,6 @@ CREATE_USER_TEST_CASES = [
                     "msg": "String should have at least 8 characters",
                     "input": "a",
                     "ctx": {"min_length": 8},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/string_too_short",
                 },
             ]
         },
@@ -353,7 +346,6 @@ PATCH_USER_TEST_CASES = [
                     "msg": "String should have at least 3 characters",
                     "input": "a",
                     "ctx": {"min_length": 3},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/string_too_short",
                 },
                 {
                     "type": "value_error",
@@ -370,7 +362,6 @@ PATCH_USER_TEST_CASES = [
                     "msg": "String should have at least 3 characters",
                     "input": "a",
                     "ctx": {"min_length": 3},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/string_too_short",
                 },
                 {
                     "type": "string_too_short",
@@ -378,7 +369,6 @@ PATCH_USER_TEST_CASES = [
                     "msg": "String should have at least 8 characters",
                     "input": "a",
                     "ctx": {"min_length": 8},
-                    "url": f"https://errors.pydantic.dev/{PYDANTIC_VERSION}/v/string_too_short",
                 },
             ]
         },
