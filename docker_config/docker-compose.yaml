@@ -1,0 +1,125 @@
+services:
+  app:
+    container_name: web_app
+    restart: unless-stopped
+    image: codewithteddy_web_app
+    build:
+      context: .
+      dockerfile: ./docker_config/Dockerfile.app
+    expose:
+      - 8000
+    env_file:
+      # environment variables from later env files override those from earlier ones
+      - .env.dev
+      - .env
+    environment:
+      - PROXY=1
+    secrets:
+      - db_connection_string
+    volumes:
+      - ./app/web/html/static:/code/app/web/html/static
+    depends_on:
+      - db
+    profiles:
+      - dev
+      - prod
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://web_app:8000"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  db: # Postgres
+    image: postgres:16.2
+    container_name: db
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      # environment variables from later env files override those from earlier ones
+      - .env.dev
+      - .env
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+    profiles:
+      - dev
+      - prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      start_period: 10s
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  nginx-dev:
+    build:
+      context: .
+      dockerfile: ./docker_config/Dockerfile.nginx
+      args:
+        - NGINX_FILE=./nginx/nginx-dev.conf
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./app/web/html/static:/static
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+    profiles:
+      - dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      start_period: 10s
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker_config/Dockerfile.nginx
+      args:
+        - NGINX_FILE=./nginx/nginx.conf
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./app/web/html/static:/code/app/web/html/static
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+    profiles:
+      - prod
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      start_period: 10s
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    profiles:
+      - prod
+
+volumes:
+  postgres_data:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password
+  db_connection_string:
+    file: ./secrets/db_connection_string

@@ -20,6 +20,7 @@ class Environment(str, enum.Enum):
     """Enum for environment types."""
 
     LOCAL = "LOCAL"
+    DOCKER = "DOCKER"
     PROD = "PROD"
 
     def __str__(self) -> str:

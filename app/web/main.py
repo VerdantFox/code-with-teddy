@@ -6,6 +6,7 @@ This is the main entrypoint for the web app. It mounts the API and HTML apps.
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
+import sqlalchemy
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -24,8 +25,15 @@ SESSION_SECRET = "SUPER-SECRET-KEY"  # noqa: S105 (hardcoded-password-string)
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 (unused-argument)
     """Code to run before taking any requests and just before shutdown."""
     engine = get_engine()
-    async with engine.begin() as conn:
-        await conn.run_sync(db_models.Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(db_models.Base.metadata.create_all)
+    except sqlalchemy.exc.OperationalError as e:  # pragma: no cover
+        err_msg = (
+            "Could not connect to the database. Check the connection string."
+            " Is the server running on that host and accepting TCP/IP connections?"
+        )
+        raise RuntimeError(err_msg) from e
     yield
     # Code to run before shutdown.
     await engine.dispose()

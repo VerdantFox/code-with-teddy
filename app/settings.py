@@ -1,6 +1,6 @@
 """settings: settings management for the app."""
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     app_description: str = "FastAPI app"
     app_version: str = "0.1.0"
     app_host: str = ""
+
+    model_config = SettingsConfigDict(secrets_dir="/run/secrets")
 
 
 settings: Settings = Settings()

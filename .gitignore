@@ -35,3 +35,5 @@ certbot/
 **/static/media/executables/
 **/tailwind-styles.css
 html_response.html
+data/
+secrets/

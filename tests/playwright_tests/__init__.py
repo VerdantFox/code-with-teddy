@@ -6,6 +6,7 @@ from tests import Environment
 
 ENVIRONMENT_MAP = {
     Environment.LOCAL: "http://localhost:8000",
+    Environment.DOCKER: "http://localhost",
     Environment.PROD: "https://not-yet-determined.com",
 }
 

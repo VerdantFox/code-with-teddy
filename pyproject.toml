@@ -40,6 +40,8 @@ dependencies = [
     "email-validator",
     # FastAPI: web framework
     "fastapi",
+    # Gunicorn: load balancer
+    "gunicorn",
     # Jinja-partials: Jinja2 template partials
     "jinja-partials",
     # Jinja2: templating engine
@@ -322,4 +324,4 @@ max-complexity = 8
 
 
 [tool.ruff.lint.isort]
-known-first-party = ["app"]
+known-first-party = ["app", "tests", "scripts"]

@@ -18,8 +18,10 @@ import random
 import textwrap
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Annotated
 
 import faker
+import typer
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app import permissions
@@ -51,7 +53,8 @@ async def populate_database(connection_string: str | None = None) -> None:
     db_connection_before = os.environ.get(DB_STRING_KEY)
     if connection_string:
         os.environ[DB_STRING_KEY] = connection_string
-    engine = get_engine()
+
+    engine = get_engine(connection_string=connection_string)
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         pop_db = PopulateDB(session=session)
@@ -193,5 +196,19 @@ class PopulateDB:
         await blog_handler.save_new_comment(db=self.session, data=data)
 
 
+cli_app = typer.Typer(add_completion=False, no_args_is_help=True, pretty_exceptions_enable=False)
+
+
+@cli_app.command()
+def typer_main(
+    *,
+    connection_string: Annotated[
+        str, typer.Option(help="database connection string.")
+    ] = "postgresql+psycopg://postgres:postgres@localhost:5432/postgres",
+) -> None:
+    """Create a postgres docker container and postgres database with tables."""
+    asyncio.run(populate_database(connection_string=connection_string))
+
+
 if __name__ == "__main__":
-    asyncio.run(populate_database())
+    cli_app()

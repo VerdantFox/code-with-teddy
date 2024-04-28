@@ -141,7 +141,8 @@ def logout(page: Page, base_url: str) -> None:
 @pytest.fixture(scope="session", name="ui_details")
 def fixture_get_integration_environment(request: pytest.FixtureRequest) -> UIDetails:
     """Set the environment for integration tests."""
-    dotenv.load_dotenv()
+    dotenv.load_dotenv(".env.dev")
+    dotenv.load_dotenv(".env")
     basic_username = os.environ.get("BASIC_USERNAME", "")
     basic_password = os.environ.get("BASIC_PASSWORD", "")
     admin_username = os.environ.get("ADMIN_USERNAME", "")

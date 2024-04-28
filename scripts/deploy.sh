@@ -32,23 +32,18 @@ STOP=${STOP:-0}
 START=${START:-1}
 FROM_SCRATCH=${FROM_SCRATCH:-0}
 IF_NEEDED=${IF_NEEDED:-0}
-CELERY_SCALE=${CELERY_SCALE:-1}
 
 # crontab can't find docker compose without PATH defined
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # Needed for correct timezone with 'date' calls
 export TZ=America/Denver
+# Log files
 DATE="$(date +"%Y-%m-%d")"
 CRON_LOG="$(pwd)/logs/${DATE}_crontab.log"
 NGINX_LOG="$(pwd)/logs/${DATE}_nginx.log"
-FLASK_LOG="$(pwd)/logs/${DATE}_flask.log"
-MONGODB_LOG="$(pwd)/logs/${DATE}_mongodb.log"
 CERTBOT_LOG="$(pwd)/logs/${DATE}_certbot.log"
-REDIS_LOG="$(pwd)/logs/${DATE}_redis.log"
-CELERY_LOG_1="$(pwd)/logs/${DATE}_celery_1.log"
-CELERY_LOG_2="$(pwd)/logs/${DATE}_celery_2.log"
-CELERY_BEAT_LOG="$(pwd)/logs/${DATE}_celery_beat.log"
-CELERY_DASHBOARD_LOG="$(pwd)/logs/${DATE}_celery_dash.log"
+WEB_APP_LOG="$(pwd)/logs/${DATE}_web_app.log"
+DB_LOG="$(pwd)/logs/${DATE}_db.log"
 
 
 # ---------------------------------------------------------------------------
@@ -68,8 +63,6 @@ echo_usage() {
     echo '  --skip-build      Skip the build step.'
     echo '  --from-scratch    (Re-)build containers from scratch without cache.'
     echo '  --if-needed       Only re-build/re-start if the release-branch has been updated. Only effects PROD=1.'
-    echo '  --celery-scale NUMS'
-    echo '                    Scale the celery worker containers to NUMS workers. Defaults to 1.'
 }
 
 # Log message to stdout with timestamp and log level
@@ -87,8 +80,6 @@ source_environment() {
     touch .env
     source .env
     eval "${globals}"
-    export CELERY_USER="$CELERY_USER"
-    export CELERY_PASSWORD="$CELERY_PASSWORD"
 }
 
 # Announcee global variables
@@ -136,8 +127,8 @@ then
     touch "$CRON_LOG"
     log INFO "Installing new crontab..."
 crontab << ENDCRON
-# VerdantFox scheduled tasks
-# This crontab was generated automatically by utils/deploy.sh and should not be edited here.
+# Scheduled tasks
+# This crontab was generated automatically by scripts/deploy.sh and should not be edited here.
 # Times calculated for UTC. (America/Denver is UTC-7, so 12:00AM MST is 7:00AM UTC.)
 # Deploy (building from scratch) and restart all containers: every day at 7:07AM UTC (12:07AM MST).
 7 7 * * * PATH=$PATH TZ=America/Denver "$(pwd)/utils/deploy.sh" --from-scratch --restart --prod >> "$CRON_LOG"  2>&1
@@ -149,7 +140,7 @@ ENDCRON
 fi
 }
 
-# Set docker-compose profile based ond dev or prod
+# Set docker-compose profile based on dev or prod
 set_profile() {
     if [ "${PROD:-}" == "1" ]
     then
@@ -167,7 +158,7 @@ set_extras() {
     else
         unset BUILD_EXTRAS
     fi
-    COMPOSE_EXTRAS=( "--file=docker/docker-compose.yaml" "--project-directory=." )
+    COMPOSE_EXTRAS=( "--file=docker_config/docker-compose.yaml" "--project-directory=." )
 }
 
 # Build the docker images
@@ -209,7 +200,7 @@ start_containers() {
         log INFO "Starting containers..."
         # shellcheck disable=SC2068
         docker compose ${COMPOSE_EXTRAS[@]:-} --profile $PROFILE up \
-            --detach --scale celery_worker="${CELERY_SCALE:-1}" --timeout 120
+            --detach --timeout 120
         log_containers
         remove_dangling
     fi
@@ -221,20 +212,10 @@ log_containers() {
     # Logs dir created earlier, so no need to re-create here
     touch "$NGINX_LOG"
     docker logs --follow nginx &>> "$NGINX_LOG" &
-    touch "$FLASK_LOG"
-    docker logs --follow flask &>> "$FLASK_LOG" &
-    touch "$MONGODB_LOG"
-    docker logs --follow mongodb &>> "$MONGODB_LOG" &
-    touch "$REDIS_LOG"
-    docker logs --follow redis &>> "$REDIS_LOG" &
-    touch "$CELERY_DASHBOARD_LOG"
-    docker logs --follow celery_dashboard &>> "$CELERY_DASHBOARD_LOG" &
-    touch "$CELERY_LOG_1"
-    docker logs --follow verdantflask-celery_worker-1 &>> "$CELERY_LOG_1" &
-    touch "$CELERY_LOG_2"
-    docker logs --follow verdantflask-celery_worker-2 &>> "$CELERY_LOG_2" &
-    touch "$CELERY_BEAT_LOG"
-    docker logs --follow celery_beat &>> "$CELERY_BEAT_LOG" &
+    touch "$WEB_APP_LOG"
+    docker logs --follow web_app &>> "$WEB_APP_LOG" &
+    touch "$DB_LOG"
+    docker logs --follow db &>> "$DB_LOG" &
 
     if [ "${PROD:-}" == "1" ]
     then
@@ -292,8 +273,6 @@ do
         --from-scratch) FROM_SCRATCH=1
             ;;
         --if-needed) IF_NEEDED=1
-            ;;
-        --celery-scale) CELERY_SCALE="$2"; shift
             ;;
         *) echo "Unknown option: $1"; echo_usage; exit 1
             ;;
