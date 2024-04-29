@@ -20,11 +20,11 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] Moth hunt
   - [x] File renamer
   - [ ] Portfolio website (link to blog post about technologies)
-  - [ ] Analytics page (remake first)
+  - [ ] Analytics page (remake first) -- maybe sentry can do this?
 - [x] Show/hide password button for login
 - [ ] Set up Oauth2 authentication (google and github)
-- [ ] Set up secrets with keyring
-  - [ ] Move any existing hardcoded secrets to keyring (fresh secrets obviously)
+- [x] Set up secrets with docker and secrets files
+  - [x] Move any existing hardcoded secrets to secrets files
 - [ ] Set up email service
   - [ ] Emails for blog post comments
   - [ ] Emails for recover password
@@ -38,19 +38,19 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] CSP
   - [ ] etc.
 - [ ] Deploy
-  - [ ] Set up container orchestration
-  - [ ] Set up deployment script
+  - [x] Set up container orchestration
+  - [x] Set up deployment script
   - [x] Purchase domain
-  - [ ] Start DigitalOcean site
+  - [ ] Start VPS site
   - [ ] Update apt, get docker, git, etc.
   - [ ] Hook domain into real site
   - [ ] Set up initial postgres
   - [ ] Set up https
   - [ ] Set up github actions for CI/CD
 - [ ] Refactor to separate db models from services models
-- [ ] Add sqlite database option (for faster tests)
+  - [ ] Add sqlite database option (for faster tests)
 - [ ] Set up logging
-  - [ ] log to files that clean up automatically
+  - [x] log to files that clean up automatically
   - [ ] See if other info should be logged
   - [ ] Connect with Sentry for logging
 - [ ] Rebuild projects

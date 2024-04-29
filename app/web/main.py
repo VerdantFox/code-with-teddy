@@ -14,11 +14,9 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.datastore import db_models
 from app.datastore.database import get_engine
+from app.settings import settings
 from app.web.api import main as api_main
 from app.web.html import main as html_main
-
-# TODO: Change this to a secret key and store it in secrets.
-SESSION_SECRET = "SUPER-SECRET-KEY"  # noqa: S105 (hardcoded-password-string)
 
 
 @asynccontextmanager
@@ -63,7 +61,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
+    app.add_middleware(SessionMiddleware, secret_key=settings.session_secret)
 
     @app.get("/api")
     async def api_home(request: Request) -> RedirectResponse:

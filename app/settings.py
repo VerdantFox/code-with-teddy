@@ -7,23 +7,26 @@ class Settings(BaseSettings):
     """Settings for the app."""
 
     # Database settings
-    db_connection_string: str = "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
+    db_connection_string: str
     db_echo: bool = False
     db_pool_size: int = 5
     db_max_overflow: int = 10
 
     # JWT settings
-    jwt_secret: str = "secret"
+    jwt_secret: str
     jwt_algorithm: str = "HS256"
-    jwt_expires_s: int = 3600
+    jwt_expires_mins: int = 30
 
     # App settings
+    session_secret: str
     app_name: str = "FastAPI App"
     app_description: str = "FastAPI app"
     app_version: str = "0.1.0"
     app_host: str = ""
 
-    model_config = SettingsConfigDict(secrets_dir="/run/secrets")
+    model_config = SettingsConfigDict(
+        secrets_dir="/run/secrets", env_file=(".env.dev", ".env"), extra="ignore"
+    )
 
 
 settings: Settings = Settings()

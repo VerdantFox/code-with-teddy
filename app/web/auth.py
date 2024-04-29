@@ -12,6 +12,7 @@ from sqlalchemy import select
 
 from app.datastore import db_models
 from app.datastore.database import DBSession
+from app.settings import settings
 from app.web import errors, web_models
 from app.web import field_types as ft
 
@@ -26,11 +27,8 @@ OptionalTokenDependency = Annotated[str | None, Depends(optional_oauth2_bearer)]
 OptionalCookieDependency = Annotated[str | None, Cookie()]  # key matches param name
 
 
-# ----------- User Constants (should be in secrets) -----------
-# TODO: Replace with actual password in secrets
-SECRET_KEY = "a32739cd7e677c1b8dfcf560a68d59793efdd035fa14dc488192b815d3b5e498"  # noqa: S105 (hardcoded-password-string)
-ALGORITHM = "HS256"
-TOKEN_EXPIRATION = timedelta(minutes=30)
+# ----------- Constants -----------
+TOKEN_EXPIRATION = timedelta(minutes=settings.jwt_expires_mins)
 
 
 # ------------ Functions ------------
@@ -120,7 +118,7 @@ async def refresh_token(
 async def parse_access_token(access_token: str) -> dict[str, str | int | datetime]:
     """Parse the access token."""
     try:
-        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(access_token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
     except JWTError as e:
         raise errors.UserNotValidatedError from e
     username: str = payload.get("sub", "")
@@ -144,7 +142,9 @@ def create_access_token(user: db_models.User) -> web_models.Token:
 
 def encode_access_token(payload: dict[str, str | int | datetime]) -> web_models.Token:
     """Encode a JWT access token from a payload."""
-    access_token = jwt.encode(claims=payload, key=SECRET_KEY, algorithm=ALGORITHM)
+    access_token = jwt.encode(
+        claims=payload, key=settings.jwt_secret, algorithm=settings.jwt_algorithm
+    )
     return web_models.Token(access_token=access_token, token_type="bearer")  # noqa: S106 (hardcoded-password-func-arg)
 
 

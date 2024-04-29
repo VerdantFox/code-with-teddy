@@ -17,9 +17,6 @@ from app.web.html import jinja_globals, routes  # noqa: F401 (import-unused)
 from app.web.html.const import STATIC_DIR
 from app.web.html.error_handlers import register_error_handlers
 
-# TODO: Change this to a secret key and store it in secrets.
-SESSION_SECRET = "SUPER-SECRET-KEY"  # noqa: S105 (hardcoded-password-string)
-
 SELF = "'self'"
 FONTS_BUNNY = "https://fonts.bunny.net"
 UNSAFE_INLINE = "'unsafe-inline'"

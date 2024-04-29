@@ -9,13 +9,13 @@ services:
     expose:
       - 8000
     env_file:
-      # environment variables from later env files override those from earlier ones
-      - .env.dev
       - .env
     environment:
       - PROXY=1
     secrets:
       - db_connection_string
+      - jwt_secret
+      - session_secret
     volumes:
       - ./app/web/html/static:/code/app/web/html/static
     depends_on:
@@ -39,8 +39,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
-      # environment variables from later env files override those from earlier ones
-      - .env.dev
       - .env
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
@@ -123,3 +121,7 @@ secrets:
     file: ./secrets/db_password
   db_connection_string:
     file: ./secrets/db_connection_string
+  jwt_secret:
+    file: ./secrets/jwt_secret
+  session_secret:
+    file: ./secrets/session_secret
