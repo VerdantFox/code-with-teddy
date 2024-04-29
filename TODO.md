@@ -9,6 +9,10 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Integration tests (maybe)
   - [ ] Locust stress tests
 - [ ] Add resume to "experience" page
+- [ ] Add "series" data to blog posts
+  - [ ] Update database models (maybe series table and posts have series position field)
+  - [ ] Update blog post create/edit
+  - [ ] Update blog post read to show series + next/previous
 - [x] Better errors
       ~~- [x] redirect for html errors~~
   - [x] 404 page for missing
