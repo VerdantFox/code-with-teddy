@@ -24,6 +24,8 @@ cd "$(dirname "$0")/.." || return
 # ---------------------------------------------------------------------------
 # GLOBALS
 # ---------------------------------------------------------------------------
+NODE_VERSION=22
+
 #OPTS
 DEBUG=${DEBUG:-0}
 PROD=${PROD:-0}
@@ -176,7 +178,7 @@ run_build_steps() {
     log INFO "Running build steps..."
 
     log INFO "Running npm install and build..."
-    docker run --rm -v "$(pwd):/usr/src/app" -w /usr/src/app node:latest /bin/bash -c "npm install && npm run build"
+    docker run --rm -v "$(pwd):/usr/src/app" -w /usr/src/app "node:${NODE_VERSION}-slim" /bin/bash -c "npm install && npm run build"
 }
 
 # Stop all docker containers
