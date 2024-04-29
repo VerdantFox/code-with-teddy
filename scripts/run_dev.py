@@ -63,6 +63,9 @@ def open_new_terminal() -> None:
 
 def run_tailwind() -> None:
     """Start a tailwind server with hot reloading."""
+    args = ["rm", "-f", "./app/web/html/static/css/tailwind-styles.css"]
+    run_cmd(args, new_terminal=False)
+
     args = ["npm", "run", "watch"]
     run_cmd(args)
 
