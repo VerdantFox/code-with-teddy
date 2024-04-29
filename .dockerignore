@@ -1,7 +1,7 @@
+# Ignore everything, then whitelist specific files and directories
 *
 !app/*
-!package.json
-!package-lock.json
+app/web/html/static/*
 !requirements-*.txt
 !.gitignore
 !nginx/*

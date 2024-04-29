@@ -171,6 +171,14 @@ build_images() {
     fi
 }
 
+# Run any build steps (e.g. migrations, npm scripts, etc.)
+run_build_steps() {
+    log INFO "Running build steps..."
+
+    log INFO "Running npm install and build..."
+    docker run --rm -v "$(pwd):/usr/src/app" -w /usr/src/app node:latest /bin/bash -c "npm install && npm run build"
+}
+
 # Stop all docker containers
 stop_containers() {
     if [ "${STOP:-}" == "1" ] && [ "${START:-}" == "0" ]
@@ -241,6 +249,7 @@ main() {
     set_profile
     set_extras
     build_images
+    run_build_steps
     stop_containers
     restart_containers
     start_containers
