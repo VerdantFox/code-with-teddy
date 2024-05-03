@@ -1,0 +1,21 @@
+<div id="series-list" class="w-full htmx-fade-out-150ms htmx-fade-in-300ms">
+  <table class="table-auto w-full">
+    <thead>
+      <tr class="font-semibold">
+        <th class="text-right px-1 py-1">id</th>
+        <th class="text-left px-1 py-1">name</th>
+        <th class="text-left px-1 py-1">description</th>
+        <th class="text-right px-1 py-1">posts</th>
+        <th class="text-center px-1 py-1">update</th>
+        <th class="text-center px-1 py-1">delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for series in series_list %}
+        {% set form = series_update_form(name=series.name, description=series.description) %}
+        {{ render_partial('blog/partials/single_series.html', request=request, form=form, series=series) }}
+      {% endfor %}
+      {{ render_partial('blog/partials/add_series_form.html', request=request, form=series_update_form()) }}
+    </tbody>
+  </table>
+</div>

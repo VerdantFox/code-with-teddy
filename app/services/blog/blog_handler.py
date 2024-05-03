@@ -10,7 +10,7 @@ from typing import Self
 import sqlalchemy
 from fastapi import UploadFile
 from pydantic import BaseModel, Field, model_validator
-from sqlalchemy import Select, select
+from sqlalchemy import Select, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -174,6 +174,76 @@ def _calculate_limit_offset(*, results_per_page: int, page: int) -> tuple[int, i
     """Calculate the limit and offset for a query."""
     limit = results_per_page
     return limit, (page - 1) * limit
+
+
+async def get_all_series(
+    *,
+    db: AsyncSession,
+    search: str | None = None,
+) -> list[db_models.BlogPostSeries]:
+    """Get blog post series' according to search."""
+    stmt = (
+        select(db_models.BlogPostSeries)
+        .options(selectinload(db_models.BlogPostSeries.posts).load_only(db_models.BlogPost.id))
+        .order_by(db_models.BlogPostSeries.id)
+    )
+    if search:
+        stmt = stmt.filter(db_models.BlogPostSeries.ts_vector.match(search))
+
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
+
+
+async def get_series_from_id(*, db: AsyncSession, series_id: int) -> db_models.BlogPostSeries:
+    """Get a blog post series from its ID."""
+    try:
+        stmt = (
+            select(db_models.BlogPostSeries)
+            .options(selectinload(db_models.BlogPostSeries.posts))
+            .filter(db_models.BlogPostSeries.id == series_id)
+        )
+        result = await db.execute(stmt)
+        return result.scalars().one()
+    except sqlalchemy.exc.NoResultFound as e:
+        raise errors.BlogPostSeriesNotFoundError from e
+
+
+async def create_series(
+    db: AsyncSession,
+    name: str,
+    description: str | None = None,
+) -> db_models.BlogPostSeries:
+    """Create a blog post series."""
+    series = db_models.BlogPostSeries(name=name, description=description)
+    db.add(series)
+    await db.commit()
+    await db.refresh(series, attribute_names=["posts"])
+    return series
+
+
+async def update_series(
+    db: AsyncSession,
+    series: db_models.BlogPostSeries,
+    name: str,
+    description: str | None = None,
+) -> db_models.BlogPostSeries:
+    """Update a blog post series."""
+    series.name = name
+    series.description = description
+    await db.commit()
+    await db.refresh(series, attribute_names=["posts", "name", "description"])
+    return series
+
+
+async def delete_series(
+    db: AsyncSession,
+    series_id: int,
+) -> bool:
+    """Delete a blog post series."""
+    stmt = delete(db_models.BlogPostSeries).where(db_models.BlogPostSeries.id == series_id)
+    result = await db.execute(stmt)
+    await db.commit()
+    return result.rowcount > 0
 
 
 async def get_bp_from_id(

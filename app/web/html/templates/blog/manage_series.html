@@ -1,0 +1,20 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 4 %}
+{% set page_title = "Manage Blog Post Series" %}
+{%
+  set admin_extras = [
+  {"href": url_for("html:create_bp_get"),
+  "icon": "hammer",
+  "text": "Create Blog Post"}
+  ]
+%}
+
+{% block content %}
+  <section>
+    <div class="section-container mt-64 mb-36">
+      <h1 class="text-6xl font-bold mb-20">Manage Series</h1>
+      {{ render_partial('blog/partials/list_series_form.html', request=request, form=search_form) }}
+      {{ render_partial('blog/partials/list_series.html', request=request, series_list=series_list, series_update_form=series_update_form) }}
+    </div>
+  </section>
+{% endblock content %}

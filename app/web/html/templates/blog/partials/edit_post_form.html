@@ -24,7 +24,7 @@
         {{ render_partial('shared/partials/forms/toggle_field.html', field=form.is_published, click_extras="; isDirty = true") }}
       </div>
     </div>
-    {{ render_partial('shared/partials/forms/field.html', field=form.description, extra_fields={"@input.once": "isDirty = true"}) }}
+    {{ render_partial('shared/partials/forms/field.html', field=form.description, extra_fields={"@input.once": "isDirty = true", "rows": "6"}) }}
     {{
       render_partial(
       'shared/partials/forms/markdown_textarea.html',

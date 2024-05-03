@@ -66,7 +66,7 @@
   }
 
   .btn-filled-danger {
-    @apply text-white bg-pink-700 bg-pink-700 hover:bg-pink-800 active:bg-pink-900 disabled:text-pink-100 disabled:bg-pink-800 disabled:opacity-50 transition-bg-color duration-300;
+    @apply text-white bg-pink-700 hover:bg-pink-800 active:bg-pink-900 disabled:text-pink-100 disabled:bg-pink-800 disabled:opacity-50 transition-bg-color duration-300;
   }
 
   .btn-outline {

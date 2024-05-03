@@ -42,6 +42,13 @@ class BlogPostMediaNotFoundError(WebError):
     status_code = status.HTTP_404_NOT_FOUND
 
 
+class BlogPostSeriesNotFoundError(WebError):
+    """Blog post series not found."""
+
+    detail = "Blog post series not found"
+    status_code = status.HTTP_404_NOT_FOUND
+
+
 class UserNotAuthenticatedError(WebError):
     """User not authenticated."""
 

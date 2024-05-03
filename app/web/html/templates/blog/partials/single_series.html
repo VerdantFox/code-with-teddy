@@ -1,0 +1,47 @@
+<tr id="series-{{ series.id }}" class="htmx-fade-out-150ms htmx-fade-in-300ms">
+  <td class="font-semibold text-right px-1 py-1">{{ series.id }}</td>
+  <td class="text-left px-1 py-1">
+    {{ render_partial('shared/partials/forms/field.html', field=form.name, hide_label=True) }}
+  </td>
+  <td class="text-left px-1 py-1">
+    {{ render_partial('shared/partials/forms/field.html', field=form.description, hide_label=True) }}
+  </td>
+  <td class="text-right px-1 py-1">{{ series.posts | count }}</td>
+  <td class="flex items-center justify-center px-1 py-1">
+    <button
+      class="btn-sm btn-filled submit-btn font-semibold p-2"
+      type="submit"
+      title="Update Series"
+      hx-patch="{{ url_for('html:update_series', series_id=series.id) }}"
+      hx-target="#series-{{ series.id }}"
+      hx-target-error="#series-{{ series.id }}"
+      hx-swap="outerHTML swap:150ms settle:300ms"
+      hx-include="#series-{{ series.id }}"
+    >
+      {{ render_partial('shared/partials/icons/check-bold.html', class="w-6 h-6") }}
+    </button>
+  </td>
+
+  <td class="px-1 py-1">
+    <button
+      id="delete-series-btn-{{ series.id }}"
+      class="btn-sm btn-filled-danger submit-btn font-semibold p-2"
+      type="submit"
+      title="Delete Series"
+      hx-delete="{{ url_for('html:delete_series', series_id=series.id) }}"
+      hx-target="#series-{{ series.id }}"
+      hx-target-error="#series-{{ series.id }}"
+      hx-swap="outerHTML swap:150ms settle:300ms"
+      hx-confirm="Delete the series?"
+    >
+      {{ render_partial('shared/partials/icons/x-bold.html', class="w-6 h-6") }}
+    </button>
+    <script nonce="{{ request.state.nonce }}">
+      addConfirmEventListener("delete-series-btn-{{ series.id }}")
+    </script>
+  </td>
+</tr>
+{% if add_series == True %}
+  {{ render_partial('blog/partials/add_series_form.html', request=request, form=series_update_form()) }}
+{% endif %}
+{{ render_partial('shared/partials/flash_messages.html', request=request) }}

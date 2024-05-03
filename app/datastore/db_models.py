@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Annotated, ClassVar
 
 import sqlalchemy as sa
-from sqlalchemy import Column, Computed, ForeignKey, Index, String, Table
+from sqlalchemy import Column, Computed, ForeignKey, Index, String, Table, asc
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -41,6 +41,7 @@ DateTimeIndexed = Annotated[datetime, mapped_column(index=True)]
 UsersFk = Annotated[int, mapped_column(ForeignKey("users.id"), index=True)]
 BlogPostFK = Annotated[int, mapped_column(ForeignKey("blog_posts.id"), index=True)]
 CommentFK = Annotated[int, mapped_column(ForeignKey("blog_post_comments.id"), index=True)]
+BPSeriesFK = Annotated[int | None, mapped_column(ForeignKey("blog_post_series.id"), index=True)]
 
 
 class TSVector(sa.types.TypeDecorator):
@@ -137,6 +138,9 @@ class BlogPost(Base):
     comments: Mapped[list["BlogPostComment"]] = relationship(
         back_populates="blog_post", order_by="asc(BlogPostComment.created_timestamp)"
     )
+    series_id: Mapped[BPSeriesFK | None]
+    series_position: Mapped[IntNullable]
+    series: Mapped["BlogPostSeries"] = relationship(back_populates="posts")
 
     ts_vector: Mapped[TSVector] = mapped_column(
         TSVector(),
@@ -213,3 +217,23 @@ class BlogPostComment(Base):
     created_timestamp: Mapped[DateTimeIndexed]
     updated_timestamp: Mapped[DateTimeIndexed]
     likes: Mapped[IntIndexedDefaultZero]
+
+
+class BlogPostSeries(Base):
+    """Blog post series model."""
+
+    __tablename__ = "blog_post_series"
+
+    id: Mapped[IntPK]
+    name: Mapped[StrIndexedUnique]
+    description: Mapped[StrNullable]
+    posts: Mapped[list[BlogPost]] = relationship(
+        back_populates="series",
+        order_by=[asc(BlogPost.series_position), asc(BlogPost.created_timestamp)],
+    )
+
+    ts_vector: Mapped[TSVector] = mapped_column(
+        TSVector(),
+        Computed("to_tsvector('english', name || ' ' || description)", persisted=True),
+    )
+    __table_args__ = (Index("ix_bp_series_ts_vector", ts_vector, postgresql_using="gin"),)

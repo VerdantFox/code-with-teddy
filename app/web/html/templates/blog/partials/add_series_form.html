@@ -1,0 +1,26 @@
+<tr id="add-series" class="w-full htmx-fade-out-150ms htmx-fade-in-300ms">
+  <td class="font-semibold text-right px-1 py-1"></td>
+  <td class="text-left px-1 py-1">
+    {{ render_partial('shared/partials/forms/field.html', field=form.name, hide_label=True) }}
+  </td>
+  <td class="text-left px-1 py-1">
+    {{ render_partial('shared/partials/forms/field.html', field=form.description, hide_label=True) }}
+  </td>
+  <td class="text-right px-1 py-1"></td>
+  <td class="flex items-center justify-center px-1 py-1">
+    <button
+      class="btn-sm btn-filled submit-btn font-semibold p-2"
+      type="submit"
+      title="Add Series"
+      hx-post="{{ url_for('html:create_series') }}"
+      hx-target="#add-series"
+      hx-target-error="#add-series"
+      hx-swap="outerHTML swap:150ms settle:300ms"
+      hx-include="#add-series"
+    >
+      {{ render_partial('shared/partials/icons/plus-bold.html', class="w-6 h-6") }}
+    </button>
+  </td>
+  <td class="px-1 py-1"></td>
+</tr>
+{{ render_partial('shared/partials/flash_error_messages.html', request=request) }}

@@ -1,0 +1,19 @@
+<form
+  id="list-series-search"
+  hx-get="{{ url_for('html:get_manage_series') }}"
+  hx-target="#series-list"
+  hx-target-error="#list-series-search"
+  hx-swap="outerHTML swap:150ms settle:300ms"
+  hx-push-url="true"
+  class="htmx-fade-out-150ms htmx-fade-in-300ms"
+>
+  <div class="flex gap-4 items-center justify-between mb-8">
+    {{ render_partial('shared/partials/forms/field.html', field=form.search, class="flex-grow") }}
+    <div>
+      <p class="p-1">&nbsp;</p>
+      <button class="btn-sm btn-outline submit-btn font-semibold" type="submit">
+        Search
+      </button>
+    </div>
+  </div>
+</form>

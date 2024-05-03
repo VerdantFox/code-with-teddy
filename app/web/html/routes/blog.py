@@ -2,6 +2,7 @@
 
 from logging import getLogger
 
+import sqlalchemy
 from fastapi import APIRouter, Request, UploadFile, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
@@ -52,6 +53,12 @@ FLASH_ERRORS_TEMPLATE = "shared/partials/flash_error_messages.html"
 COMMENTS_TEMPLATE = "blog/partials/comments.html"
 COMMENT_TEMPLATE = "blog/partials/comment.html"
 COMMENT_FORM_TEMPLATE = "blog/partials/comment_form.html"
+MANAGE_SERIES_TEMPLATE = "blog/manage_series.html"
+LIST_SERIES_TEMPLATE = "blog/partials/list_series.html"
+SINGLE_SERIES_TEMPLATE = "blog/partials/single_series.html"
+ADD_SERIES_FORM_TEMPLATE = "blog/partials/add_series_form.html"
+DELETED_SERIES_TEMPLATE = "blog/partials/deleted_series.html"
+
 MEDIA_FORM = "media_form"
 COMMENT_FORM = "comment_form"
 LIKED_POSTS_COOKIE = "liked_posts"  # Sets a cookie with a list of liked posts, by id
@@ -175,6 +182,16 @@ class BlogPostForm(Form):
             validators.Length(max=2000),
         ],
     )
+    series_name = IntegerField(
+        "Series ID",
+        description="Series ID (optional)",
+        validators=[validators.optional()],
+    )
+    series_position = IntegerField(
+        "Series Position",
+        description="99 (optional)",
+        validators=[validators.optional()],
+    )
 
 
 @router.get("/blog/create", response_model=None)
@@ -235,6 +252,193 @@ async def create_bp_post(
     return RedirectResponse(
         url=request.url_for("html:edit_bp_get", bp_id=response.blog_post.id),
         status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+class SeriesSearchForm(Form):
+    """Form for searching blog post series."""
+
+    search = StringField(
+        "Search", description="Search blog post series", validators=[validators.optional()]
+    )
+
+
+class SeriesUpdateForm(Form):
+    """Form for updating a blog post series."""
+
+    name = StringField("Name", description="My new series", validators=[validators.Length(min=1)])
+    description = StringField(
+        "Description",
+        description="Short plain text description",
+        validators=[validators.optional()],
+    )
+
+
+@router.get("/blog/series", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def get_manage_series(
+    request: Request, current_user: LoggedInUser, db: DBSession
+) -> _TemplateResponse:
+    """Return page to manage blog post series."""
+    is_form_request = request.headers.get("hx-target") == "series-list"
+    template = LIST_SERIES_TEMPLATE if is_form_request else MANAGE_SERIES_TEMPLATE
+    params = dict(request.query_params)
+    search_form = SeriesSearchForm.load(params)
+    series_list = await blog_handler.get_all_series(db=db, search=search_form.search.data)
+    return templates.TemplateResponse(
+        template,
+        {
+            constants.REQUEST: request,
+            constants.CURRENT_USER: current_user,
+            "search_form": search_form,
+            "series_list": series_list,
+            "series_update_form": SeriesUpdateForm,
+        },
+    )
+
+
+@router.post("/blog/series", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def create_series(
+    request: Request,
+    current_user: LoggedInUser,  # noqa: ARG001
+    db: DBSession,
+) -> _TemplateResponse:
+    """Create a blog post series."""
+    form_data = await request.form()
+    form = SeriesUpdateForm.load(form_data)
+    err_msg_title = "Error creating series"
+    if not form.validate():
+        FlashMessage(
+            title=err_msg_title,
+            text="See errors in form",
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        return templates.TemplateResponse(
+            MANAGE_SERIES_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                "form": form,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    try:
+        series = await blog_handler.create_series(
+            db=db, name=form.name.data, description=form.description.data
+        )
+    except sqlalchemy.exc.IntegrityError:
+        logger.exception(err_msg_title)
+        FlashMessage(
+            title=err_msg_title,
+            text="Name already exists.",
+            category=FlashCategory.ERROR,
+            timeout=20,
+        ).flash(request)
+        return templates.TemplateResponse(
+            ADD_SERIES_FORM_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                "form": form,
+                "series_update_form": SeriesUpdateForm,
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    FlashMessage(
+        title="Series Created!",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    return templates.TemplateResponse(
+        SINGLE_SERIES_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            "form": SeriesUpdateForm(name=series.name, description=series.description),
+            "series": series,
+            "series_update_form": SeriesUpdateForm,
+            "add_series": True,
+        },
+    )
+
+
+@router.patch("/blog/series/{series_id}", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def update_series(
+    request: Request,
+    current_user: LoggedInUser,  # noqa: ARG001
+    db: DBSession,
+    series_id: int,
+) -> _TemplateResponse:
+    """Update a blog post series."""
+    form_data = await request.form()
+    form = SeriesUpdateForm.load(form_data)
+    series = await blog_handler.get_series_from_id(db=db, series_id=series_id)
+    if not form.validate():
+        FlashMessage(
+            title="Error updating series",
+            text="See errors in form",
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        return templates.TemplateResponse(
+            SINGLE_SERIES_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                "form": form,
+                "series": series,
+                "series_update_form": SeriesUpdateForm,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    series = await blog_handler.update_series(
+        db=db, series=series, name=form.name.data, description=form.description.data
+    )
+    FlashMessage(
+        title="Series Updated!",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    return templates.TemplateResponse(
+        SINGLE_SERIES_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            "form": SeriesUpdateForm(name=series.name, description=series.description),
+            "series": series,
+            "series_update_form": SeriesUpdateForm,
+        },
+    )
+
+
+@router.delete("/blog/series/{series_id}", response_model=None)
+@requires_permission(Action.EDIT_BP)
+async def delete_series(
+    request: Request,
+    current_user: LoggedInUser,  # noqa: ARG001
+    db: DBSession,
+    series_id: int,
+) -> _TemplateResponse:
+    """Delete a blog post series."""
+    try:
+        await blog_handler.delete_series(db=db, series_id=series_id)
+    except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.PendingRollbackError) as e:
+        logger.exception("Error deleting series")
+        FlashMessage(
+            title="Error deleting series",
+            text=str(e),
+            category=FlashCategory.ERROR,
+        ).flash(request)
+        message = str(e)
+        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    else:
+        FlashMessage(
+            title="Series Deleted!",
+            category=FlashCategory.SUCCESS,
+        ).flash(request)
+        message = "Series deleted."
+        status_code = status.HTTP_200_OK
+    return templates.TemplateResponse(
+        DELETED_SERIES_TEMPLATE,
+        {
+            constants.REQUEST: request,
+            "message": message,
+        },
+        status_code=status_code,
     )
 
 
