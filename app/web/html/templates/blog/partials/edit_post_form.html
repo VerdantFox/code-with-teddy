@@ -32,6 +32,10 @@
       extra_fields={"rows": "8", "hx-post": url_for('html:edit_bp_live_update'), "hx-trigger": "keyup changed delay:1000ms", "hx-target": "#preview", "hx-swap": "innerHTML", "@input.once": "isDirty = true"}
       )
     }}
+    <div class="flex items-center gap-4 max-lg:flex-col">
+      {{ render_partial('shared/partials/forms/field.html', field=form.series_id, class="max-lg:w-full") }}
+      {{ render_partial('shared/partials/forms/field.html', field=form.series_position, class="max-lg:w-full") }}
+    </div>
   </div>
   {% if blog_post and not form.is_new.data %}
     <div class="mb-12">

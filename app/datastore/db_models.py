@@ -39,9 +39,13 @@ DateTimeIndexed = Annotated[datetime, mapped_column(index=True)]
 
 # ForeignKey types
 UsersFk = Annotated[int, mapped_column(ForeignKey("users.id"), index=True)]
-BlogPostFK = Annotated[int, mapped_column(ForeignKey("blog_posts.id"), index=True)]
+BlogPostFK = Annotated[
+    int, mapped_column(ForeignKey("blog_posts.id", ondelete="CASCADE"), index=True)
+]
 CommentFK = Annotated[int, mapped_column(ForeignKey("blog_post_comments.id"), index=True)]
-BPSeriesFK = Annotated[int | None, mapped_column(ForeignKey("blog_post_series.id"), index=True)]
+BPSeriesFK = Annotated[
+    int | None, mapped_column(ForeignKey("blog_post_series.id", ondelete="SET NULL"), index=True)
+]
 
 
 class TSVector(sa.types.TypeDecorator):

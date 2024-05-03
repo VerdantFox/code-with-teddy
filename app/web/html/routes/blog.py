@@ -182,7 +182,7 @@ class BlogPostForm(Form):
             validators.Length(max=2000),
         ],
     )
-    series_name = IntegerField(
+    series_id = IntegerField(
         "Series ID",
         description="Series ID (optional)",
         validators=[validators.optional()],
@@ -420,10 +420,11 @@ async def delete_series(
         logger.exception("Error deleting series")
         FlashMessage(
             title="Error deleting series",
-            text=str(e),
+            text=repr(e),
             category=FlashCategory.ERROR,
+            timeout=30,
         ).flash(request)
-        message = str(e)
+        message = repr(e)
         status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
     else:
         FlashMessage(
@@ -906,6 +907,8 @@ async def edit_bp_get(
             "description": bp.markdown_description,
             "content": bp.markdown_content,
             "thumbnail_url": bp.thumbnail_location or "",
+            "series_id": bp.series_id or "",
+            "series_position": bp.series_position or "",
         }
     )
 

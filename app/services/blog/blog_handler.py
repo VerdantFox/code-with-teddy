@@ -36,6 +36,8 @@ class SaveBlogInput(BaseModel, arbitrary_types_allowed=True):
     description: str
     content: str
     thumbnail_url: str | None = None
+    series_id: int | None = None
+    series_position: int | None = None
 
     # These 2 only work for creating new blog posts
     # and are only here for testing purposes
@@ -334,7 +336,7 @@ async def _save_bp_to_db(
     return blog_post
 
 
-async def update_existing_bp_fields(
+async def update_existing_bp_fields(  # noqa: C901 (complexity)
     *,
     db: AsyncSession,
     data: SaveBlogInput,
@@ -374,6 +376,10 @@ async def update_existing_bp_fields(
         blog_post.read_mins = blog_utils.calc_read_mins(data.content)
     if blog_post.thumbnail_location != data.thumbnail_url:
         blog_post.thumbnail_location = data.thumbnail_url
+    if blog_post.series_id != data.series_id:
+        blog_post.series_id = data.series_id
+    if blog_post.series_position != data.series_position:
+        blog_post.series_position = data.series_position
     blog_post.updated_timestamp = datetime.now().astimezone(timezone.utc)
     return blog_post
 
@@ -417,6 +423,8 @@ async def set_new_bp_fields(
         likes=data.likes,
         views=data.views,
         thumbnail_location=data.thumbnail_url,
+        series_id=data.series_id,
+        series_position=data.series_position,
     )
 
 
@@ -457,19 +465,22 @@ async def _create_bp_save_sqlalchemy_error_response(
     """
     logger.exception(ERROR_SAVING_BP)
     await db.rollback()
-    err = str(e)
+    err = repr(e)
     msg = ERROR_SAVING_BP
 
     if ("duplicate key value violates unique constraint" in err) and (
         "ix_blog_posts_slug" in err or "ix_blog_posts_title" in err
     ):
         field_errors["title"].append("Title already exists")
+    elif ('is not present in table "blog_post_series"' in err) and ("series_id" in err):
+        field_errors["series_id"].append("Series does not exist")
     else:  # pragma: no cover (don't know what other errors could happen)
         msg = err
     return SaveBlogResponse(
         success=False,
-        message=msg,
+        err_msg=msg,
         field_errors=field_errors,
+        status_code=HTTPStatus.BAD_REQUEST,
     )
 
 

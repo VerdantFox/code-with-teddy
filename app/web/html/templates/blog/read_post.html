@@ -1,7 +1,7 @@
 {% extends "shared/base.html" %}
 {% set active_nav_item = 4 %}
 {% set page_title = blog_post.title %}
-{% if blog_post.thumbnail_location.startswith('/') %}
+{% if blog_post.thumbnail_location and blog_post.thumbnail_location.startswith('/') %}
   {% set thumbnail_location = url_for('html:static', path=blog_post.thumbnail_location) %}
 {% else %}
   {% set thumbnail_location = blog_post.thumbnail_location %}
