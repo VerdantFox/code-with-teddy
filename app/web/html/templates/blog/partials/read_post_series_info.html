@@ -1,0 +1,19 @@
+<div class="">
+  <h2 class="text-2xl font-semibold mb-8 mt-16">Posts in Series</h2>
+  <ol class="flex flex-col gap-2">
+    {% for post in blog_post.series.posts %}
+      <li class="list-decimal">
+        {% if post.title == blog_post.title %}
+          {{ post.title }}
+          (this post)
+        {% else %}
+          <a
+            href="{{ url_for('html:read_blog_post', slug=post.slug) }}"
+            class="link-underlined"
+            >{{ post.title }}</a
+          >
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</div>

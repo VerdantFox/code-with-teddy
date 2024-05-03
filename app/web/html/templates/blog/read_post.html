@@ -142,9 +142,9 @@
       });
     }"
   >
-    <div class="max-w-[100rem] border-b dark:border-grayscale-900">
+    <div class="max-w-[110rem] border-b dark:border-grayscale-900">
       <div
-        class="grid grid-cols-[minmax(20rem,_1fr)_4fr] max-2xl:grid-cols-[minmax(20rem,_1fr)_4fr)] max-xl:grid-cols-[minmax(20rem,_1fr)_3fr] max-lg:grid-cols-[minmax(14rem,_1fr)_3fr] max-md:grid-cols-1 gap-20 max-xl:gap-12 md:relative "
+        class="grid grid-cols-[minmax(20rem,_1fr)_4fr_minmax(20rem,_1fr)] max-2xl:grid-cols-[minmax(20rem,_1fr)_3fr] max-lg:grid-cols-[minmax(14rem,_1fr)_4fr] max-md:grid-cols-1 gap-20 max-xl:gap-12 md:relative"
       >
         <!-- Table of Contents -->
         <div
@@ -187,28 +187,36 @@
 
           @prose blog-prose"
         >
+          <!-- Series info -->
+          {% if blog_post.series_id %}
+            <div class="2xl:hidden mb-12">
+              {{ render_partial('blog/partials/read_post_series_info.html', blog_post=blog_post, request=request) }}
+            </div>
+          {% endif %}
+
           <!-- Blog article -->
           {{ render_partial('blog/partials/post_body.html', request=request, blog_post=blog_post) }}
 
           <!-- About the author -->
           {{ render_partial('blog/partials/about_the_author.html', request=request) }}
 
+          <!-- Next in series -->
+          {% if blog_post.series_id %}
+            {{ render_partial('blog/partials/read_posts_next_in_series.html', blog_post=blog_post, request=request) }}
+          {% endif %}
+
           <!-- Comments -->
           {{ render_partial('blog/partials/comments.html', request=request, current_user=current_user, blog_post=blog_post, liked=liked, comment_form=comment_form) }}
         </div>
 
-        <!-- Extras -->
-        {#
-        <section class="text-xl max-xl:hidden pt-16 pr-8">
-          <div class="pb-36">
-            <h2 class="text-2xl font-semibold mb-8 mt-16">extra stuff</h2>
-            <p>
-              asdf asdf asdfasdfas asdfasdf sdf asdfasdf asdfasdfasdfasdfasdfasd
-              asdf asf asdf asdfasdfasdf asdf asd fasdfasfasdfasdf
-            </p>
-          </div>
-        </section>
-        #}
+        <!-- Series info -->
+        {% if blog_post.series_id %}
+          <section class="text-xl max-2xl:hidden pt-16 pr-3 relative">
+            <div class="sticky top-8">
+              {{ render_partial('blog/partials/read_post_series_info.html', blog_post=blog_post, request=request) }}
+            </div>
+          </section>
+        {% endif %}
       </div>
     </div>
     <button

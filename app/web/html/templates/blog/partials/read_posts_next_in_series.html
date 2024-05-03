@@ -1,0 +1,15 @@
+<div class="flex justify-between">
+  {% set variable = value %}
+  {% for post in blog_post.series.posts %}
+    {% if post.id == blog_post.id and loop.nextitem %}
+      <p>
+        Up next in blog series:
+        <a
+          href="{{ url_for('html:read_blog_post', slug=loop.nextitem.slug) }}"
+          class="link-underlined"
+          >{{ loop.nextitem.title }}</a
+        >
+      </p>
+    {% endif %}
+  {% endfor %}
+</div>

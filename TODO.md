@@ -12,12 +12,14 @@ A list of stuff that needs to get done for the project, roughly in order of impo
 - [ ] Add "series" data to blog posts
   - [x] Update database models
   - [x] Add series CRUD management page
-  - [ ] Update blog post create/edit for series
-  - [ ] Update blog post read to show series + next/previous
+  - [x] Update blog post create/edit for series
+  - [x] Update blog post read to show series + next in series
+  - [ ] Write tests for series stuff
 - [x] Better errors
       ~~- [x] redirect for html errors~~
   - [x] 404 page for missing
 - [x] Blog comment edit history
+- [ ] Add comment likes
 - [ ] Add projects to projects page (plus individual pages as needed)
   - [ ] Finance (complete first)
   - [x] Twisted towers

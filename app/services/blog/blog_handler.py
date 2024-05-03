@@ -94,6 +94,14 @@ def _get_bp_statement() -> Select:
         selectinload(db_models.BlogPost.media),
         selectinload(db_models.BlogPost.comments).selectinload(db_models.BlogPostComment.user),
         selectinload(db_models.BlogPost.old_slugs),
+        selectinload(db_models.BlogPost.series)
+        .selectinload(db_models.BlogPostSeries.posts)
+        .load_only(
+            db_models.BlogPost.id,
+            db_models.BlogPost.title,
+            db_models.BlogPost.slug,
+            db_models.BlogPost.is_published,
+        ),
     )
 
 
