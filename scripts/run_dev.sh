@@ -6,7 +6,6 @@ set -euo pipefail
 cd "$(dirname "$0")/.." || return
 
 main() {
-    run_setup
     run_tailwind
     run_browser_sync
     run_uvicorn
@@ -50,6 +49,7 @@ run_tailwind() {
 # Function to start Uvicorn with optional Postgres
 run_uvicorn() {
     open_new_terminal
+    run_setup
     run_cmd 'uvicorn "app.web.main:create_app" --factory --host=0.0.0.0 --reload --reload-include="*.html" --reload-include="*.css" --reload-include="*.js"'
 }
 
