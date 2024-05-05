@@ -1,4 +1,4 @@
-Generic single-database configuration.# Alembic + alembic
+# Alembic database migrations
 
 Database migrations are necessary to update existing databases, especially when those databases contain data. So, for example, if you need to add/remove a table, add/remove a field from a table, or change an existing field, you'll need to run a database migration. And when I say "table", I also mean an SQLAlchemy model class corresponding to those tables.
 

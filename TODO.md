@@ -8,13 +8,18 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] playwright end-to-end tests
   - [ ] Integration tests (maybe)
   - [ ] Locust stress tests
+- [ ] Set up alembic migrations
+  - [x] Initial migration
+  - [ ] Get alembic working with deploy script
+  - [ ] Use alembic in tests
 - [ ] Add resume to "experience" page
-- [x] Add "series" data to blog posts
+- [ ] Add "series" data to blog posts
   - [x] Update database models
   - [x] Add series CRUD management page
   - [x] Update blog post create/edit for series
   - [x] Update blog post read to show series + next in series
   - [x] Write tests for series stuff
+  - [ ] Add series to populate_db script
 - [x] Better errors
       ~~- [x] redirect for html errors~~
   - [x] 404 page for missing
