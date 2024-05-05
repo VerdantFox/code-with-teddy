@@ -77,6 +77,7 @@ class PopulateDB:
         """Populate the database with dummy data."""
         await self.populate_users()
         await self.populate_blog_posts()
+        await self.populate_bp_series()
 
     async def populate_users(self) -> None:
         """Populate the users table."""
@@ -194,6 +195,17 @@ class PopulateDB:
             content=content,
         )
         await blog_handler.save_new_comment(db=self.session, data=data)
+
+    async def populate_bp_series(self) -> None:
+        """Populate the blog post series table."""
+        series = await blog_handler.create_series(
+            db=self.session,
+            name="The Wheel of Time",
+            description="A series of blog posts about The Wheel of Time.",
+        )
+        for blog_post in self.blog_posts[:2]:
+            blog_post.series_id = series.id
+        await self.session.commit()
 
 
 cli_app = typer.Typer(add_completion=False, no_args_is_help=True, pretty_exceptions_enable=False)

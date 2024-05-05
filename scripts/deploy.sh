@@ -87,33 +87,30 @@ source_environment() {
 
 # Announcee global variables
 announce_vars() {
-    if [ "${DEBUG:-}" == "1" ]
-    then
-        log DEBUG "Global variables set:"
-        log DEBUG "DEBUG=${DEBUG:-}"
-        log DEBUG "PROD=${PROD:-}"
-        log DEBUG "BUILD=${BUILD:-}"
-        log DEBUG "STOP=${STOP:-}"
-        log DEBUG "START=${START:-}"
-        log DEBUG "FROM_SCRATCH=${FROM_SCRATCH:-}"
-        log DEBUG "IF_NEEDED=${IF_NEEDED:-}"
-    fi
+    if [ "${DEBUG:-}" != "1" ]; then return; fi
+    log DEBUG "Global variables set:"
+    log DEBUG "DEBUG=${DEBUG:-}"
+    log DEBUG "PROD=${PROD:-}"
+    log DEBUG "BUILD=${BUILD:-}"
+    log DEBUG "STOP=${STOP:-}"
+    log DEBUG "START=${START:-}"
+    log DEBUG "FROM_SCRATCH=${FROM_SCRATCH:-}"
+    log DEBUG "IF_NEEDED=${IF_NEEDED:-}"
 }
 
 # Checkout and update the release branch (in production)
 update_branch() {
-    if [ "${PROD:-}" == "1" ]
+    if [ "${PROD:-}" != "1" ]; then return; fi
+    log INFO "Rebasing latest release-branch..."
+    git fetch origin --prune
+    checkout_result="$(git checkout release-branch)"
+    log INFO "$checkout_result"
+    if [[ "$checkout_result" == *"Your branch is up to date with 'origin/release-branch'."* && "${IF_NEEDED:-}" == "1" ]]
     then
-        log INFO "Rebasing latest release-branch..."
-        git fetch origin --prune
-        checkout_result="$(git checkout release-branch)"
-        log INFO "$checkout_result"
-        if [[ "$checkout_result" == *"Your branch is up to date with 'origin/release-branch'."* && "${IF_NEEDED:-}" == "1" ]]; then
-            # Nothing to do then.
-            exit 0
-        fi
-        git rebase
+        # Nothing to do then.
+        exit 0
     fi
+    git rebase
 }
 
 # Install crontabs (in production)
@@ -123,8 +120,7 @@ update_branch() {
 # - 1x per day run this deploy script to rebuild the docker images from scratch (to get latest security patches)
 # - 1x per day delete > 4-day old logs from the 'logs/' directory
 install_crontab() {
-if [ "${PROD:-}" == "1" ]
-then
+    if [ "${PROD:-}" != "1" ]; then return; fi
     # Set up log for crontab jobs (including deployment log)
     mkdir -p "$(pwd)/logs"
     touch "$CRON_LOG"
@@ -140,7 +136,6 @@ crontab << ENDCRON
 # Remove 4-day-old logs (logs > 3 days old): every day at 7:37AM UTC (12:37AM MST).
 37 7 * * * find "$(pwd)/logs/" -mtime +3  -exec rm {} \; >> "$CRON_LOG"  2>&1
 ENDCRON
-fi
 }
 
 # Set docker-compose profile based on dev or prod
@@ -166,16 +161,16 @@ set_extras() {
 
 # Build the docker images
 build_images() {
-    if [ "${BUILD:-}" == "1" ]
-    then
-        log INFO "Building latest images..."
-        # shellcheck disable=SC2068
-        docker compose ${COMPOSE_EXTRAS[@]:-} --profile $PROFILE build ${BUILD_EXTRAS[@]:-}
-    fi
+    if [ "${BUILD:-}" != "1" ]; then return; fi
+    log INFO "Building latest images..."
+    # shellcheck disable=SC2068
+    docker compose ${COMPOSE_EXTRAS[@]:-} --profile $PROFILE build ${BUILD_EXTRAS[@]:-}
 }
 
 # Run any build steps (e.g. migrations, npm scripts, etc.)
 run_build_steps() {
+    if [ "${BUILD:-}" != "1" ]; then return; fi
+
     log INFO "Running build steps..."
 
     log INFO "Running npm install and build..."
