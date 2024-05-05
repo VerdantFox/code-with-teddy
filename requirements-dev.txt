@@ -459,9 +459,6 @@ email-validator==2.1.1 \
     # via
     #   fastapi
     #   wtforms
-evdev==1.7.0 \
-    --hash=sha256:95bd2a1e0c6ce2cd7a2ecc6e6cd9736ff794b3ad5cb54d81d8cbc2e414d0b870
-    # via pynput
 faker==25.0.1 \
     --hash=sha256:6737cc6d591cd83421fdc5e494f6e2c1a6e32266214f158b745aa9fa15687c98 \
     --hash=sha256:c153505618801f1704807b258a6010ea8cabf91f66f4788939bfdba83b887e76
@@ -1256,9 +1253,6 @@ pygments==2.18.0 \
 pymdown-extensions==10.8.1 \
     --hash=sha256:3ab1db5c9e21728dabf75192d71471f8e50f216627e9a1fa9535ecb0231b9940 \
     --hash=sha256:f938326115884f48c6059c67377c46cf631c733ef3629b6eed1349989d1b30cb
-pynput==1.7.6 \
-    --hash=sha256:19861b2a0c430d646489852f89500e0c9332e295f2c020e7c2775e7046aa2e2f \
-    --hash=sha256:3a5726546da54116b687785d38b1db56997ce1d28e53e8d22fc656d8b92e533c
 pyproject-hooks==1.1.0 \
     --hash=sha256:4b37730834edbd6bd37f26ece6b44802fb1c1ee2ece0e54ddff8bfc06db86965 \
     --hash=sha256:7ceeefe9aec63a1064c18d939bdc3adf2d8aa1988a510afec15151578b232aa2
@@ -1307,10 +1301,6 @@ python-slugify==8.0.4 \
     --hash=sha256:276540b79961052b66b7d116620b36518847f52d5fd9e3a70164fc8c50faa6b8 \
     --hash=sha256:59202371d1d05b54a9e7720c5e038f928f45daaffe41dd10822f3907b937c856
     # via pytest-playwright
-python-xlib==0.33 \
-    --hash=sha256:55af7906a2c75ce6cb280a584776080602444f75815a7aff4d287bb2d7018b32 \
-    --hash=sha256:c3534038d42e0df2f1392a1b30a15a4ff5fdc2b86cfa94f072bf11b10a164398
-    # via pynput
 pytz==2024.1 \
     --hash=sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812 \
     --hash=sha256:328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319
@@ -1418,9 +1408,7 @@ six==1.16.0 \
     # via
     #   bleach
     #   ecdsa
-    #   pynput
     #   python-dateutil
-    #   python-xlib
 sniffio==1.3.1 \
     --hash=sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2 \
     --hash=sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc

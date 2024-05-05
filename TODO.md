@@ -44,12 +44,13 @@ A list of stuff that needs to get done for the project, roughly in order of impo
 - [ ] Look up extra security desired
   - [x] CSP
   - [ ] etc.
+- [x] Update run_dev to not use pynput
 - [ ] Deploy
   - [x] Set up container orchestration
   - [x] Set up deployment script
   - [x] Purchase domain
-  - [ ] Start VPS site
-  - [ ] Update apt, get docker, git, etc.
+  - [x] Start VPS site
+  - [x] Update apt, get docker, git, etc.
   - [ ] Hook domain into real site
   - [ ] Set up initial postgres
   - [ ] Set up https

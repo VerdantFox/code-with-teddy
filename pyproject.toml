@@ -104,8 +104,6 @@ dev = [
     "playwright",
     # Pre-commit: git pre-commit hooks
     "pre-commit",
-    # Pynput: keyboard listener
-    "pynput",
     # Pytest: testing framework
     "pytest",
     # Pytest-cov: coverage support for pytest
