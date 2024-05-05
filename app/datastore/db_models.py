@@ -230,7 +230,7 @@ class BlogPostSeries(Base):
 
     id: Mapped[IntPK]
     name: Mapped[StrIndexedUnique]
-    description: Mapped[StrNullable]
+    description: Mapped[str]
     posts: Mapped[list[BlogPost]] = relationship(
         back_populates="series",
         order_by=[asc(BlogPost.series_position), asc(BlogPost.created_timestamp)],

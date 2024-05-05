@@ -221,7 +221,7 @@ async def get_series_from_id(*, db: AsyncSession, series_id: int) -> db_models.B
 async def create_series(
     db: AsyncSession,
     name: str,
-    description: str | None = None,
+    description: str = "",
 ) -> db_models.BlogPostSeries:
     """Create a blog post series."""
     series = db_models.BlogPostSeries(name=name, description=description)
@@ -235,7 +235,7 @@ async def update_series(
     db: AsyncSession,
     series: db_models.BlogPostSeries,
     name: str,
-    description: str | None = None,
+    description: str,
 ) -> db_models.BlogPostSeries:
     """Update a blog post series."""
     series.name = name

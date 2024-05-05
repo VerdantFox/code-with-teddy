@@ -315,7 +315,7 @@ async def create_series(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
-            MANAGE_SERIES_TEMPLATE,
+            ADD_SERIES_FORM_TEMPLATE,
             {
                 constants.REQUEST: request,
                 "form": form,
@@ -359,11 +359,11 @@ async def create_series(
     )
 
 
-@router.patch("/blog/series/{series_id}", response_model=None)
+@router.put("/blog/series/{series_id}", response_model=None)
 @requires_permission(Action.EDIT_BP)
 async def update_series(
     request: Request,
-    current_user: LoggedInUser,  # noqa: ARG001
+    current_user: LoggedInUser,
     db: DBSession,
     series_id: int,
 ) -> _TemplateResponse:
@@ -387,9 +387,31 @@ async def update_series(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    series = await blog_handler.update_series(
-        db=db, series=series, name=form.name.data, description=form.description.data
-    )
+    try:
+        series = await blog_handler.update_series(
+            db=db, series=series, name=form.name.data, description=form.description.data
+        )
+    except sqlalchemy.exc.IntegrityError:
+        await db.rollback()
+        await db.refresh(series, attribute_names=["id", "name", "description", "posts"])
+        await db.refresh(current_user)
+        logger.exception("Error updating series")
+        FlashMessage(
+            title="Error updating series",
+            text="Name already exists.",
+            category=FlashCategory.ERROR,
+            timeout=20,
+        ).flash(request)
+        return templates.TemplateResponse(
+            SINGLE_SERIES_TEMPLATE,
+            {
+                constants.REQUEST: request,
+                "form": form,
+                "series": series,
+                "series_update_form": SeriesUpdateForm,
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
     FlashMessage(
         title="Series Updated!",
         category=FlashCategory.SUCCESS,
@@ -414,25 +436,13 @@ async def delete_series(
     series_id: int,
 ) -> _TemplateResponse:
     """Delete a blog post series."""
-    try:
-        await blog_handler.delete_series(db=db, series_id=series_id)
-    except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.PendingRollbackError) as e:
-        logger.exception("Error deleting series")
-        FlashMessage(
-            title="Error deleting series",
-            text=repr(e),
-            category=FlashCategory.ERROR,
-            timeout=30,
-        ).flash(request)
-        message = repr(e)
-        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-    else:
-        FlashMessage(
-            title="Series Deleted!",
-            category=FlashCategory.SUCCESS,
-        ).flash(request)
-        message = "Series deleted."
-        status_code = status.HTTP_200_OK
+    await blog_handler.delete_series(db=db, series_id=series_id)
+    FlashMessage(
+        title="Series Deleted!",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    message = "Series deleted."
+    status_code = status.HTTP_200_OK
     return templates.TemplateResponse(
         DELETED_SERIES_TEMPLATE,
         {

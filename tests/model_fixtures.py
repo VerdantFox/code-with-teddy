@@ -238,3 +238,54 @@ async def add_several_blog_posts_module(
         assert response.blog_post
         blog_posts.append(response.blog_post)
     return blog_posts
+
+
+@pytest.fixture(name="empty_series")
+async def add_empty_series(db_session: AsyncSession) -> db_models.BlogPostSeries:
+    """Return an empty series added to the database."""
+    return await blog_handler.create_series(
+        db=db_session, name="Empty series", description="Empty series description."
+    )
+
+
+@pytest.fixture(name="empty_series_2")
+async def add_empty_series_2(db_session: AsyncSession) -> db_models.BlogPostSeries:
+    """Return an empty series added to the database."""
+    return await blog_handler.create_series(
+        db=db_session, name="Empty series 2", description="Empty series 2 description."
+    )
+
+
+@pytest.fixture(name="empty_series_module", scope="module")
+async def add_empty_series_module(db_session_module: AsyncSession) -> db_models.BlogPostSeries:
+    """Return an empty series added to the database."""
+    return await blog_handler.create_series(db=db_session_module, name="Empty series")
+
+
+@pytest.fixture(name="series_with_post")
+async def add_series_with_post(
+    db_session: AsyncSession, basic_blog_post: db_models.BlogPost
+) -> db_models.BlogPostSeries:
+    """Return a series with a post added to the database."""
+    series = await blog_handler.create_series(
+        db=db_session, name="Series with post", description="Series with post description."
+    )
+    basic_blog_post.series_id = series.id
+    await db_session.commit()
+    await db_session.refresh(series, attribute_names=["posts"])
+    return series
+
+
+@pytest.fixture(name="series_with_posts_module", scope="module")
+async def add_series_with_posts_module(
+    db_session_module: AsyncSession, several_blog_posts_module: list[db_models.BlogPost]
+) -> db_models.BlogPostSeries:
+    """Return a series with posts added to the database."""
+    series = await blog_handler.create_series(
+        db=db_session_module, name="Series with posts", description="Series with posts description."
+    )
+    for bp in several_blog_posts_module:
+        bp.series_id = series.id
+    await db_session_module.commit()
+    await db_session_module.refresh(series, attribute_names=["posts"])
+    return series
