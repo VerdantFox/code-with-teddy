@@ -10,7 +10,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Locust stress tests
 - [ ] Set up alembic migrations
   - [x] Initial migration
-  - [ ] Get alembic working with deploy script
+  - [x] Get alembic working with deploy script
   - [ ] Use alembic in tests
 - [ ] Add resume to "experience" page
 - [ ] Add "series" data to blog posts

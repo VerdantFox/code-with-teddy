@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     db_echo: bool = False
     db_pool_size: int = 5
     db_max_overflow: int = 10
+    db_create_tables: bool = True
 
     # JWT settings
     jwt_secret: str

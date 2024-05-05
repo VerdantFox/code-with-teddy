@@ -12,6 +12,7 @@ services:
       - .env
     environment:
       - PROXY=1
+      - DB_CREATE_TABLES=0
     secrets:
       - db_connection_string
       - jwt_secret
@@ -19,7 +20,8 @@ services:
     volumes:
       - ./app/web/html/static:/code/app/web/html/static
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     profiles:
       - dev
       - prod
@@ -29,6 +31,32 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  migration:
+    container_name: migration_app
+    restart: "no"
+    image: codewithteddy_web_app
+    build:
+      context: .
+      dockerfile: ./docker_config/Dockerfile.app
+    env_file:
+      - .env
+    environment:
+      - DB_CREATE_TABLES=0
+    secrets:
+      - db_connection_string
+      - jwt_secret
+      - session_secret
+    volumes:
+      - ./scripts:/code/scripts
+      - ./migrations:/code/migrations
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python -m scripts.alembic upgrade
+    profiles:
+      - dev
+      - prod
 
   db: # Postgres
     image: postgres:16.2
@@ -50,8 +78,8 @@ services:
       - prod
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
-      start_period: 10s
-      interval: 15s
+      start_period: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
 

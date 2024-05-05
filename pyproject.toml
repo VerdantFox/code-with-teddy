@@ -28,6 +28,8 @@ maintainers = [
 dependencies = [
     # Aiocache: async cache library (temporarily stopped using because it broke html script nonce)
     "aiocache",
+    # Alembic: SQLAlchemy migration tool
+    "alembic",
     # Asyncpg: PostgreSQL database adapter
     "asyncpg",
     # Bcrypt: password hashing library
@@ -86,8 +88,6 @@ dependencies = [
 dev = [
     # Aiohttp: async HTTP client/server
     "aiohttp",
-    # Alembic: SQLAlchemy migration tool
-    "alembic",
     # Anyio: async library
     "anyio",
     # Docker: containerization tool

@@ -25,7 +25,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 
     engine = get_engine()
     try:
         async with engine.begin() as conn:
-            await conn.run_sync(db_models.Base.metadata.create_all)
+            if settings.db_create_tables:
+                await conn.run_sync(db_models.Base.metadata.create_all)
+            else:
+                yield
     except sqlalchemy.exc.OperationalError as e:  # pragma: no cover
         err_msg = (
             "Could not connect to the database. Check the connection string."

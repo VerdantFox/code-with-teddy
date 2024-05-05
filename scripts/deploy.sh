@@ -46,6 +46,7 @@ NGINX_LOG="$(pwd)/logs/${DATE}_nginx.log"
 CERTBOT_LOG="$(pwd)/logs/${DATE}_certbot.log"
 WEB_APP_LOG="$(pwd)/logs/${DATE}_web_app.log"
 DB_LOG="$(pwd)/logs/${DATE}_db.log"
+MIGRATION_LOG="$(pwd)/logs/${DATE}_migration.log"
 
 
 # ---------------------------------------------------------------------------
@@ -226,6 +227,8 @@ log_containers() {
     docker logs --follow web_app &>> "$WEB_APP_LOG" &
     touch "$DB_LOG"
     docker logs --follow db &>> "$DB_LOG" &
+    touch "$MIGRATION_LOG"
+    docker logs --follow migration_app &>> "$MIGRATION_LOG" &
 
     if [ "${PROD:-}" == "1" ]
     then

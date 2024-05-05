@@ -14,7 +14,7 @@ BASE_ARGS = ["alembic", "--config"]
 state = {BASE_ARGS_KEY: BASE_ARGS}
 
 
-cli_app = typer.Typer(add_completion=False, no_args_is_help=True)
+cli_app = typer.Typer(add_completion=False, no_args_is_help=True, pretty_exceptions_enable=False)
 
 
 @cli_app.callback()
