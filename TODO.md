@@ -56,7 +56,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] Purchase domain
   - [x] Start VPS site
   - [x] Update apt, get docker, git, etc.
-  - [ ] Hook domain into real site
+  - [x] Hook domain into real site
   - [ ] Set up initial postgres
   - [ ] Set up https
   - [ ] Set up github actions for CI/CD
