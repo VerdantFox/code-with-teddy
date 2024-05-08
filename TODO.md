@@ -57,9 +57,9 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] Start VPS site
   - [x] Update apt, get docker, git, etc.
   - [x] Hook domain into real site
-  - [ ] Set up initial postgres
-  - [ ] Set up https
-  - [ ] Set up github actions for CI/CD
+  - [x] Set up initial postgres
+  - [x] Set up github actions for CI/CD
+  - [ ] Set up https, certbot
 - [ ] Refactor to separate db models from services models
   - [ ] Add sqlite database option (for faster tests)
 - [ ] Set up logging
