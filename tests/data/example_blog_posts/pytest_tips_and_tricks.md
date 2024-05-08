@@ -52,6 +52,7 @@ I'll show the entirety of this module here for your reference.
 
 ```python
 """example: file with example python code to pytest"""
+
 import logging
 import os
 import time
@@ -185,13 +186,11 @@ My test file:
 import pytest
 
 
-def test_basic():
-    ...
+def test_basic(): ...
 
 
 @pytest.mark.slow
-def test_complicated():
-    ...
+def test_complicated(): ...
 ```
 
 If I were to run `pytest -m slow`, only the tests containing the

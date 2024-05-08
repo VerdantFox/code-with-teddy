@@ -90,6 +90,8 @@ dev = [
     "aiohttp",
     # Anyio: async library
     "anyio",
+    # Black: code formatter (for blacken-docs)
+    "black",
     # Docker: containerization tool
     "docker",
     # Faker: fake data generator
