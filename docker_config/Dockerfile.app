@@ -64,7 +64,7 @@ WORKDIR $APP_HOME
 # This user should have same UID as user that cloned repo
 RUN addgroup --system codewithteddy \
     && adduser --system --group codewithteddy \
-    && usermod -u 1000 codewithteddy
+    && usermod -u 1001 codewithteddy
 
 # Copy all files into the APP_HOME directory
 COPY app/ $APP_HOME/app
