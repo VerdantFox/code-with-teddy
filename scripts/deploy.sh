@@ -131,9 +131,9 @@ crontab << ENDCRON
 # This crontab was generated automatically by scripts/deploy.sh and should not be edited here.
 # Times calculated for UTC. (America/Denver is UTC-7, so 12:00AM MST is 7:00AM UTC.)
 # Deploy (building from scratch) and restart all containers: every day at 7:07AM UTC (12:07AM MST).
-7 7 * * * PATH=$PATH TZ=America/Denver "$(pwd)/utils/deploy.sh" --from-scratch --restart --prod >> "$CRON_LOG"  2>&1
+7 7 * * * PATH=$PATH TZ=America/Denver "$(pwd)/scripts/deploy.sh" --from-scratch --restart --prod >> "$CRON_LOG"  2>&1
 # Deploy (only if needed): every 5 minutes.
-*/5 * * * * PATH=$PATH TZ=America/Denver "$(pwd)/utils/deploy.sh" --if-needed --prod >> "$CRON_LOG"  2>&1
+*/5 * * * * PATH=$PATH TZ=America/Denver "$(pwd)/scripts/deploy.sh" --if-needed --prod >> "$CRON_LOG"  2>&1
 # Remove 4-day-old logs (logs > 3 days old): every day at 7:37AM UTC (12:37AM MST).
 37 7 * * * find "$(pwd)/logs/" -mtime +3  -exec rm {} \; >> "$CRON_LOG"  2>&1
 ENDCRON
@@ -243,7 +243,7 @@ remove_dangling() {
 
 # Main function--run all the steps
 main() {
-    log INFO "Running utils/deploy.sh..."
+    log INFO "Running scripts/deploy.sh..."
     announce_vars
     update_branch
     install_crontab
