@@ -110,7 +110,7 @@ update_branch() {
         # Nothing to do then.
         exit 0
     fi
-    git rebase
+    git pull
 }
 
 # Install crontabs (in production)
