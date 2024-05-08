@@ -71,8 +71,10 @@ services:
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_USER_FILE: /run/secrets/db_user
     secrets:
       - db_password
+      - db_user
     profiles:
       - dev
       - prod
@@ -147,6 +149,8 @@ volumes:
 secrets:
   db_password:
     file: ./secrets/db_password
+  db_user:
+    file: ./secrets/db_user
   db_connection_string:
     file: ./secrets/db_connection_string
   jwt_secret:
