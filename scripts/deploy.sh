@@ -110,6 +110,7 @@ update_branch() {
         # Nothing to do then.
         exit 0
     fi
+    git stash
     git pull
 }
 
