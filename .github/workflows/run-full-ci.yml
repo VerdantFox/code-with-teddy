@@ -67,6 +67,8 @@ jobs:
   # - Resets the 'release-branch' to reflect the 'master' branch
   # - Pushes the updated 'release-branch' to our repository
   release:
+    permissions:
+      contents: write
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - lint
