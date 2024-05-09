@@ -37,3 +37,4 @@ certbot/
 html_response.html
 data/
 secrets/
+node_modules/
