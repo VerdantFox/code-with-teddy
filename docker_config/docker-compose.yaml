@@ -12,6 +12,7 @@ services:
       - .env
     environment:
       - PROXY=1
+      - FORWARDED_ALLOW_IPS=${FORWARDED_ALLOW_IPS}
       - DB_CREATE_TABLES=0
     secrets:
       - db_connection_string
