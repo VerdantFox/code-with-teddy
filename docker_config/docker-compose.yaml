@@ -117,7 +117,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./app/web/html/static:/code/app/web/html/static
+      - ./app/web/html/static:/static
       - ./certs:/etc/ssl
     command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
     profiles:
