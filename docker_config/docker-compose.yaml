@@ -118,8 +118,10 @@ services:
       - "443:443"
     volumes:
       - ./app/web/html/static:/code/app/web/html/static
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
+      - ./certs/codewithteddy.dev/domain.cert.pem:/etc/ssl/codewithteddy.dev/domain.cert.pem
+      - ./certs/codewithteddy.dev/private.key.pem:/etc/ssl/codewithteddy.dev/private.key.pem
+      - ./certs/codewithteddy.dev/intermediate.cert.pem:/etc/ssl/codewithteddy.dev/intermediate.cert.pem
+      - ./certs/dhparam.pem 2048:/etc/ssl/certs/dhparam.pem 2048
     command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
     profiles:
       - prod
@@ -129,18 +131,6 @@ services:
       interval: 15s
       timeout: 5s
       retries: 3
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    restart: unless-stopped
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    command: "certonly --webroot --webroot-path=/var/www/certbot --email theodore.f.williams@gmail.com --agree-tos --no-eff-email --staging -d codewithteddy.dev -d www.codewithteddy.dev"
-    profiles:
-      - prod
 
 volumes:
   postgres_data:
