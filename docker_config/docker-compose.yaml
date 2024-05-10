@@ -121,6 +121,9 @@ services:
       - ./certs/codewithteddy.dev/domain.cert.pem:/etc/ssl/codewithteddy.dev/domain.cert.pem
       - ./certs/codewithteddy.dev/private.key.pem:/etc/ssl/codewithteddy.dev/private.key.pem
       - ./certs/codewithteddy.dev/intermediate.cert.pem:/etc/ssl/codewithteddy.dev/intermediate.cert.pem
+      - ./certs/codewithteddy.com/domain.cert.pem:/etc/ssl/codewithteddy.com/domain.cert.pem
+      - ./certs/codewithteddy.com/private.key.pem:/etc/ssl/codewithteddy.com/private.key.pem
+      - ./certs/codewithteddy.com/intermediate.cert.pem:/etc/ssl/codewithteddy.com/intermediate.cert.pem
       - ./certs/dhparam.pem 2048:/etc/ssl/certs/dhparam.pem 2048
     command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
     profiles:
