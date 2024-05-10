@@ -11,7 +11,6 @@ services:
     env_file:
       - .env
     environment:
-      - FORWARDED_ALLOW_IPS='*'
       - DB_CREATE_TABLES=0
     secrets:
       - db_connection_string
