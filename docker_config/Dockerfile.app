@@ -78,7 +78,7 @@ USER codewithteddy
 EXPOSE 8000
 
 # Using uvicorn as the server
-CMD ["uvicorn", "app.web.main:create_app", "--factory", "--host=0.0.0.0", "--port=8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
+# CMD ["uvicorn", "app.web.main:create_app", "--factory", "--host=0.0.0.0", "--port=8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
 
 # Using gunicorn as the server
-# CMD ["gunicorn",  "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind-address", "0.0.0.0:8000", "--access-logfile", "-", "--access-logformat", "%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s %(b)s '%(f)s' '%(a)s'", "app.web.main:create_app()"]
+CMD ["gunicorn", "app.web.main:create_app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--forwarded-allow-ips", "*", "--access-logfile", "-", "--access-logformat", "%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s %(b)s '%(f)s' '%(a)s'", "--factory"]

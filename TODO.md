@@ -50,7 +50,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] CSP
   - [ ] etc.
 - [x] Update run_dev to not use pynput
-- [ ] Deploy
+- [x] Deploy
   - [x] Set up container orchestration
   - [x] Set up deployment script
   - [x] Purchase domain
@@ -59,7 +59,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] Hook domain into real site
   - [x] Set up initial postgres
   - [x] Set up github actions for CI/CD
-  - [ ] Set up https, certbot
+  - [x] Set up https
 - [ ] Refactor to separate db models from services models
   - [ ] Add sqlite database option (for faster tests)
 - [ ] Set up logging
