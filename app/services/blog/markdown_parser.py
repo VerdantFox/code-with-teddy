@@ -117,6 +117,8 @@ def _update_html_media(html_soup: BeautifulSoup) -> None:
         img.parent["class"] = [*img.parent.get("class", []), "text-center"]
     for picture in html_soup.find_all("picture"):
         picture.parent["class"] = [*picture.parent.get("class", []), "text-center"]
+    for media in html_soup.find_all(class_="media-element"):
+        media.parent["class"] = [*media.parent.get("class", []), "text-center"]
     for video in html_soup.find_all("video"):
         video["class"] = [*video.get("class", []), "lazy"]
         for source in video.find_all("source"):

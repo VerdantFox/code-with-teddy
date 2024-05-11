@@ -64,13 +64,13 @@
           x-show="expandMedia"
           x-transition.duration.500ms
         >
-          <div class="not-prose">
+          <span class="not-prose media-element block">
             <img
               src="{{ url_for('html:static', path=locations[0]) }}"
               alt="{{ media_item.name }}"
               title="{{ media_item.name }}"
             />
-          </div>
+          </span>
         </span>
       {% elif media_item.media_type == "image" %}
         <span
@@ -78,7 +78,7 @@
           x-show="expandMedia"
           x-transition.duration.500ms
         >
-          <picture>
+          <picture class="media-element">
             {% for location in locations[:-1] %}
               <source
                 srcset="{{ url_for('html:static', path=location) }}"
@@ -97,6 +97,7 @@
           id="media-html-{{ loop.index }}"
           x-show="expandMedia"
           x-transition.duration.500ms
+          class="media-element"
         >
           <div class="flex justify-center content-center">
             <video
