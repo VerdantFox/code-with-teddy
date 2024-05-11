@@ -103,6 +103,12 @@ def save_image(name: str, image_file: MediaFileProtocol) -> str:
     """Save an image, and its webp version."""
     og_image_path = BLOG_UPLOAD_FOLDER / _fix_name_suffix(name)
 
+    # GIF don't save properly with pillow
+    # Webp is already compressed
+    if og_image_path.suffix.casefold() in (".gif", ".webp"):
+        og_image_path.write_bytes(image_file.read())
+        return get_path_str_from_static(og_image_path)
+
     try:
         pil_save(
             pic=image_file,

@@ -57,14 +57,26 @@
         </p>
       </span>
       <hr class="mb-6" />
-      {% if media_item.media_type == "image" %}
+      {% set locations = media_item.locations_to_list() %}
+      {% if media_item.media_type == "image" and locations.__len__() == 1 %}
+        <span
+          id="media-html-{{ loop.index }}"
+          x-show="expandMedia"
+          x-transition.duration.500ms
+        >
+          <img
+            src="{{ url_for('html:static', path=locations[0]) }}"
+            alt="{{ media_item.name }}"
+            title="{{ media_item.name }}"
+          />
+        </span>
+      {% elif media_item.media_type == "image" %}
         <span
           id="media-html-{{ loop.index }}"
           x-show="expandMedia"
           x-transition.duration.500ms
         >
           <picture>
-            {% set locations = media_item.locations_to_list() %}
             {% for location in locations[:-1] %}
               <source
                 srcset="{{ url_for('html:static', path=location) }}"
@@ -93,7 +105,6 @@
               playsinline
               poster="{{ url_for('html:static', path='media/shared/video-poster.svg') }}"
             >
-              {% set locations = media_item.locations_to_list() %}
               {% for location in locations %}
                 <source
                   src="{{ url_for('html:static', path=location) }}"

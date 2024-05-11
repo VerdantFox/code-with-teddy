@@ -133,6 +133,13 @@ DEPENDENCIES = {
         bundle_path=CSS_BUNDLED,
         add_version=True,
     ),
+    "Freezeframe": Dependency(
+        name="Freezeframe",
+        api_name="freezeframe",
+        url="https://unpkg.com/freezeframe@{version}/dist/freezeframe.min.js",
+        bundle_path=JS_BUNDLED_NON_DEFERRED,
+        add_version=True,
+    ),
 }
 
 
