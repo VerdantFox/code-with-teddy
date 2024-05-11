@@ -102,6 +102,20 @@ function lazyLoadVideos() {
 }
 document.addEventListener("DOMContentLoaded", lazyLoadVideos)
 
+// Add freezeframe.js to GIFs
+// https://github.com/ctrl-freaks/freezeframe.js/tree/master/packages/freezeframe
+function addFreezeFrame() {
+  const allGifs = document.querySelectorAll('img[src$=".gif"]')
+  ;[...allGifs].forEach((gif) => {
+    new Freezeframe({
+      selector: gif,
+      trigger: "click",
+      overlay: true,
+      responsive: false,
+    })
+  })
+}
+
 // Highlight the table of contents element that corresponds to the current
 // scroll position (in blog posts)
 function highlightTocElement(id) {

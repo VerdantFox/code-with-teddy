@@ -64,11 +64,13 @@
           x-show="expandMedia"
           x-transition.duration.500ms
         >
-          <img
-            src="{{ url_for('html:static', path=locations[0]) }}"
-            alt="{{ media_item.name }}"
-            title="{{ media_item.name }}"
-          />
+          <div class="not-prose">
+            <img
+              src="{{ url_for('html:static', path=locations[0]) }}"
+              alt="{{ media_item.name }}"
+              title="{{ media_item.name }}"
+            />
+          </div>
         </span>
       {% elif media_item.media_type == "image" %}
         <span
