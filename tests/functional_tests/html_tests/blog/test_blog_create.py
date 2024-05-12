@@ -153,16 +153,16 @@ picture caption</p>
 
 ADVANCED_CONTENT_TOC_NAV = """\
 <nav class="not-prose" id="toc">
-<ul class="space-y-3"><li><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#">Title</a></li>
-<li class="space-y-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-1">Header 1</a><ul class="space-y-3 ml-6">
-<li class="space-y-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-2">Header 2</a><ul class="space-y-3 ml-6">
-<li class="space-y-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-3">Header 3</a></li>
+<ul class="flex flex-col gap-3"><li class="flex flex-col gap-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#">Title</a></li>
+<li class="flex flex-col gap-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-1">Header 1</a><ul class="flex flex-col gap-3 ml-6">
+<li class="flex flex-col gap-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-2">Header 2</a><ul class="flex flex-col gap-3 ml-6">
+<li class="flex flex-col gap-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#header-3">Header 3</a></li>
 </ul>
 </li>
-<li class="space-y-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#blog-123-header-starts-with-numbers">123 Header starts with numbers</a></li>
+<li class="flex flex-col gap-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#blog-123-header-starts-with-numbers">123 Header starts with numbers</a></li>
 </ul>
 </li>
-<li><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#about-the-author">About the author</a></li><li><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#comments">Comments</a></li></ul>
+<li class="flex flex-col gap-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#about-the-author">About the author</a></li><li class="flex flex-col gap-3"><a @click="tocOpen = false; allowTocClose = false;" class="link px-2 py-1 rounded-lg" href="#comments">Comments</a></li></ul>
 </nav>"""
 
 
@@ -181,7 +181,7 @@ def test_post_create_blog_post_advanced_md_content_succeeds(test_client: TestCli
         "description": description,
         "content": ADVANCED_CONTENT_MD,
     }
-    response = test_client.post(ENDPOINT, data=data, to_file=True)
+    response = test_client.post(ENDPOINT, data=data)
     assert response.status_code == status.HTTP_200_OK
     assert re.match(rf"{BASE_URL}/blog/\d+/edit", str(response.url))
 
