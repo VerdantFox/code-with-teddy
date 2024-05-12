@@ -190,7 +190,15 @@ div.highlight.not-prose {
 }
 
 .blog-prose {
-  @apply prose-xl max-xs:prose-xl prose-h4:text-2xl max-xs:prose-h4:text-xl prose-ul:list-disc prose-ol:list-decimal prose-li:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:leading-8 prose-a:link prose-a:link-underlined prose-headings:font-semibold prose-code:bg-grayscale-200 dark:prose-code:bg-grayscale-700 prose-code:rounded prose-code:py-0.5 prose-code:px-1 prose-blockquote:border-l-8 prose-blockquote:border-primary-300 dark:prose-blockquote:border-primary-900 prose-blockquote:bg-grayscale-100 dark:prose-blockquote:bg-grayscale-800 prose-blockquote:rounded-r-lg prose-blockquote:pr-4 prose-blockquote:py-0.5 prose-blockquote:text-grayscale-500 prose-blockquote:dark:text-grayscale-400 prose-video:my-6 prose-video:max-h-96;
+  @apply prose-xl max-xs:prose-xl prose-h4:text-2xl max-xs:prose-h4:text-xl prose-ul:list-disc prose-ol:list-decimal prose-li:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:leading-8 prose-a:link prose-a:link-underlined prose-headings:font-semibold
+
+  prose-code:bg-grayscale-200 dark:prose-code:bg-grayscale-700 prose-code:rounded prose-code:py-0.5 prose-code:px-1
+
+  prose-blockquote:border-l-8 prose-blockquote:border-primary-300 dark:prose-blockquote:border-primary-900 prose-blockquote:bg-grayscale-100 dark:prose-blockquote:bg-grayscale-800 prose-blockquote:rounded-r-lg prose-blockquote:pr-4 prose-blockquote:py-0.5 prose-blockquote:text-grayscale-500 prose-blockquote:dark:text-grayscale-400
+
+  prose-video:my-6 prose-video:max-h-96
+
+  prose-table:border-collapse prose-th:border prose-td:border prose-td:border-grayscale-700 dark:prose-td:border-grayscale-100 prose-th:border-grayscale-700 dark:prose-th:border-grayscale-100 prose-th:p-2 prose-td:p-2 prose-th:bg-offset-200 even:prose-tr:bg-offset-100  odd:prose-tr:bg-offset-50 dark:prose-th:bg-grayscale-800 odd:dark:prose-tr:bg-grayscale-600 even:dark:prose-tr:bg-grayscale-700;
 }
 
 .comment-button {

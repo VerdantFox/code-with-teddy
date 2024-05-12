@@ -8,8 +8,10 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] playwright end-to-end tests
   - [ ] Integration tests (maybe)
   - [ ] Locust stress tests
-- [ ] Fix blog bugs
-  - [x] GIFs don't work
+- [x] Blog improvements
+  - [x] Fix don't work
+  - [x] Update size
+  - [x] Make tables look nicer (see "how I built a Connect 4 AI" post)
 - [x] Set up alembic migrations
   - [x] Initial migration
   - [x] Get alembic working with deploy script
