@@ -154,12 +154,12 @@ def update_toc(toc: str) -> str:
     toc_list_outer = toc_element.find("ul")
     update_element(
         element=toc_list_outer,
-        class_="flex flex-col gap-4",
+        class_="space-y-3",
     )
     for li_tag in toc_list_outer.find_all("li"):
         update_element(
             element=li_tag,
-            class_="flex flex-col gap-4",
+            class_="space-y-3",
         )
         a_tag = li_tag.find("a")
         update_element(
@@ -171,15 +171,14 @@ def update_toc(toc: str) -> str:
         for ul_tag in ul_tags:
             update_element(
                 element=ul_tag,
-                class_="flex flex-col gap-4 ml-6",
+                class_="space-y-3 ml-6",
             )
 
         update_a_tag_alpha_href(a_tag)
     # Add title comments and contact sections
     title = BeautifulSoup(
         (
-            '<li class="flex flex-col gap-4">'
-            '<a class="link px-2 py-1 rounded-lg"'
+            '<li><a class="link px-2 py-1 rounded-lg"'
             ' @click="tocOpen = false; allowTocClose = false;"'
             ' href="#">Title</a></li>'
         ),
@@ -188,8 +187,7 @@ def update_toc(toc: str) -> str:
     toc_list_outer.insert(0, title)
     about = BeautifulSoup(
         (
-            '<li class="flex flex-col gap-4">'
-            '<a class="link px-2 py-1 rounded-lg"'
+            '<li><a class="link px-2 py-1 rounded-lg"'
             ' @click="tocOpen = false; allowTocClose = false;"'
             ' href="#about-the-author">About the author</a></li>'
         ),
@@ -197,8 +195,7 @@ def update_toc(toc: str) -> str:
     )
     comments = BeautifulSoup(
         (
-            '<li class="flex flex-col gap-4">'
-            '<a class="link px-2 py-1 rounded-lg"'
+            '<li><a class="link px-2 py-1 rounded-lg"'
             ' @click="tocOpen = false; allowTocClose = false;"'
             ' href="#comments">Comments</a></li>'
         ),
