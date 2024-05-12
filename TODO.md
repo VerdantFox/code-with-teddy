@@ -64,6 +64,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] Set up initial postgres
   - [x] Set up github actions for CI/CD
   - [x] Set up https
+- [ ] Add Google Search Console
 - [ ] Refactor to separate db models from services models
   - [ ] Add sqlite database option (for faster tests)
 - [ ] Set up logging
