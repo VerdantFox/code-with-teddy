@@ -110,21 +110,33 @@ def _update_html_media(html_soup: BeautifulSoup) -> None:
     - Make all images lazy loaded.
     """
     for img in html_soup.find_all("img"):
-        img["class"] = [*img.get("class", []), "rounded-lg", "mx-auto"]
-        img["loading"] = "lazy"
-        if img.parent.name != "p":
-            continue
-        img.parent["class"] = [*img.parent.get("class", []), "text-center"]
+        _update_img(img)
     for picture in html_soup.find_all("picture"):
         picture.parent["class"] = [*picture.parent.get("class", []), "text-center"]
     for media in html_soup.find_all(class_="media-element"):
         media.parent["class"] = [*media.parent.get("class", []), "text-center"]
     for video in html_soup.find_all("video"):
-        video["class"] = [*video.get("class", []), "lazy"]
-        for source in video.find_all("source"):
-            if source.get("src"):
-                source["data-src"] = source["src"]
-                del source["src"]
+        _update_video(video)
+
+
+def _update_img(img: Tag) -> None:
+    """Update the image tag."""
+    img["class"] = [*img.get("class", []), "rounded-lg", "mx-auto"]
+    img["loading"] = "lazy"
+    if img.attrs.get("src", "").endswith(".svg"):
+        img["class"].extend(["w-4/5", "max-sm:w-full"])
+    if img.parent.name != "p":
+        return
+    img.parent["class"] = [*img.parent.get("class", []), "text-center"]
+
+
+def _update_video(video: Tag) -> None:
+    """Update the video tag."""
+    video["class"] = [*video.get("class", []), "lazy"]
+    for source in video.find_all("source"):
+        if source.get("src"):
+            source["data-src"] = source["src"]
+            del source["src"]
 
 
 def update_toc(toc: str) -> str:
