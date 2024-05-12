@@ -18,7 +18,7 @@ Then install python environment:
 
 ```bash
 # Create a virtual environment
-uv venv --python=3.11 venv
+uv venv --python=3.12 venv
 source venv/bin/activate
 
 # Install DEV dependencies

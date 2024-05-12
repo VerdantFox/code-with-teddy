@@ -64,13 +64,14 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] Set up initial postgres
   - [x] Set up github actions for CI/CD
   - [x] Set up https
-- [ ] Add Google Search Console
+- [x] Add Google Search Console
+- [ ] Make projects searchable
 - [ ] Refactor to separate db models from services models
   - [ ] Add sqlite database option (for faster tests)
 - [ ] Set up logging
   - [x] log to files that clean up automatically
   - [ ] See if other info should be logged
-  - [ ] Connect with Sentry for logging
+  - [x] Connect with Sentry for logging
 - [ ] Rebuild projects
   - [ ] Finance
   - [ ] Connect 4

@@ -6,6 +6,7 @@ This is the main entrypoint for the web app. It mounts the API and HTML apps.
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
+import sentry_sdk
 import sqlalchemy
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,27 +18,6 @@ from app.datastore.database import get_engine
 from app.settings import settings
 from app.web.api import main as api_main
 from app.web.html import main as html_main
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 (unused-argument)
-    """Code to run before taking any requests and just before shutdown."""
-    engine = get_engine()
-    try:
-        async with engine.begin() as conn:
-            if settings.db_create_tables:
-                await conn.run_sync(db_models.Base.metadata.create_all)
-            else:
-                yield
-    except sqlalchemy.exc.OperationalError as e:  # pragma: no cover
-        err_msg = (
-            "Could not connect to the database. Check the connection string."
-            " Is the server running on that host and accepting TCP/IP connections?"
-        )
-        raise RuntimeError(err_msg) from e
-    yield
-    # Code to run before shutdown.
-    await engine.dispose()
 
 
 def create_app() -> FastAPI:
@@ -75,3 +55,42 @@ def create_app() -> FastAPI:
     app.mount("/", html_main.app, name="html")
 
     return app
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 (unused-argument)
+    """Code to run before taking any requests and just before shutdown."""
+    initialize_sentry()
+
+    engine = get_engine()
+    try:
+        async with engine.begin() as conn:
+            if settings.db_create_tables:
+                await conn.run_sync(db_models.Base.metadata.create_all)
+            else:
+                yield
+    except sqlalchemy.exc.OperationalError as e:  # pragma: no cover
+        err_msg = (
+            "Could not connect to the database. Check the connection string."
+            " Is the server running on that host and accepting TCP/IP connections?"
+        )
+        raise RuntimeError(err_msg) from e
+    yield
+    # Code to run before shutdown.
+    await engine.dispose()
+
+
+def initialize_sentry() -> None:
+    """Initialize Sentry for error tracking."""
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.environment.value,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+        enable_tracing=True,
+    )

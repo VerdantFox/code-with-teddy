@@ -16,7 +16,7 @@ requires-python = ">=3.11"
 classifiers = [
     "Framework :: FastAPI",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 maintainers = [
     {name = "Theodore Williams", email = "theodore.f.williams@gmail.com"},
@@ -72,6 +72,8 @@ dependencies = [
     "python-multipart",
     # Pytz: timezone library
     "pytz",
+    # Sentry-sdk: error tracking
+    "sentry-sdk[fastapi,sqlalchemy]",  # aiohttp, httpx (dev deps)
     # SQLAlchemy: database toolkit
     "sqlalchemy[asyncio]",
     # Uv: Python package manager
