@@ -480,9 +480,9 @@ email-validator==2.1.1 \
     # via
     #   fastapi
     #   wtforms
-faker==25.1.0 \
-    --hash=sha256:2107618cf306bb188dcfea3e5cfd94aa92d65c7293a2437c1e96a99c83274755 \
-    --hash=sha256:24e28dce0b89683bb9e017e042b971c8c4909cff551b6d46f1e207674c7c2526
+faker==25.2.0 \
+    --hash=sha256:45b84f47ff1ef86e3d1a8d11583ca871ecf6730fad0660edadc02576583a2423 \
+    --hash=sha256:cfe97c4857c4c36ee32ea4aaabef884895992e209bae4cbd26807cf3e05c6918
 fastapi==0.111.0 \
     --hash=sha256:97ecbf994be0bcbdadedf88c3150252bed7b2087075ac99735403b1b76cc8fc0 \
     --hash=sha256:b9db9dd147c91cb8b769f7183535773d8741dd46f9dc6676cd82eab510228cd7
@@ -1694,9 +1694,9 @@ uvloop==0.19.0 \
     --hash=sha256:e27f100e1ff17f6feeb1f33968bc185bf8ce41ca557deee9d9bbbffeb72030b7 \
     --hash=sha256:f467a5fd23b4fc43ed86342641f3936a68ded707f4627622fa3f82a120e18256
     # via uvicorn
-virtualenv==20.26.1 \
-    --hash=sha256:604bfdceaeece392802e6ae48e69cec49168b9c5f4a44e483963f9242eb0e78b \
-    --hash=sha256:7aa9982a728ae5892558bff6a2839c00b9ed145523ece2274fad6f414690ae75
+virtualenv==20.26.2 \
+    --hash=sha256:82bf0f4eebbb78d36ddaee0283d43fe5736b53880b8a8cdcd37390a07ac3741c \
+    --hash=sha256:a624db5e94f01ad993d476b9ee5346fdf7b9de43ccaee0e0197012dc838a0e9b
     # via pre-commit
 watchfiles==0.21.0 \
     --hash=sha256:02b73130687bc3f6bb79d8a170959042eb56eb3a42df3671c79b428cd73f17cc \
