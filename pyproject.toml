@@ -44,18 +44,18 @@ dependencies = [
     "fastapi",
     # Gunicorn: load balancer
     "gunicorn",
+    # Itsdangerous: cryptographically signed tokens
+    "itsdangerous",
     # Jinja-partials: Jinja2 template partials
     "jinja-partials",
     # Jinja2: templating engine
     "jinja2",
-    # Itsdangerous: cryptographically signed tokens
-    "itsdangerous",
+    # MailerSend: email sending service
+    "mailersend",
     # Markdown: Markdown parser
     "markdown",
     # Micawber: oEmbed consumer
     "micawber",
-    # Pygments: syntax highlighting library
-    "pygments",
     # Pillow: image processing library
     "pillow",
     # PsycoPG: PostgreSQL database adapter
@@ -64,6 +64,8 @@ dependencies = [
     "pydantic",
     # Pydantic-settings: Pydantic settings management
     "pydantic-settings",
+    # Pygments: syntax highlighting library
+    "pygments",
     # Pymdown-extensions: Markdown extensions
     "pymdown-extensions",
     # Python-jose: JSON Web Tokens

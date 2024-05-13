@@ -6,11 +6,13 @@ from pathlib import Path
 
 import pytest
 from dotenv import load_dotenv
+from pytest_mock import MockerFixture
 from sqlalchemy import Table, delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy_utils.functions import database_exists, drop_database
 
 from app.datastore.database import get_engine
+from app.services.general.email_handler import mailersend_emails
 from app.services.general.transforms import to_bool
 from scripts.start_local_postgres import DBBuilder
 from tests import ADMIN_COOKIE, ADMIN_TOKEN, BASIC_COOKIE, BASIC_TOKEN
@@ -123,6 +125,14 @@ async def get_db_session_module(db_builder: DBBuilder) -> AsyncGenerator[AsyncSe
     async_session = _make_session(db_builder)
     async with async_session() as session:
         yield session
+
+
+# --------------- Mock external services ----------------
+# Email service
+@pytest.fixture(name="mock_mailersend", autouse=True, scope="session")
+def _mock_mailersend(session_mocker: MockerFixture) -> None:
+    """Mock the mailersend email service."""
+    session_mocker.patch.object(mailersend_emails.NewEmail, "send", return_value="202\n")
 
 
 # ----------------- Clean DB fixtures -------------------

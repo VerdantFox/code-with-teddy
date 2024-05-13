@@ -3,7 +3,7 @@
 from logging import getLogger
 
 import sqlalchemy
-from fastapi import APIRouter, Request, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Request, UploadFile, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 from starlette.templating import _TemplateResponse
@@ -22,6 +22,7 @@ from app import constants
 from app.datastore.database import DBSession
 from app.permissions import Action, requires_permission
 from app.services.blog import blog_handler
+from app.services.general import email_handler
 from app.web import errors
 from app.web.auth import LoggedInUser, LoggedInUserOptional
 from app.web.html import web_user_handlers
@@ -671,7 +672,11 @@ async def comment_post_preview(
 
 @router.post("/blog/{bp_id}/comment", response_model=None)
 async def comment_blog_post(
-    request: Request, db: DBSession, bp_id: int, current_user: LoggedInUserOptional
+    request: Request,
+    db: DBSession,
+    bp_id: int,
+    current_user: LoggedInUserOptional,
+    background_tasks: BackgroundTasks,
 ) -> _TemplateResponse:
     """Comment on a blog post."""
     form_data = await request.form()
@@ -757,6 +762,12 @@ async def comment_blog_post(
         text="Find it above the form.",
         category=FlashCategory.SUCCESS,
     ).flash(request)
+
+    # Send emails for comment
+    background_tasks.add_task(
+        email_handler.send_comment_notification_emails, comment=comment, post=bp
+    )
+
     response = templates.TemplateResponse(
         COMMENTS_TEMPLATE,
         {

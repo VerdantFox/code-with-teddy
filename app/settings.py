@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     app_host: str = ""
 
+    # Email settings
+    my_email_address: str = "theodore.f.williams@gmail.com"
+    site_email_address: str = "noreply@codewithteddy.dev"
+    mailersend_api_key: str = ""
+
     # Sentry settings
     sentry_dsn: str = ""
 

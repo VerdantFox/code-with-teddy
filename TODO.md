@@ -24,9 +24,10 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Analytics page (remake first) -- maybe sentry can do this?
 - [ ] Set up Oauth2 authentication (google and github)
 - [ ] Set up email service
-  - [ ] Emails for blog post comments
+  - [x] Emails to me for blog post comments
+  - [ ] Emails to other subscribers for blog post comments
   - [ ] Emails for recover password
-  - [ ] Supply domain to whoever so emails don't go to spam
+  - [x] Supply domain to whoever so emails don't go to spam
 - [x] Index site (add sitemap.xml, robots.txt, etc.)
 - [ ] Look up extra security desired
   - [x] CSP
