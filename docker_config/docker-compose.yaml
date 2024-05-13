@@ -15,6 +15,7 @@ services:
     secrets:
       - db_connection_string
       - jwt_secret
+      - mailersend_api_key
       - session_secret
     volumes:
       - ./app/web/html/static:/code/app/web/html/static
@@ -138,5 +139,7 @@ secrets:
     file: ./secrets/db_connection_string
   jwt_secret:
     file: ./secrets/jwt_secret
+  mailersend_api_key:
+    file: ./secrets/mailersend_api_key
   session_secret:
     file: ./secrets/session_secret
