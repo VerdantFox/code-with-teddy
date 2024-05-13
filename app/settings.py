@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     # Sentry settings
     sentry_dsn: str = ""
 
+    # Logfire settings
+    logfire_token: str = ""
+
     model_config = SettingsConfigDict(
         secrets_dir="/run/secrets", env_file=(".env.dev", ".env"), extra="ignore"
     )

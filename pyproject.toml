@@ -50,6 +50,8 @@ dependencies = [
     "jinja-partials",
     # Jinja2: templating engine
     "jinja2",
+    # Logfire: OpenTelemetry logging, tracing, and metrics
+    "logfire[fastapi,sqlalchemy,system-metrics]",
     # MailerSend: email sending service
     "mailersend",
     # Markdown: Markdown parser

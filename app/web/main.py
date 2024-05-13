@@ -6,11 +6,14 @@ This is the main entrypoint for the web app. It mounts the API and HTML apps.
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
+import logfire
 import sentry_sdk
 import sqlalchemy
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+from sqlalchemy.ext.asyncio import AsyncEngine
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.datastore import db_models
@@ -22,6 +25,7 @@ from app.web.html import main as html_main
 
 def create_app() -> FastAPI:
     """Create the FastAPI app."""
+    initialize_sentry()
     app = FastAPI(lifespan=lifespan)
 
     origins = [
@@ -54,14 +58,14 @@ def create_app() -> FastAPI:
     app.mount("/api/v1", api_main.app, name="api")
     app.mount("/", html_main.app, name="html")
 
+    initialize_logfire(app=app, engine=get_engine())
+
     return app
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 (unused-argument)
     """Code to run before taking any requests and just before shutdown."""
-    initialize_sentry()
-
     engine = get_engine()
     try:
         async with engine.begin() as conn:
@@ -94,3 +98,10 @@ def initialize_sentry() -> None:
         profiles_sample_rate=1.0,
         enable_tracing=True,
     )
+
+
+def initialize_logfire(app: FastAPI, engine: AsyncEngine) -> None:
+    """Initialize Logfire for OpenTelemetry metrics and logging."""
+    logfire.configure(token=settings.logfire_token)
+    logfire.instrument_fastapi(app)
+    SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine)
