@@ -31,7 +31,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
 - [x] Index site (add sitemap.xml, robots.txt, etc.)
 - [ ] Look up extra security desired
   - [x] CSP
-  - [ ] Replace python-jose dependency
+  - [x] Replace python-jose dependency
   - [x] Look into code scanning errors
   - [ ] etc.
 - [ ] Make nginx brotli work

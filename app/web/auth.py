@@ -5,9 +5,9 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 import bcrypt
+import jwt
 from fastapi import Cookie, Depends
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from sqlalchemy import select
 
 from app.datastore import db_models
@@ -119,7 +119,7 @@ async def parse_access_token(access_token: str) -> dict[str, str | int | datetim
     """Parse the access token."""
     try:
         payload = jwt.decode(access_token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-    except JWTError as e:
+    except jwt.DecodeError as e:
         raise errors.UserNotValidatedError from e
     username: str = payload.get("sub", "")
     user_id: int = payload.get("user_id", 0)
@@ -143,7 +143,7 @@ def create_access_token(user: db_models.User) -> web_models.Token:
 def encode_access_token(payload: dict[str, str | int | datetime]) -> web_models.Token:
     """Encode a JWT access token from a payload."""
     access_token = jwt.encode(
-        claims=payload, key=settings.jwt_secret, algorithm=settings.jwt_algorithm
+        payload=payload, key=settings.jwt_secret, algorithm=settings.jwt_algorithm
     )
     return web_models.Token(access_token=access_token, token_type="bearer")  # noqa: S106 (hardcoded-password-func-arg)
 
