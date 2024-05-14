@@ -119,7 +119,7 @@ async def parse_access_token(access_token: str) -> dict[str, str | int | datetim
     """Parse the access token."""
     try:
         payload = jwt.decode(access_token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-    except jwt.DecodeError as e:
+    except jwt.InvalidTokenError as e:
         raise errors.UserNotValidatedError from e
     username: str = payload.get("sub", "")
     user_id: int = payload.get("user_id", 0)
