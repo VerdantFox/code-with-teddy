@@ -15,7 +15,7 @@ def initialize_sentry() -> None:
         sample_rate=settings.sentry_sample_rate,
         enable_tracing=True,
         integrations=[
-            StarletteIntegration(transaction_style="url"),
-            FastApiIntegration(transaction_style="url"),
+            StarletteIntegration(transaction_style="endpoint"),
+            FastApiIntegration(transaction_style="endpoint"),
         ],
     )
