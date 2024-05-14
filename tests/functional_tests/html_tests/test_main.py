@@ -30,6 +30,11 @@ GET_TEST_CASES = [
         expected_text="Web Alchemist & Python Craftsman",
     ),
     GetTestCase(
+        id="healthcheck",
+        endpoint="/healthcheck",
+        expected_text="ok",
+    ),
+    GetTestCase(
         id="projects",
         endpoint="/projects",
         expected_text="Tech Playground",

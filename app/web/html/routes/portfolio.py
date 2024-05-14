@@ -1,6 +1,8 @@
 """landing: HTML routes for landing."""
 
+import sentry_sdk
 from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse
 from starlette.templating import _TemplateResponse
 
 from app import constants
@@ -25,7 +27,7 @@ async def about(
 async def projects(
     request: Request,
 ) -> _TemplateResponse:
-    """Return the portfolio landing page."""
+    """Return the portfolio projects page."""
     return templates.TemplateResponse(
         "main/projects/projects.html",
         {constants.REQUEST: request},
@@ -36,8 +38,19 @@ async def projects(
 async def experience(
     request: Request,
 ) -> _TemplateResponse:
-    """Return the portfolio landing page."""
+    """Return the portfolio experience page."""
     return templates.TemplateResponse(
         "main/experience/experience.html",
         {constants.REQUEST: request},
     )
+
+
+@router.get("/healthcheck", response_model=None)
+async def healthcheck(
+    request: Request,  # noqa: ARG001 (unused argument)
+) -> HTMLResponse:
+    """Return the portfolio healthcheck page."""
+    with sentry_sdk.configure_scope() as scope:
+        if scope.transaction:
+            scope.transaction.sampled = False
+    return HTMLResponse(content="ok")

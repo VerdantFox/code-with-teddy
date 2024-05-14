@@ -28,7 +28,7 @@ services:
       - dev
       - prod
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://web_app:8000"]
+      test: ["CMD", "curl", "-f", "http://web_app:8000/healthcheck"]
       start_period: 10s
       interval: 10s
       timeout: 5s
@@ -101,7 +101,7 @@ services:
     profiles:
       - dev
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test: ["CMD", "curl", "-f", "http://localhost/healthcheck"]
       start_period: 10s
       interval: 15s
       timeout: 5s
@@ -125,7 +125,7 @@ services:
     profiles:
       - prod
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test: ["CMD", "curl", "-f", "http://localhost/healthcheck"]
       start_period: 10s
       interval: 15s
       timeout: 5s
