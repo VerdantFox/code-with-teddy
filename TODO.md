@@ -8,6 +8,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [x] playwright end-to-end tests
   - [ ] Integration tests (maybe)
   - [ ] Locust stress tests
+- [ ] Replace python-jose dependency
 - [x] Set up alembic migrations
   - [x] Initial migration
   - [x] Get alembic working with deploy script

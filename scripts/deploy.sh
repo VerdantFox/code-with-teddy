@@ -76,10 +76,10 @@ log() {
 }
 
 # Load environment variables
-# Priority: actual environment variables > .env > .env.dev
+# Priority: actual environment variables > .env > .env.local
 source_environment() {
     globals=$(printenv | grep '^DEBUG=\|^PROD=\|^BUILD=\|^STOP=\|^START=\|^FROM_SCRATCH=\|^IF_NEEDED=' || true)
-    source .env.dev
+    source .env.local
     touch .env
     source .env
     eval "${globals}"

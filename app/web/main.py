@@ -6,7 +6,6 @@ This is the main entrypoint for the web app. It mounts the API and HTML apps.
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-import sentry_sdk
 import sqlalchemy
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -43,7 +42,6 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
     app.add_middleware(SessionMiddleware, secret_key=settings.session_secret)
 
     @app.get("/api")
@@ -60,8 +58,6 @@ def create_app() -> FastAPI:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 (unused-argument)
     """Code to run before taking any requests and just before shutdown."""
-    initialize_sentry()
-
     engine = get_engine()
     try:
         async with engine.begin() as conn:
@@ -78,19 +74,3 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 
     yield
     # Code to run before shutdown.
     await engine.dispose()
-
-
-def initialize_sentry() -> None:
-    """Initialize Sentry for error tracking."""
-    sentry_sdk.init(
-        dsn=settings.sentry_dsn,
-        environment=settings.environment.value,
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        traces_sample_rate=1.0,
-        # Set profiles_sample_rate to 1.0 to profile 100%
-        # of sampled transactions.
-        # We recommend adjusting this value in production.
-        profiles_sample_rate=1.0,
-        enable_tracing=True,
-    )

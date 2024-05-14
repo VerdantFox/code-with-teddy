@@ -111,6 +111,8 @@ def send_comment_notification_emails(
         {comment.md_content}
         """
     )
+    if not settings.mailersend_api_key:
+        return {}, ""
 
     return send_transaction_email(
         to_email=settings.my_email_address,

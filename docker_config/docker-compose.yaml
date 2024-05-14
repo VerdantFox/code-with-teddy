@@ -16,6 +16,8 @@ services:
       - db_connection_string
       - jwt_secret
       - mailersend_api_key
+      - sentry_dsn
+      - sentry_ingest
       - session_secret
     volumes:
       - ./app/web/html/static:/code/app/web/html/static
@@ -141,5 +143,9 @@ secrets:
     file: ./secrets/jwt_secret
   mailersend_api_key:
     file: ./secrets/mailersend_api_key
+  sentry_dsn:
+    file: ./secrets/sentry_dsn
+  sentry_ingest:
+    file: ./secrets/sentry_ingest
   session_secret:
     file: ./secrets/session_secret

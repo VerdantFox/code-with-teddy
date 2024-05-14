@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Environment(str, enum.Enum):
     """Environment enum."""
 
-    DEV = "dev"
+    DEV = "local"
     PROD = "prod"
 
 
@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     """Settings for the app."""
 
     # Info settings
-    environment: Environment = Environment.DEV
+    environment: Environment
 
     # Database settings
     db_connection_string: str
@@ -32,21 +32,20 @@ class Settings(BaseSettings):
 
     # App settings
     session_secret: str
-    app_name: str = "FastAPI App"
-    app_description: str = "FastAPI app"
-    app_version: str = "0.1.0"
-    app_host: str = ""
 
     # Email settings
+    mailersend_api_key: str
     my_email_address: str = "theodore.f.williams@gmail.com"
     site_email_address: str = "noreply@codewithteddy.dev"
-    mailersend_api_key: str = ""
 
     # Sentry settings
-    sentry_dsn: str = ""
+    sentry_dsn: str
+    sentry_ingest: str
 
+    # `.env` overrides `.env.local`
+    # `.env.local` is used locally, but is not present in the production docker container
     model_config = SettingsConfigDict(
-        secrets_dir="/run/secrets", env_file=(".env.dev", ".env"), extra="ignore"
+        secrets_dir="/run/secrets", env_file=(".env.local", ".env"), extra="ignore"
     )
 
 

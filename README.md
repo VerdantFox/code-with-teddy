@@ -161,7 +161,7 @@ To update dependencies, run:
 
 ## Settings and secrets
 
-Settings and secrets for the Python app are handled by the `app.settings` module, using the Pydantic `BaseSettings` class. The settings are loaded from environment variables, which can be set in a `.env` file in the root of the project. The `.env` file is not checked into version control, but a `.env.dev` file is provided as a template. Secrets are stored in the `secrets` directory, which is not checked into version control. Secrets are files who's name is the secret key and they contain just the secret value. Secrets are loaded onto the `settings` object at runtime.
+Settings and secrets for the Python app are handled by the `app.settings` module, using the Pydantic `BaseSettings` class. The settings are loaded from environment variables, which can be set in a `.env` file in the root of the project. The `.env` file is not checked into version control, but a `.env.local` file is provided as a template. Secrets are stored in the `secrets` directory, which is not checked into version control. Secrets are files who's name is the secret key and they contain just the secret value. Secrets are loaded onto the `settings` object at runtime.
 
 ## Database migrations
 

@@ -12,15 +12,24 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
+from app.settings import settings
+
 # Have to import 'jinja_globals' to register the jinja globals in this module
 from app.web.html import jinja_globals, routes  # noqa: F401 (import-unused)
 from app.web.html.const import STATIC_DIR
 from app.web.html.error_handlers import register_error_handlers
 
 SELF = "'self'"
+YOUTUBE = "youtube.com www.youtube.com"
+SCRATCH = "scratch.mit.edu"
 FONTS_BUNNY = "https://fonts.bunny.net"
 UNSAFE_INLINE = "'unsafe-inline'"
 UNSAFE_EVAL = "'unsafe-eval'"
+SENTRY_JS_CDN = "https://js.sentry-cdn.com"
+SENTRY_BROWSER_CDN = "https://browser.sentry-cdn.com"
+SENTRY_INGEST = settings.sentry_ingest
+BLOB = "blob:"
+DATA = "data:"
 
 
 class CSPMiddleware(BaseHTTPMiddleware):
@@ -40,11 +49,13 @@ class CSPMiddleware(BaseHTTPMiddleware):
         # HTMX struggles with non-unsafe-inline CSP script
         csp_policy = [
             f"default-src {SELF}",
-            "frame-src youtube.com www.youtube.com scratch.mit.edu",
-            f"style-src {SELF}  {FONTS_BUNNY} {UNSAFE_INLINE}",
+            f"frame-src {YOUTUBE} {SCRATCH}",
+            f"style-src {SELF} {FONTS_BUNNY} {UNSAFE_INLINE}",
             f"font-src {SELF} {FONTS_BUNNY}",
-            f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL}",
-            "img-src * data:",
+            f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL} {SENTRY_JS_CDN} {SENTRY_BROWSER_CDN}",
+            f"connect-src {SELF} {SENTRY_INGEST}",
+            f"worker-src {SELF} {SENTRY_JS_CDN} {SENTRY_BROWSER_CDN} {BLOB}",
+            f"img-src * {DATA}",
         ]
         response.headers["Content-Security-Policy"] = "; ".join(csp_policy)
         return response
