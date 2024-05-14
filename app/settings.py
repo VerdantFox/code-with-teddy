@@ -42,7 +42,11 @@ class Settings(BaseSettings):
     sentry_dsn: str
     sentry_ingest: str
     sentry_cdn: str
-    sentry_sample_rate: float
+    sentry_error_sample_rate: float  # <-- percentage of errors sampled
+    sentry_traces_sample_rate: float  # <-- percentage of traces sampled
+    sentry_profiles_sample_rate: float  # <-- percentage of traces profiled
+    #     (relative to sentry_traces_sample_rate)
+    # NOTE: Sentry client session sample rate currently fixed value, but could be added here
 
     # `.env` overrides `.env.local`
     # `.env.local` is used locally, but is not present in the production docker container

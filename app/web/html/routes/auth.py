@@ -1,5 +1,6 @@
 """auth: Authentication functions for the HTML web app."""
 
+import sentry_sdk
 from fastapi import APIRouter, Request, Response
 from starlette.templating import _TemplateResponse
 
@@ -47,6 +48,10 @@ async def refresh_access_token(
     remaining_time: int | None = None,
 ) -> _TemplateResponse:
     """Refresh the access token, if one is already set."""
+    with sentry_sdk.configure_scope() as scope:
+        if scope.transaction:
+            scope.transaction.sampled = False
+
     if not access_token:
         return templates.TemplateResponse(
             REFRESH_ACCESS_PARTIAL,
