@@ -18,6 +18,7 @@ services:
       - mailersend_api_key
       - sentry_dsn
       - sentry_ingest
+      - sentry_cdn
       - session_secret
     volumes:
       - ./app/web/html/static:/code/app/web/html/static
@@ -147,5 +148,7 @@ secrets:
     file: ./secrets/sentry_dsn
   sentry_ingest:
     file: ./secrets/sentry_ingest
+  sentry_cdn:
+    file: ./secrets/sentry_cdn
   session_secret:
     file: ./secrets/session_secret

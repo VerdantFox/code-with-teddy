@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     # Sentry settings
     sentry_dsn: str
     sentry_ingest: str
+    sentry_cdn: str
     sentry_sample_rate: float
 
     # `.env` overrides `.env.local`

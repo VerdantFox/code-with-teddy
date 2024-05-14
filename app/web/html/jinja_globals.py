@@ -7,6 +7,7 @@ import textwrap
 from urllib.parse import quote
 
 from app.services.blog.blog_utils import strip_markdown
+from app.settings import settings
 from app.web.html import flash_messages
 from app.web.html.const import templates
 
@@ -33,3 +34,4 @@ templates.env.globals["hasattr"] = hasattr
 templates.env.globals["shorten"] = shorten
 templates.env.globals["strip_markdown"] = strip_markdown
 templates.env.globals["get_flashed_messages"] = flash_messages.get_flashed_messages
+templates.env.globals["sentry_cdn"] = settings.sentry_cdn
