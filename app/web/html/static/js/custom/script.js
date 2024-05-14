@@ -189,7 +189,7 @@ function setThumbnailImage() {
   if (remoteFile.value) {
     imgPreview.innerHTML =
       '<img src="' +
-      remoteFile.value +
+      escapeHTML(remoteFile.value) +
       '" class="object-cover max-w-lg max-h-36" />'
   }
 }
