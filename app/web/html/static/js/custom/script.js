@@ -152,6 +152,12 @@ function addConfirmEventListener(id) {
   })
 }
 
+function escapeHTML(str) {
+  const div = document.createElement("div")
+  div.appendChild(document.createTextNode(str))
+  return div.innerHTML
+}
+
 // Set the avatar image preview (in user settings)
 function setAvatarImage(avatar_upload_id, avatar_url_id) {
   const imgPreview = document.getElementById("avatar-image")
@@ -164,11 +170,15 @@ function setAvatarImage(avatar_upload_id, avatar_url_id) {
     fileReader.readAsDataURL(files)
     fileReader.addEventListener("load", function () {
       imgPreview.innerHTML =
-        '<img src="' + this.result + '" class="object-cover h-36 w-36" />'
+        '<img src="' +
+        escapeHTML(this.result) +
+        '" class="object-cover h-36 w-36" />'
     })
   } else if (remoteFile.value) {
     imgPreview.innerHTML =
-      '<img src="' + remoteFile.value + '" class="object-cover h-36 w-36" />'
+      '<img src="' +
+      escapeHTML(remoteFile.value) +
+      '" class="object-cover h-36 w-36" />'
   }
 }
 
