@@ -52,7 +52,7 @@ EMAIL_CSS = """\
         font-size: 16px;
         line-height: 1.5;
         color: #555555;
-        margin: 0 0 20px;
+        margin: 0 0 15px;
     }
 
     footer {
@@ -70,6 +70,20 @@ EMAIL_CSS = """\
 
     a:hover {
         text-decoration: underline;
+    }
+
+    .comment {
+        background-color: #f2f2f2; /* Light gray */
+        padding: 10px;
+    }
+
+
+    blockquote {
+        padding: 10px 20px;
+        margin: 0 0 20px;
+        border-left: 5px solid #b3b3b3; /* Light gray */
+        background-color: #f9f9f9; /* Lighter gray */
+        font-style: italic;
     }
 
     /* Responsive styles */
@@ -99,12 +113,12 @@ def send_comment_notification_emails(
         f"""\
         {EMAIL_CSS}
         </style>
-        <h1>New comment on <a href="https://codewithteddy.dev/blog/{post.slug}">{post.title!r}</a></h1>
+        <h1>New comment on <a href="https://codewithteddy.dev/blog/{post.slug}#comments ">{post.title!r}</a></h1>
         <p>Commenter: {comment.name}</p>
         <p>comment:</p>
-        {comment.html_content}
+        <div class="comment">{comment.html_content}</div>
         <br><br>
-        """
+        """  # noqa: E501 (line too long)
     )
 
     text_content = textwrap.dedent(
