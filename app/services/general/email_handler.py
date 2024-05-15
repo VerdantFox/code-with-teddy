@@ -14,6 +14,7 @@ ContactType = dict[str, str]  # {name: str, email: str}
 MailBodyType = dict[str, str | ContactType | list[ContactType]]
 TransactionEmailResponse = tuple[MailBodyType, str]
 
+TEST_MESSAGE = "temporary test comment…"
 EMAIL_CSS = """\
 <style>
     /* General styles */
@@ -89,13 +90,16 @@ def send_comment_notification_emails(
     *, comment: db_models.BlogPostComment, post: db_models.BlogPost
 ) -> TransactionEmailResponse:
     """Send an email to me and others on the post."""
+    if comment.md_content == TEST_MESSAGE:
+        return {}, ""
+
     subject = f"New comment on {post.title}"
 
     html_content = textwrap.dedent(
         f"""\
         {EMAIL_CSS}
         </style>
-        <h1>New comment on {post.title!r}</h1>
+        <h1>New comment on <a href="https://codewithteddy.dev/blog/{post.slug}">{post.title!r}</a></h1>
         <p>Commenter: {comment.name}</p>
         <p>comment:</p>
         {comment.html_content}

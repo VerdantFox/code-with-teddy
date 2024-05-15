@@ -19,9 +19,9 @@ PYDANTIC_VERSION = re.search(r"pydantic==(\d+\.\d+)", REQUIREMENTS_DEV_TEXT)[1] 
 class Environment(str, enum.Enum):
     """Enum for environment types."""
 
-    LOCAL = "LOCAL"
-    DOCKER = "DOCKER"
-    PROD = "PROD"
+    LOCAL = "local"
+    DOCKER = "docker"
+    PROD = "prod"
 
     def __str__(self) -> str:
         return self.value

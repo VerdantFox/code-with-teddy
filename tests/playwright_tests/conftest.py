@@ -6,10 +6,15 @@ from typing import Any
 
 import dotenv
 import pytest
-from playwright.sync_api import Browser, Page
+from playwright.sync_api import Browser, Page, expect
 
 from tests import Environment
 from tests.playwright_tests import ENVIRONMENT_MAP, UIDetails
+
+IGNORED_CONSOLE_MESSAGES = {
+    # Sentry error for over limit of profiling requests
+    "Failed to load resource: the server responded with a status of 429 ()"
+}
 
 
 @pytest.fixture(scope="session", name="page_session_session")
@@ -30,7 +35,8 @@ def fixture_page_session(page_session_session: Page) -> Generator[Page, Any, Any
     console_msgs = []
     page.on("console", lambda msg: console_msgs.append(msg.text))
     yield page
-    assert not console_msgs
+    console_msg_set = set(console_msgs) - IGNORED_CONSOLE_MESSAGES
+    assert not console_msg_set
 
 
 @pytest.fixture()
@@ -39,7 +45,8 @@ def page(page: Page) -> Generator[Page, Any, Any]:
     console_msgs = []
     page.on("console", lambda msg: console_msgs.append(msg.text))
     yield page
-    assert not console_msgs
+    console_msg_set = set(console_msgs) - IGNORED_CONSOLE_MESSAGES
+    assert not console_msg_set
 
 
 @pytest.fixture(scope="session", name="login_basic_session_page_session")
@@ -64,7 +71,8 @@ def fixture_session_basic_login(
     console_msgs = []
     page.on("console", lambda msg: console_msgs.append(msg.text))
     yield page
-    assert not console_msgs
+    console_msg_set = set(console_msgs) - IGNORED_CONSOLE_MESSAGES
+    assert not console_msg_set
 
 
 @pytest.fixture(scope="session", name="login_admin_session_page_session")
@@ -89,7 +97,8 @@ def fixture_session_admin_login(
     console_msgs = []
     page.on("console", lambda msg: console_msgs.append(msg.text))
     yield page
-    assert not console_msgs
+    console_msg_set = set(console_msgs) - IGNORED_CONSOLE_MESSAGES
+    assert not console_msg_set
 
 
 @pytest.fixture(name="login_basic_once_page")
@@ -102,7 +111,8 @@ def fixture_login_basic_once(
     console_msgs = []
     page.on("console", lambda msg: console_msgs.append(msg.text))
     yield page
-    assert not console_msgs
+    console_msg_set = set(console_msgs) - IGNORED_CONSOLE_MESSAGES
+    assert not console_msg_set
 
 
 def login_basic(page: Page, ui_details: UIDetails) -> None:
@@ -113,6 +123,7 @@ def login_basic(page: Page, ui_details: UIDetails) -> None:
         username=ui_details.basic_username,
         password=ui_details.basic_password,
     )
+    expect(page.locator("div").filter(has_text="You are logged in!").nth(1)).to_be_visible()
 
 
 def login_admin(page: Page, ui_details: UIDetails) -> None:
@@ -123,6 +134,7 @@ def login_admin(page: Page, ui_details: UIDetails) -> None:
         username=ui_details.admin_username,
         password=ui_details.admin_password,
     )
+    expect(page.locator("div").filter(has_text="You are logged in!").nth(1)).to_be_visible()
 
 
 def login(page: Page, base_url: str, username: str, password: str) -> None:
@@ -141,24 +153,9 @@ def logout(page: Page, base_url: str) -> None:
 @pytest.fixture(scope="session", name="ui_details")
 def fixture_get_integration_environment(request: pytest.FixtureRequest) -> UIDetails:
     """Set the environment for integration tests."""
-    dotenv.load_dotenv(".env.local")
-    dotenv.load_dotenv(".env")
-    basic_username = os.environ.get("BASIC_USERNAME", "")
-    basic_password = os.environ.get("BASIC_PASSWORD", "")
-    admin_username = os.environ.get("ADMIN_USERNAME", "")
-    admin_password = os.environ.get("ADMIN_PASSWORD", "")
-    if not all(
-        [basic_username, basic_password, admin_username, admin_password]
-    ):  # pragma: no cover
-        err_msg = (
-            "BASIC_USERNAME, BASIC_PASSWORD, ADMIN_USERNAME, and ADMIN_PASSWORD"
-            " must be set in the environment."
-        )
-        raise ValueError(err_msg)
-
     all_opt = request.config.getoption("--all")
     playwright_opt = str(request.config.getoption("--playwright")).upper()
-    env_opt = "LOCAL" if all_opt else playwright_opt  # pragma: no branch
+    env_opt = "local" if all_opt else playwright_opt  # pragma: no branch
 
     try:
         environment = Environment[env_opt]
@@ -169,7 +166,31 @@ def fixture_get_integration_environment(request: pytest.FixtureRequest) -> UIDet
         )
         raise pytest.UsageError(msg) from e
 
+    dotenv.load_dotenv(".env.local")
+    dotenv.load_dotenv(".env")
+    lower_env = {k.casefold(): v for k, v in os.environ.items()}
+
+    basic_username_key = f"{environment.casefold()}_basic_username"
+    basic_password_key = f"{env_opt.casefold()}_basic_password"
+    admin_username_key = f"{env_opt.casefold()}_admin_username"
+    admin_password_key = f"{env_opt.casefold()}_admin_password"
+
+    basic_username = lower_env.get(basic_username_key, "")
+    basic_password = lower_env.get(basic_password_key, "")
+    admin_username = lower_env.get(admin_username_key, "")
+    admin_password = lower_env.get(admin_password_key, "")
+
+    if not all(
+        [basic_username, basic_password, admin_username, admin_password]
+    ):  # pragma: no cover
+        err_msg = (
+            f"{basic_username_key}, {basic_password_key}, {admin_username_key},"
+            f" and {admin_password} must be set in the environment."
+        )
+        raise ValueError(err_msg)
+
     return UIDetails(
+        environment=environment,
         url=ENVIRONMENT_MAP[environment],
         basic_username=basic_username,
         basic_password=basic_password,

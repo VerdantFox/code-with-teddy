@@ -42,7 +42,7 @@ pytest_plugins = ["tests.model_fixtures"]
 # -------------------------------------------------------
 def pytest_addoption(parser: pytest.Parser) -> None:
     """Add option to run playwright tests."""
-    environments = ["LOCAL", "PROD"]
+    environments = ["local", "prod"]
     help_msg = (
         "Run API integration tests against the specified environment. Options:" f" {environments}"
     )

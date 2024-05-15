@@ -25,7 +25,7 @@ To run the tests:
 pytest --playwright ENVIRONMENT
 ```
 
-Where `ENVIRONMENT` is one of `LOCAL` or `PROD`. Or you can run:
+Where `ENVIRONMENT` is one of `local` or `prod`. Or you can run:
 
 ```bash
 pytest --all

@@ -81,8 +81,10 @@ def test_write_edit_delete_comment_as_guest(page_session: Page, blog_post_url: s
     expect(page.locator("div").filter(has_text="Comment updated!").nth(1)).to_be_visible()
 
     # Delete the comment
+    page.wait_for_timeout(500)
     page.get_by_role("button", name="Delete comment").click()
     page.get_by_role("button", name="Delete").click()
-    expect(page.get_by_text("Comment deleted!")).to_be_visible()
+
     # Comment updated in toast notification is visible
     expect(page.locator("div").filter(has_text="Comment deleted").nth(1)).to_be_visible()
+    expect(page.get_by_text("Comment deleted!")).to_be_visible()
