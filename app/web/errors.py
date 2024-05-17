@@ -49,6 +49,20 @@ class BlogPostSeriesNotFoundError(WebError):
     status_code = status.HTTP_404_NOT_FOUND
 
 
+class PasswordResetTokenNotFoundError(WebError):
+    """Password reset token not found."""
+
+    detail = "Password reset token not found"
+    status_code = status.HTTP_404_NOT_FOUND
+
+
+class PasswordResetTokenExpiredError(WebError):
+    """Password reset token expired."""
+
+    detail = "Password reset token expired"
+    status_code = status.HTTP_400_BAD_REQUEST
+
+
 class UserNotAuthenticatedError(WebError):
     """User not authenticated."""
 

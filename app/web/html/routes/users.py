@@ -1,10 +1,8 @@
 """users: HTML routes for users."""
 
 from typing import Annotated
-from uuid import uuid4
 
-import sqlalchemy
-from fastapi import APIRouter, Query, Request, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Query, Request, UploadFile, status
 from fastapi.responses import RedirectResponse
 from starlette.templating import _TemplateResponse
 from wtforms import (
@@ -18,10 +16,8 @@ from wtforms import (
 )
 
 from app import constants
-from app.datastore import db_models
 from app.datastore.database import DBSession
-from app.permissions import Role
-from app.services.media import media_handler
+from app.services.users import user_handler
 from app.web import auth, errors
 from app.web.html.const import templates
 from app.web.html.flash_messages import FlashCategory, FlashMessage, FormErrorMessage
@@ -194,24 +190,20 @@ async def register_post(
                 constants.MESSAGE: FormErrorMessage(),
                 constants.FORM: register_form,
             },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-    user_model = db_models.User(
-        username=register_form.username.data,
-        email=register_form.email.data,
-        full_name=register_form.name.data,
-        password_hash=auth.hash_password(register_form.password.data),
-        role=Role.USER,
-        is_active=True,
+    register_response = await user_handler.register_user(
+        db=db,
+        user_input=user_handler.SaveUserInput(
+            username=register_form.username.data,
+            email=register_form.email.data,
+            full_name=register_form.name.data,
+            password=register_form.password.data,
+        ),
     )
-    db.add(user_model)
-    try:
-        await db.commit()
-    except sqlalchemy.exc.IntegrityError as e:
-        await db.rollback()
-        if 'unique constraint "ix_users_email"' in str(e):
-            register_form.email.errors.append("Email already exists for another account.")
-        if 'unique constraint "ix_users_username"' in str(e):
-            register_form.username.errors.append("Username taken.")
+    if not register_response.success:
+        for error_field, error_msg in register_response.field_errors.items():
+            register_form[error_field].errors.extend(error_msg)
         return templates.TemplateResponse(
             REGISTER_TEMPLATE,
             {
@@ -219,16 +211,18 @@ async def register_post(
                 constants.MESSAGE: FormErrorMessage(),
                 constants.FORM: register_form,
             },
+            status_code=register_response.status_code,
         )
-    await db.refresh(user_model)
+
+    user = register_response.user
     FlashMessage(
         title="Registration successful!",
-        msg=f"username: {user_model.username}",
+        msg=f"username: {user.username}",
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return RedirectResponse(
         request.url_for("html:login_get").include_query_params(
-            username_or_email=user_model.email,
+            username_or_email=user.email,
             next=register_form.redirect_url.data,
         ),
         status_code=status.HTTP_302_FOUND,
@@ -347,17 +341,22 @@ async def user_settings_post(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
 
-    await update_user_settings_from_form(form=form, user=current_user)
-
-    try:
-        await db.commit()
-    except sqlalchemy.exc.IntegrityError as e:
-        await db.rollback()
-        if "ix_users_email" in str(e):
-            form.email.errors.append("Email already exists for another account.")
-        if "ix_users_username" in str(e):
-            form.username.errors.append("Username taken.")
-        await db.refresh(current_user)
+    update_user_response = await user_handler.update_user(
+        db=db,
+        user_input=user_handler.SaveUserInput(
+            existing_user=current_user,
+            email=form.email.data,
+            username=form.username.data,
+            full_name=form.name.data,
+            password=form.password.data,
+            timezone=form.timezone.data,
+            avatar_location=form.avatar_url.data,
+            avatar_upload=form.avatar_upload.data,
+        ),
+    )
+    if not update_user_response.success:
+        for error_field, error_msg in update_user_response.field_errors.items():
+            form[error_field].errors.extend(error_msg)
         return templates.TemplateResponse(
             "users/settings.html",
             {
@@ -366,9 +365,8 @@ async def user_settings_post(
                 constants.FORM: form,
                 constants.CURRENT_USER: current_user,
             },
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=update_user_response.status_code,
         )
-    await db.refresh(current_user)
 
     FlashMessage(
         title="Settings updated!",
@@ -379,22 +377,119 @@ async def user_settings_post(
     )
 
 
-async def update_user_settings_from_form(form: UserSettingsForm, user: db_models.User) -> None:
-    """Update a user model from a form."""
-    if form.password.data:
-        user.password_hash = auth.hash_password(form.password.data)
-    user.email = form.email.data
-    user.username = form.username.data
-    user.full_name = form.name.data
-    user.timezone = form.timezone.data
-    avatar_before = user.avatar_location
-    if form.avatar_upload.data:
-        upload_file = form.avatar_upload.data
-        name = f"{user.id}_{uuid4()}"
-        user.avatar_location = await media_handler.upload_avatar(pic=upload_file, name=name)
-    if form.avatar_url.data and not form.avatar_upload.data:
-        user.avatar_location = form.avatar_url.data
-    if not form.avatar_url.data and not form.avatar_upload.data:
-        user.avatar_location = None
-    if avatar_before and avatar_before != user.avatar_location:
-        media_handler.del_media_from_path_str(avatar_before)
+class PasswordResetRequestForm(Form):
+    """Form for password reset request page."""
+
+    email: EmailField = EmailField(
+        "Email",
+        description="your@emal.com",
+        validators=[validators.Length(min=1, max=100), validators.Email()],
+    )
+
+
+@router.get("/request-password-reset", response_model=None)
+async def get_request_password_reset(request: Request) -> _TemplateResponse:
+    """Return the password reset form."""
+    form = PasswordResetRequestForm()
+    return templates.TemplateResponse(
+        "users/request_password_reset.html",
+        {constants.REQUEST: request, constants.FORM: form},
+    )
+
+
+@router.post("/request-password-reset", response_model=None)
+async def post_request_password_reset(
+    request: Request,
+    db: DBSession,
+    background_tasks: BackgroundTasks,
+) -> _TemplateResponse | RedirectResponse:
+    """Send a password reset email."""
+    form_data = await request.form()
+    form = PasswordResetRequestForm.load(form_data)
+    if not form.validate():
+        return templates.TemplateResponse(
+            "users/request_password_reset.html",
+            {
+                constants.REQUEST: request,
+                constants.MESSAGE: FormErrorMessage(),
+                constants.FORM: form,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+
+    await user_handler.send_pw_reset_email(
+        db=db, email=form.email.data, background_tasks=background_tasks
+    )
+    FlashMessage(
+        title="If the email exists, a reset link has been sent.",
+        text="Check your email for the reset link.",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    return RedirectResponse(
+        request.url_for("html:get_password_reset"),
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+class PasswordResetForm(Form):
+    """Form for password reset page."""
+
+    password: PasswordField = PasswordField(
+        "New Password",
+        validators=[validators.Length(min=8, max=100)],
+    )
+    confirm_password: PasswordField = PasswordField(
+        "Confirm New Password",
+        validators=[
+            validators.EqualTo("password", message="Passwords must match"),
+        ],
+    )
+
+
+@router.get("/reset-password/{reset_token_query}", response_model=None)
+async def get_password_reset(
+    request: Request,
+    reset_token_query: str,
+) -> _TemplateResponse:
+    """Return the password reset form."""
+    form = PasswordResetForm()
+    form.reset_token_query = reset_token_query
+    return templates.TemplateResponse(
+        "users/password_reset.html",
+        {constants.REQUEST: request, constants.FORM: form},
+    )
+
+
+@router.post("/reset-password/{reset_token_query}", response_model=None)
+async def post_password_reset(
+    request: Request,
+    db: DBSession,
+    reset_token_query: str,
+) -> _TemplateResponse | RedirectResponse:
+    """Reset the user's password."""
+    form_data = await request.form()
+    form = PasswordResetForm.load(form_data)
+    if not form.validate():
+        return templates.TemplateResponse(
+            "users/password_reset.html",
+            {
+                constants.REQUEST: request,
+                constants.MESSAGE: FormErrorMessage(),
+                constants.FORM: form,
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+
+    user = await user_handler.reset_password_from_token(
+        db=db,
+        query=reset_token_query,
+        password=form.password.data,
+    )
+    FlashMessage(
+        title="Password reset successful!",
+        category=FlashCategory.SUCCESS,
+    ).flash(request)
+    return RedirectResponse(
+        request.url_for("html:login_get").include_query_params(username_or_email=user.email),
+        status_code=status.HTTP_303_SEE_OTHER,
+    )

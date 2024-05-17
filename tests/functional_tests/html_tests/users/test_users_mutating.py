@@ -100,6 +100,7 @@ REGISTER_TEST_CASES = [
             "Field must be between 3 and 100 characters long.",
             "Field must be between 8 and 100 characters long.",
         ],
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
     ),
     RegisterTestCase(
         id="invalid_email",
@@ -112,6 +113,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, INVALID_FORM_FIELDS, "Invalid email address."],
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
     ),
     RegisterTestCase(
         id="password_mismatch",
@@ -124,6 +126,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, INVALID_FORM_FIELDS, "Passwords must match"],
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
     ),
     RegisterTestCase(
         id="repeat_username",
@@ -136,6 +139,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, "Username taken."],
+        expected_status_code=status.HTTP_400_BAD_REQUEST,
     ),
     RegisterTestCase(
         id="repeat_email",
@@ -148,6 +152,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, "Email already exists for another account."],
+        expected_status_code=status.HTTP_400_BAD_REQUEST,
     ),
 ]
 

@@ -241,3 +241,16 @@ class BlogPostSeries(Base):
         Computed("to_tsvector('english', name || ' ' || description)", persisted=True),
     )
     __table_args__ = (Index("ix_bp_series_ts_vector", ts_vector, postgresql_using="gin"),)
+
+
+class PasswordResetToken(Base):
+    """Password reset token model."""
+
+    __tablename__ = "password_reset_tokens"
+
+    id: Mapped[IntPK]
+    user_id: Mapped[UsersFk]
+    query: Mapped[StrIndexedUnique]  # Query string to be used in the URL to ID this token
+    created_timestamp: Mapped[DateTimeIndexed]
+    expires_timestamp: Mapped[DateTimeIndexed]
+    user: Mapped["User"] = relationship()

@@ -9,6 +9,7 @@ from sqlalchemy import select
 from app.datastore import db_models
 from app.datastore.database import AsyncSession, DBSession
 from app.permissions import Role
+from app.services.general import auth_helpers
 from app.web import auth, errors
 from app.web import field_types as ft
 from app.web.api import api_models
@@ -84,7 +85,7 @@ async def create_user(
         username=user_in.username,
         email=user_in.email,
         full_name=user_in.full_name,
-        password_hash=auth.hash_password(user_in.password),
+        password_hash=auth_helpers.hash_password(user_in.password),
         role=Role.USER,
         is_active=True,
         timezone=user_in.timezone,
@@ -123,7 +124,7 @@ async def update_current_user(
             raise errors.UserPermissionsError(err_msg)
         if field == "password":
             field = "password_hash"  # noqa: PLW2901 (redefined-loop-name)
-            value = auth.hash_password(value)  # noqa: PLW2901 (redefined-loop-name)
+            value = auth_helpers.hash_password(value)  # noqa: PLW2901 (redefined-loop-name)
         setattr(current_user, field, value)
     try:
         await db.commit()
@@ -159,7 +160,7 @@ async def update_user(
             raise errors.UserPermissionsError(err_msg)
         if field == "password":
             field = "password_hash"  # noqa: PLW2901 (redefined-loop-name)
-            value = auth.hash_password(value)  # noqa: PLW2901 (redefined-loop-name)
+            value = auth_helpers.hash_password(value)  # noqa: PLW2901 (redefined-loop-name)
         setattr(user_model, field, value)
     try:
         await db.commit()

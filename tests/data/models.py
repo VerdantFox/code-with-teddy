@@ -6,7 +6,7 @@ from typing import Any
 from app.datastore import db_models
 from app.permissions import Role
 from app.services.blog import blog_handler
-from app.web import auth
+from app.services.general import auth_helpers
 
 
 class UserModelKeys(str, enum.Enum):
@@ -33,7 +33,7 @@ BASIC_USER = {
     UserModelKeys.FULL_NAME: "Test User",
     UserModelKeys.IS_ACTIVE: True,
     UserModelKeys.PASSWORD: PASSWORD_VAL,
-    UserModelKeys.PASSWORD_HASH: auth.hash_password(PASSWORD_VAL),
+    UserModelKeys.PASSWORD_HASH: auth_helpers.hash_password(PASSWORD_VAL),
     UserModelKeys.ROLE: Role.USER,
 }
 
@@ -54,7 +54,7 @@ ADMIN_USER = {
     UserModelKeys.IS_ACTIVE: True,
     UserModelKeys.ROLE: Role.ADMIN,
     UserModelKeys.PASSWORD: PASSWORD_VAL,
-    UserModelKeys.PASSWORD_HASH: auth.hash_password(PASSWORD_VAL),
+    UserModelKeys.PASSWORD_HASH: auth_helpers.hash_password(PASSWORD_VAL),
 }
 
 
