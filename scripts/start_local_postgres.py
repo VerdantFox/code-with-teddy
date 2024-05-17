@@ -8,6 +8,7 @@ Run with `python -m dev_tools.start_local_postgres --help`
 import asyncio
 import contextlib
 import os
+import subprocess
 import time
 from typing import Annotated, Any, Optional
 from urllib.parse import quote_plus
@@ -22,7 +23,6 @@ from sqlalchemy import MetaData
 
 from app.datastore import database, db_models
 from scripts import populate_db
-from scripts.alembic import upgrade
 
 HEALTH_CHECK_TIMEOUT = 15
 
@@ -164,7 +164,8 @@ class DBBuilder:
     def run_migrations(self) -> None:
         """Run migrations to a specific version."""
         assert self.migration_version
-        upgrade(revision=self.migration_version)
+        args = ["python", "-m", "scripts.alembic", "upgrade", self.migration_version]
+        subprocess.run(args, check=True, shell=False)  # noqa: S603 (validate subprocess.run)
 
     def announce_vars(self) -> None:
         """Announce connection variables."""
