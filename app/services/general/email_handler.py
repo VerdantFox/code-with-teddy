@@ -14,7 +14,6 @@ ContactType = dict[str, str]  # {name: str, email: str}
 MailBodyType = dict[str, str | ContactType | list[ContactType]]
 TransactionEmailResponse = tuple[MailBodyType, str]
 
-WEBSITE_URL = "https://codewithteddy.dev"
 TEST_MESSAGE = "temporary test comment…"
 EMAIL_CSS = """\
 <style>
@@ -114,7 +113,7 @@ def send_comment_notification_emails(
         f"""\
         {EMAIL_CSS}
         </style>
-        <h1>New comment on <a href="{WEBSITE_URL}/blog/{post.slug}#comments ">{post.title!r}</a></h1>
+        <h1>New comment on <a href="{settings.base_url}/blog/{post.slug}#comments ">{post.title!r}</a></h1>
         <p>Commenter: {comment.name}</p>
         <p>comment:</p>
         <div class="comment">{comment.html_content}</div>
@@ -141,12 +140,10 @@ def send_comment_notification_emails(
     )
 
 
-def send_pw_reset_email_to_user(
-    *, user: db_models.User, pw_reset_token: db_models.PasswordResetToken
-) -> TransactionEmailResponse:
+def send_pw_reset_email_to_user(*, user: db_models.User, query: str) -> TransactionEmailResponse:
     """Send a password reset email to a user."""
-    subject = "Password reset request"
-    reset_url = f"{WEBSITE_URL}/reset-password/{pw_reset_token.query}"
+    subject = "Code With Teddy password reset request"
+    reset_url = f"{settings.base_url}/reset-password/{query}"
     html_content = textwrap.dedent(
         f"""\
         {EMAIL_CSS}
@@ -175,7 +172,7 @@ def send_pw_reset_email_to_user(
     return send_transaction_email(
         to_email=user.email,
         subject=subject,
-        to_name=user.username,
+        to_name=user.full_name,
         html_content=html_content,
         text_content=text_content,
     )

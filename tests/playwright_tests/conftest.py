@@ -8,7 +8,7 @@ import dotenv
 import pytest
 from playwright.sync_api import Browser, Page, expect
 
-from tests import Environment
+from app.settings import Environment
 from tests.playwright_tests import ENVIRONMENT_MAP, UIDetails
 
 IGNORED_CONSOLE_MESSAGES = {

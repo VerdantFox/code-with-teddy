@@ -426,7 +426,7 @@ async def post_request_password_reset(
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return RedirectResponse(
-        request.url_for("html:get_password_reset"),
+        request.url_for("html:get_request_password_reset"),
         status_code=status.HTTP_303_SEE_OTHER,
     )
 
@@ -449,14 +449,17 @@ class PasswordResetForm(Form):
 @router.get("/reset-password/{reset_token_query}", response_model=None)
 async def get_password_reset(
     request: Request,
+    db: DBSession,
     reset_token_query: str,
 ) -> _TemplateResponse:
     """Return the password reset form."""
     form = PasswordResetForm()
     form.reset_token_query = reset_token_query
+    await user_handler.assert_token_is_valid(db=db, query=reset_token_query)
+
     return templates.TemplateResponse(
         "users/password_reset.html",
-        {constants.REQUEST: request, constants.FORM: form},
+        {constants.REQUEST: request, constants.FORM: form, "reset_token_query": reset_token_query},
     )
 
 
