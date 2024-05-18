@@ -49,7 +49,12 @@ services:
       - DB_CREATE_TABLES=0
     secrets:
       - db_connection_string
+      - encryption_key
       - jwt_secret
+      - mailersend_api_key
+      - sentry_dsn
+      - sentry_ingest
+      - sentry_cdn
       - session_secret
     volumes:
       - ./scripts:/code/scripts
