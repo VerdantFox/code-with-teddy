@@ -1,5 +1,13 @@
 // Push a notification message to the screen
 function pushNotify(title, text = "", status = "success", autotimeout = 3000) {
+  // Bottom right position is sometimes offscreen on mobile
+  // Use top center position for mobile and right bottom for desktop
+  let position
+  if (window.innerWidth <= 768) {
+    position = "top center"
+  } else {
+    position = "right bottom"
+  }
   new Notify({
     status: status,
     title: title,
@@ -15,7 +23,7 @@ function pushNotify(title, text = "", status = "success", autotimeout = 3000) {
     gap: 20,
     distance: 20,
     type: 1,
-    position: "right bottom",
+    position: position,
   })
 }
 
