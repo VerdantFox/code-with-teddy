@@ -28,7 +28,7 @@ from app import permissions
 from app.datastore import db_models
 from app.datastore.database import get_engine
 from app.services.blog import blog_handler, blog_utils
-from app.web import auth
+from app.services.general import auth_helpers
 
 # DB connection constants
 DB_STRING_KEY = "DB_CONNECTION_STRING"
@@ -87,7 +87,7 @@ class PopulateDB:
                 email="dragon@gmail.com",
                 full_name="Rand Al'Thor",
                 timezone="America/Denver",
-                password_hash=auth.hash_password("password"),
+                password_hash=auth_helpers.hash_password("password"),
                 role=permissions.Role.ADMIN,
                 avatar_location="/media/local/rand.jpeg",
             ),
@@ -96,7 +96,7 @@ class PopulateDB:
                 email="alwayslucky@email.com",
                 full_name="Matrim Cauthon",
                 timezone="America/Chicago",
-                password_hash=auth.hash_password("password"),
+                password_hash=auth_helpers.hash_password("password"),
                 role=permissions.Role.USER,
                 avatar_location="https://static.wikia.nocookie.net/wot/images/c/cb/Mat_cauthon_son_of_battles_by_reddera-d993o0f.jpg",
             ),
@@ -105,7 +105,7 @@ class PopulateDB:
                 email="wolfboy@email.com",
                 full_name="Perrin Aybara",
                 timezone="America/Seattle",
-                password_hash=auth.hash_password("password"),
+                password_hash=auth_helpers.hash_password("password"),
                 role=permissions.Role.USER,
             ),
             db_models.User(
@@ -113,7 +113,7 @@ class PopulateDB:
                 email="magicmaiden@email.com",
                 full_name="Egwene al'Vere",
                 timezone="America/Denver",
-                password_hash=auth.hash_password("password"),
+                password_hash=auth_helpers.hash_password("password"),
                 role=permissions.Role.REVIEWER,
                 avatar_location="https://static.wikia.nocookie.net/wot-prime/images/e/e1/Egwene_s2_icon.jpg",
             ),

@@ -15,11 +15,11 @@ ERROR_TEMPLATE = "errors/general_error.html"
 GENERAL_ERROR_URL_FOR = "html:general_error"
 
 
-def register_error_handlers(app: FastAPI) -> None:
+def register_error_handlers(app: FastAPI) -> None:  # noqa: C901 (function too complex)
     """Register error handlers for the HTML web package."""
 
     @app.exception_handler(errors.UserNotValidatedError)
-    async def login_expired_in_handler(
+    async def login_expired_handler(
         request: Request,
         _error: errors.UserNotValidatedError,
     ) -> RedirectResponse:
@@ -83,6 +83,32 @@ def register_error_handlers(app: FastAPI) -> None:
             ),
             status_code=status.HTTP_303_SEE_OTHER,
         )
+
+    @app.exception_handler(errors.PasswordResetTokenExpiredError)
+    async def password_reset_expired_handler(
+        request: Request,
+        _error: errors.UserNotValidatedError,
+    ) -> RedirectResponse:
+        """Handle expired password reset token."""
+        FlashMessage(
+            title="Password reset token expired",
+            text="Please request a new password reset email.",
+            category=FlashCategory.WARNING,
+        ).flash(request)
+        return RedirectResponse(request.url_for("html:get_request_password_reset"), status_code=303)
+
+    @app.exception_handler(errors.PasswordResetTokenNotFoundError)
+    async def password_reset_not_found_handler(
+        request: Request,
+        _error: errors.UserNotValidatedError,
+    ) -> RedirectResponse:
+        """Handle not found password reset token."""
+        FlashMessage(
+            title="Password reset token not found",
+            text="Please request a new password reset email.",
+            category=FlashCategory.WARNING,
+        ).flash(request)
+        return RedirectResponse(request.url_for("html:get_request_password_reset"), status_code=303)
 
     @app.exception_handler(Exception)
     async def general_error(

@@ -113,7 +113,7 @@ def send_comment_notification_emails(
         f"""\
         {EMAIL_CSS}
         </style>
-        <h1>New comment on <a href="https://codewithteddy.dev/blog/{post.slug}#comments ">{post.title!r}</a></h1>
+        <h1>New comment on <a href="{settings.base_url}/blog/{post.slug}#comments ">{post.title!r}</a></h1>
         <p>Commenter: {comment.name}</p>
         <p>comment:</p>
         <div class="comment">{comment.html_content}</div>
@@ -135,6 +135,44 @@ def send_comment_notification_emails(
     return send_transaction_email(
         to_email=settings.my_email_address,
         subject=subject,
+        html_content=html_content,
+        text_content=text_content,
+    )
+
+
+def send_pw_reset_email_to_user(*, user: db_models.User, query: str) -> TransactionEmailResponse:
+    """Send a password reset email to a user."""
+    subject = "Code With Teddy password reset request"
+    reset_url = f"{settings.base_url}/reset-password/{query}"
+    html_content = textwrap.dedent(
+        f"""\
+        {EMAIL_CSS}
+        <h1>Password reset request</h1>
+        <p>Hi {user.username},</p>
+        <p>Someone requested a password reset for your account.</p>
+        <p>If this was you, click the link below to reset your password:</p>
+        <p><a href="{reset_url}">{reset_url}</a></p>
+        <p>If you didn't request a password reset, you can ignore this email.</p>
+        <footer>This email was sent to {user.email}.</footer>
+        """
+    )
+
+    text_content = textwrap.dedent(
+        f"""\
+        Password reset request
+        Hi {user.username},
+        Someone requested a password reset for your account.
+        If this was you, click the link below to reset your password (or copy and paste it into your browser):
+        {reset_url}
+        If you didn't request a password reset, you can ignore this email.
+        This email was sent to {user.email}.
+        """  # noqa: E501 (line too long)
+    )
+
+    return send_transaction_email(
+        to_email=user.email,
+        subject=subject,
+        to_name=user.full_name,
         html_content=html_content,
         text_content=text_content,
     )

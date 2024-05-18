@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from tests import Environment
+from app.settings import Environment
 
 ENVIRONMENT_MAP = {
     Environment.LOCAL: "http://localhost:8000",

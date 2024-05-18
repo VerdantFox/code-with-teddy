@@ -8,9 +8,12 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.datastore import db_models
 from app.services.media import media_handler
+from app.services.users import user_handler
+from app.web import errors
 from tests import TEST_MEDIA_DATA_PATH, TestCase
 from tests.data import models as test_models
 from tests.functional_tests import BASE_URL
@@ -100,6 +103,7 @@ REGISTER_TEST_CASES = [
             "Field must be between 3 and 100 characters long.",
             "Field must be between 8 and 100 characters long.",
         ],
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
     ),
     RegisterTestCase(
         id="invalid_email",
@@ -112,6 +116,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, INVALID_FORM_FIELDS, "Invalid email address."],
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
     ),
     RegisterTestCase(
         id="password_mismatch",
@@ -124,6 +129,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, INVALID_FORM_FIELDS, "Passwords must match"],
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
     ),
     RegisterTestCase(
         id="repeat_username",
@@ -136,6 +142,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, "Username taken."],
+        expected_status_code=status.HTTP_400_BAD_REQUEST,
     ),
     RegisterTestCase(
         id="repeat_email",
@@ -148,6 +155,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, "Email already exists for another account."],
+        expected_status_code=status.HTTP_400_BAD_REQUEST,
     ),
 ]
 
@@ -423,3 +431,147 @@ def _mock_avatar_upload_folder(tmp_path: Path, mocker: MockerFixture) -> Path:
     tmp_avatar_upload_folder_path.mkdir(parents=True, exist_ok=True)
     mocker.patch.object(media_handler, "AVATAR_UPLOAD_FOLDER", tmp_avatar_upload_folder_path)
     return tmp_avatar_upload_folder_path
+
+
+async def test_password_reset_flow_success(
+    test_client: TestClient,
+    mocker: MockerFixture,
+    basic_user: db_models.User,
+    db_session: AsyncSession,
+) -> None:
+    """Test the password reset flow."""
+    # Spy on the create_pw_reset_token function to get the query and token
+    spy_create_pw_reset_token = mocker.spy(user_handler, "create_pw_reset_token")
+
+    # Get password reset page
+    response = test_client.get("/request-password-reset")
+    assert response.status_code == status.HTTP_200_OK
+    assert "Request a password reset email" in response.text
+
+    # Request password reset
+    response = test_client.post(
+        "/request-password-reset",
+        data={EMAIL: basic_user.email},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert "If the email exists, a reset link has been sent." in response.text
+
+    # Get the password reset query and token
+    query, pw_reset_token = spy_create_pw_reset_token.spy_return
+    assert query != pw_reset_token.encrypted_query
+
+    # Get the password reset form
+    response = test_client.get(f"/reset-password/{query}")
+    assert response.status_code == status.HTTP_200_OK
+    assert "Reset your password</h1>" in response.text
+
+    # Reset password
+    new_password = "new_password!"
+    response = test_client.post(
+        f"/reset-password/{query}",
+        data={
+            "password": new_password,
+            "confirm_password": new_password,
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert "Password reset successful!" in response.text
+
+    # Check that the token is deleted
+    with pytest.raises(errors.PasswordResetTokenNotFoundError):
+        await user_handler.assert_token_is_valid(db=db_session, query=query)
+
+    # login with new password
+    response = test_client.post(
+        "/login",
+        data={
+            "username_or_email": basic_user.email,
+            "password": new_password,
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers.get("hx-redirect") == "/"
+    assert "access_token" in response.cookies
+
+
+def test_send_pw_reset_email_not_found(test_client: TestClient, mocker: MockerFixture) -> None:
+    """Test sending a password reset email for a user not found."""
+    spy_send_pw_reset_email = mocker.spy(user_handler, "send_pw_reset_email")
+
+    response = test_client.post("/request-password-reset", data={EMAIL: "missing@email.com"})
+    assert response.status_code == status.HTTP_200_OK
+    assert "If the email exists, a reset link has been sent." in response.text
+
+    assert spy_send_pw_reset_email.call_count == 1
+    assert spy_send_pw_reset_email.spy_return is None
+
+
+def test_post_request_password_reset_invalid_email(test_client: TestClient) -> None:
+    """Test resetting the password with an invalid email."""
+    response = test_client.post("/request-password-reset", data={EMAIL: "invalid_email"})
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "Invalid email address." in response.text
+
+
+def test_get_reset_password_invalid_query(test_client: TestClient) -> None:
+    """Test resetting the password with an invalid query."""
+    response = test_client.get("/reset-password/invalid_query")
+    assert response.status_code == status.HTTP_200_OK
+    assert "Password reset token not found" in response.text
+
+
+def test_post_reset_password_invalid_query(test_client: TestClient) -> None:
+    """Test resetting the password with an invalid query."""
+    response = test_client.post(
+        "/reset-password/invalid_query",
+        data={PASSWORD: "new_password", CONFIRM_PASSWORD: "new_password"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert "Password reset token not found" in response.text
+
+
+def test_post_reset_password_invalid_form(test_client: TestClient) -> None:
+    """Test resetting the password with an invalid form."""
+    response = test_client.post(
+        "/reset-password/invalid_query",
+        data={PASSWORD: "new_password", CONFIRM_PASSWORD: "differnt_password"},
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "Passwords must match" in response.text
+
+
+def test_reset_password_with_expired_token(
+    test_client: TestClient, mocker: MockerFixture, basic_user: db_models.User
+) -> None:
+    """Test resetting the password with an expired token."""
+    # Spy on the create_pw_reset_token function to get the query and token
+    spy_create_pw_reset_token = mocker.spy(user_handler, "create_pw_reset_token")
+    mocker.patch.object(user_handler, "PW_RESET_TOKEN_EXPIRATION_MINUTES", -1000)
+
+    # Request password reset
+    response = test_client.post(
+        "/request-password-reset",
+        data={EMAIL: basic_user.email},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert "If the email exists, a reset link has been sent." in response.text
+
+    # Get the password reset query and token
+    query, pw_reset_token = spy_create_pw_reset_token.spy_return
+    assert query != pw_reset_token.encrypted_query
+
+    # Get the password reset form
+    response = test_client.get(f"/reset-password/{query}")
+    assert response.status_code == status.HTTP_200_OK
+    assert "Password reset token expired" in response.text
+
+    # POST the password reset form
+    response = test_client.post(
+        f"/reset-password/{query}",
+        data={
+            "password": "new_password",
+            "confirm_password": "new_password",
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert "Password reset token expired" in response.text

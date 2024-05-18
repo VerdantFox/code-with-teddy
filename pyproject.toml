@@ -38,6 +38,8 @@ dependencies = [
     "beautifulsoup4",
     # Bleach: HTML sanitizer
     "bleach",
+    # Cryptography: cryptographic library
+    "cryptography",
     # Email-validator: email validation library for Pydantic
     "email-validator",
     # FastAPI: web framework

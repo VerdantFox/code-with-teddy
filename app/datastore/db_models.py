@@ -241,3 +241,25 @@ class BlogPostSeries(Base):
         Computed("to_tsvector('english', name || ' ' || description)", persisted=True),
     )
     __table_args__ = (Index("ix_bp_series_ts_vector", ts_vector, postgresql_using="gin"),)
+
+
+class PasswordResetToken(Base):
+    """Password reset token model.
+
+    1) Generate the query string for the token as a UUID4.
+    2) Encrypt the query string using the encryption key.
+    3) Store the encrypted query string in the database.
+    4) Send the query string in the URL to the user's email.
+    5) Re-encrypt the query string when the user clicks the link.
+    6) Use the re-encrypted query string to find the token in the database.
+    """
+
+    __tablename__ = "password_reset_tokens"
+
+    id: Mapped[IntPK]
+    user_id: Mapped[UsersFk]
+    # Encrypted query string to be used in the URL to ID this token
+    encrypted_query: Mapped[StrIndexedUnique]
+    created_timestamp: Mapped[DateTimeIndexed]
+    expires_timestamp: Mapped[DateTimeIndexed]
+    user: Mapped["User"] = relationship()

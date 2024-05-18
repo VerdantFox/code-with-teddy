@@ -6,10 +6,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Environment(str, enum.Enum):
-    """Environment enum."""
+    """Enum for environment types."""
 
-    DEV = "local"
+    LOCAL = "local"
+    DOCKER = "docker"
     PROD = "prod"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class Settings(BaseSettings):
@@ -32,6 +36,7 @@ class Settings(BaseSettings):
 
     # App settings
     session_secret: str
+    encryption_key: str
 
     # Email settings
     mailersend_api_key: str
@@ -53,6 +58,17 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         secrets_dir="/run/secrets", env_file=(".env.local", ".env"), extra="ignore"
     )
+
+    @property
+    def base_url(self) -> str:
+        """Get the base URL."""
+        match self.environment:
+            case Environment.LOCAL:
+                return "http://localhost:8000"
+            case Environment.DOCKER:
+                return "http://localhost"
+            case Environment.PROD:
+                return "https://codewithteddy.dev"
 
 
 settings: Settings = Settings()

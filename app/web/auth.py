@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-import bcrypt
 import jwt
 from fastapi import Cookie, Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -12,6 +11,7 @@ from sqlalchemy import select
 
 from app.datastore import db_models
 from app.datastore.database import DBSession
+from app.services.general import auth_helpers
 from app.settings import settings
 from app.web import errors, web_models
 from app.web import field_types as ft
@@ -158,21 +158,9 @@ async def authenticate_user(username_or_email: str, password: str, db: DBSession
     user = result.scalars().first()
     if not user:
         raise errors.UserNotAuthenticatedError
-    if not verify_password(password, user.password_hash):
+    if not auth_helpers.verify_password(password, user.password_hash):
         raise errors.UserNotAuthenticatedError
     return user
-
-
-def hash_password(password: str) -> str:
-    """Hash a password."""
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-
-
-def verify_password(plain_password: str, hashed_password: str | None) -> bool:
-    """Verify a plain password against a hashed version of the password."""
-    if not hashed_password:
-        return False
-    return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
 
 
 async def get_user_by_id(user_id: ft.Id, db: DBSession) -> db_models.User:
