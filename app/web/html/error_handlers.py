@@ -95,7 +95,7 @@ def register_error_handlers(app: FastAPI) -> None:  # noqa: C901 (function too c
             text="Please request a new password reset email.",
             category=FlashCategory.WARNING,
         ).flash(request)
-        return RedirectResponse(request.url_for("html:get_request_password_reset"))
+        return RedirectResponse(request.url_for("html:get_request_password_reset"), status_code=303)
 
     @app.exception_handler(errors.PasswordResetTokenNotFoundError)
     async def password_reset_not_found_handler(
@@ -108,7 +108,7 @@ def register_error_handlers(app: FastAPI) -> None:  # noqa: C901 (function too c
             text="Please request a new password reset email.",
             category=FlashCategory.WARNING,
         ).flash(request)
-        return RedirectResponse(request.url_for("html:get_request_password_reset"))
+        return RedirectResponse(request.url_for("html:get_request_password_reset"), status_code=303)
 
     @app.exception_handler(Exception)
     async def general_error(

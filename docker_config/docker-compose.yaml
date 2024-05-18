@@ -14,6 +14,7 @@ services:
       - DB_CREATE_TABLES=0
     secrets:
       - db_connection_string
+      - encryption_key
       - jwt_secret
       - mailersend_api_key
       - sentry_dsn
@@ -140,6 +141,8 @@ secrets:
     file: ./secrets/db_password
   db_connection_string:
     file: ./secrets/db_connection_string
+  encryption_key:
+    file: ./secrets/encryption_key
   jwt_secret:
     file: ./secrets/jwt_secret
   mailersend_api_key:

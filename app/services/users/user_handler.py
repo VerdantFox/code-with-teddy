@@ -19,7 +19,7 @@ from app.services.media import media_handler
 from app.web import errors
 
 logger = getLogger(__name__)
-PW_RESET_TOKEN_EXPIRATION_MINUTES = 1
+PW_RESET_TOKEN_EXPIRATION_MINUTES = 15
 
 
 class SaveUserInput(BaseModel, arbitrary_types_allowed=True):
@@ -226,7 +226,8 @@ async def reset_password_from_token(db: AsyncSession, query: str, password: str)
     get_user_result = await db.execute(get_user_stmt)
     try:
         user = get_user_result.scalars().one()
-    except sqlalchemy.orm.exc.NoResultFound as e:
+    # Unlikely case where the user was deleted after the token was created
+    except sqlalchemy.orm.exc.NoResultFound as e:  # pragma: no cover
         raise errors.UserNotFoundError from e
     user.password_hash = auth_helpers.hash_password(password)
     db.add(user)

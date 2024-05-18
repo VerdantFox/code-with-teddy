@@ -479,6 +479,7 @@ async def post_password_reset(
                 constants.REQUEST: request,
                 constants.MESSAGE: FormErrorMessage(),
                 constants.FORM: form,
+                "reset_token_query": reset_token_query,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
