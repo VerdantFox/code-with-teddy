@@ -23,10 +23,11 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Portfolio website (link to blog post about technologies)
   - [ ] Analytics page (remake first) -- maybe sentry can do this?
 - [ ] Set up Oauth2 authentication (google and github)
+- [ ] Allow users to delete their account
 - [ ] Set up email service
   - [x] Emails to me for blog post comments
   - [ ] Emails to other subscribers for blog post comments
-  - [ ] Emails for recover password
+  - [x] Emails for recover password
   - [x] Supply domain to whoever so emails don't go to spam
 - [x] Index site (add sitemap.xml, robots.txt, etc.)
 - [ ] Look up extra security desired
