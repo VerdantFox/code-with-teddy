@@ -81,7 +81,7 @@
         </div>
         <div class="flex items-center gap-4">
           {# Submit button #}
-          {{ render_partial('shared/partials/forms/submit_button.html', text="Submit", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 500)"}) }}
+          {{ render_partial('shared/partials/forms/submit_button.html', text="Submit", extra_fields={"@click": "smoothScroll = false; setTimeout(() => smoothScroll = true, 2000)"}) }}
           {% if is_edit %}
             {# Cancel button #}
             <button
