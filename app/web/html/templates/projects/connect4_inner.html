@@ -1,0 +1,217 @@
+<div id="game" class="grid grid-cols-6 gap-12">
+  <!-- Game board -->
+  <!-- Includes top message, circle grid, reset board/score, and settings -->
+  <div class="col-span-4 order-2">
+    <p id="message" class="fs-1-6"></p>
+
+    <!-- Circle grid -->
+    <table id="board" class="connect-4-table pb-14">
+      {% for row in range(6) %}
+        <tr>
+          {% for col in range(7) %}
+            <td
+              id="circle-{{ col }}-{{ row }}"
+              class="circles cursor-pointer"
+            ></td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      <tr id="ai-move-weights-row">
+        {% for col in range(7) %}
+          <td id="ai-weight-{{ col }}" class="ai-weight">&nbsp;</td>
+        {% endfor %}
+      </tr>
+    </table>
+
+    <!-- Reset buttons -->
+    <div class="flex gap-6 mb-8 font-bold">
+      <div class="flex-grow">
+        <button id="reset-board" class="btn btn-filled w-full">
+          Reset Board
+        </button>
+      </div>
+      <div class="flex-grow">
+        <button id="reset-score" class="btn btn-filled-danger w-full">
+          Reset Score
+        </button>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="grid grid-cols-2 gap-6 w-full">
+      <div class="">
+        <div class="custom-control custom-switch">
+          <input
+            type="checkbox"
+            class="custom-control-input"
+            id="auto-reset-switch"
+          />
+          <label
+            class="custom-control-label cursor-pointer"
+            for="auto-reset-switch"
+            >Auto-reset until games played =<br />(0 means continue
+            forever)</label
+          >
+          {# {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='auto_reset', field_data='false', field_label_text='Auto-reset until games played = (0 means continue forever)', id="auto-reset-switch") }} #}
+        </div>
+      </div>
+      <div class="">
+        <label hidden for="total-games"
+          >Until this many games played...<br />(0 means continue
+          forever)</label
+        >
+        <input
+          class="form-field"
+          id="total-games"
+          min="0"
+          name="total-games"
+          step="1"
+          pattern="^[-\d]\d*$"
+          type="number"
+          value="10"
+        />
+      </div>
+
+      <div class="">
+        <div class="custom-control custom-switch">
+          <input
+            type="checkbox"
+            class="custom-control-input"
+            id="show-move-weights-switch"
+          />
+          <label
+            class="custom-control-label cursor-pointer"
+            for="show-move-weights-switch"
+            >Show AI move weights</label
+          >
+        </div>
+      </div>
+      <div class="">
+        <div class="custom-control custom-switch">
+          <input
+            type="checkbox"
+            class="custom-control-input"
+            id="show-move-animations-switch"
+            checked
+          />
+          <label
+            class="custom-control-label cursor-pointer"
+            for="show-move-animations-switch"
+            >Show move animations</label
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Red player panel -->
+  <div class="text-center order-1 player-section">
+    <p>Red player<br />(<span id="red-description">human</span>)</p>
+    <div class="pic-wrapper">
+      <img
+        id="red-pic"
+        class="avatar"
+        src="{{ url_for('html:static', path='media/connect4/fox-red.png') }}"
+        alt="Red Player"
+      />
+    </div>
+    <p>
+      Red Score:<br />(W-L-D)<br /><span id="red-score"
+        ><span id="red-wins">0</span>-<span id="red-losses">0</span>-<span
+          id="red-draws"
+          >0</span
+        ></span
+      >
+    </p>
+    <div id="red-settings" class="flex flex-col gap-4">
+      <div class="custom-control custom-switch">
+        <input type="checkbox" class="custom-control-input" id="red-switch" />
+        <label class="custom-control-label cursor-pointer" for="red-switch"
+          >Is Computer</label
+        >
+      </div>
+      <label for="red-depth"
+        >Depth: <span id="red-depth-display">0</span></label
+      >
+      <input
+        type="range"
+        class="custom-range"
+        min="0"
+        max="6"
+        id="red-depth"
+        value="4"
+      />
+      <div class="custom-control custom-switch">
+        <input
+          type="checkbox"
+          class="custom-control-input"
+          id="red-auto-move"
+          checked
+        />
+        <label class="custom-control-label cursor-pointer" for="red-auto-move"
+          >Auto-move</label
+        >
+      </div>
+      <button id="red-move-button" class="btn btn-filled" disabled>Move</button>
+    </div>
+  </div>
+
+  <!-- Blue player panel -->
+  <div class="text-center order-3 player-section">
+    <p>Blue player<br />(<span id="blue-description">human</span>)</p>
+    <div>
+      <img
+        class="avatar"
+        id="blue-pic"
+        src="{{ url_for('html:static', path='media/connect4/fox-blue.png') }}"
+        alt="Blue Player"
+      />
+    </div>
+    <p>
+      Blue Score:<br />(W-L-D)<br /><span id="blue-score"
+        ><span id="blue-wins">0</span>-<span id="blue-losses">0</span>-<span
+          id="blue-draws"
+          >0</span
+        ></span
+      >
+    </p>
+    <div id="blue-settings" class="flex flex-col gap-4">
+      <div class="custom-control custom-switch">
+        <input
+          type="checkbox"
+          class="custom-control-input"
+          id="blue-switch"
+          checked
+        />
+        <label class="custom-control-label cursor-pointer" for="blue-switch"
+          >Is Computer</label
+        >
+      </div>
+      <label for="blue-depth"
+        >Depth: <span id="blue-depth-display">0</span></label
+      >
+      <input
+        type="range"
+        class="custom-range"
+        min="0"
+        max="6"
+        id="blue-depth"
+        value="4"
+      />
+      <div class="custom-control custom-switch">
+        <input
+          type="checkbox"
+          class="custom-control-input"
+          id="blue-auto-move"
+          checked
+        />
+        <label class="custom-control-label cursor-pointer" for="blue-auto-move"
+          >Auto-move</label
+        >
+      </div>
+      <button id="blue-move-button" class="btn btn-filled" disabled>
+        Move
+      </button>
+    </div>
+  </div>
+</div>

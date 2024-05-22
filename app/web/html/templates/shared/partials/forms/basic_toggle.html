@@ -1,0 +1,47 @@
+{% if not extra_fields %}
+  {% set extra_fields = {} %}
+{% endif %}
+<!-- Toggle -->
+<div class="flex flex-col gap-2">
+  <div
+    x-data="{ value: {{ field_data if field_data else 'false' }} }"
+    class="flex items-center justify-center"
+    x-id="['toggle-label']"
+  >
+    <input id="{{ id }}" type="hidden" name="{{ field_name }}" :value="value" />
+
+    <!-- Label -->
+    <label
+      for="{{ id }}"
+      @click="$refs.toggle.click(); $refs.toggle.focus()"
+      :id="$id('toggle-label')"
+    >
+      {{ field_label_text }}
+    </label>
+
+    <!-- Button -->
+    <button
+      x-ref="toggle"
+      x-cloak="true"
+      @click="value = ! value{% if click_extras %}{{ click_extras }}{% endif %}"
+      type="button"
+      role="switch"
+      :aria-checked="value"
+      :aria-labelledby="$id('toggle-label')"
+      :class="value ? 'bg-primary-500 hover:bg-primary-600' : 'bg-grayscale-300 hover:bg-grayscale-400 dark:bg-grayscale-600 hover:dark:bg-gray-500'"
+      class="relative ml-4 inline-flex w-14 min-w-14 rounded-full py-1 transition"
+      {% for key, val in extra_fields.items() %}
+        {{ key }}="{{ val }}"
+      {% endfor %}
+    >
+      <span
+        :class="value ? 'translate-x-7' : 'translate-x-1'"
+        class="bg-white h-6 w-6 rounded-full transition shadow-md"
+        aria-hidden="true"
+      ></span>
+    </button>
+  </div>
+  {% if field_errors %}
+    {{ render_partial('shared/partials/forms/field_errors.html', errors=field_errors) }}
+  {% endif %}
+</div>

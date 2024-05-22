@@ -1,0 +1,181 @@
+/* Connect 4 CSS */
+h3 {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.avatar {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  padding: 25px;
+}
+.active-player {
+  padding: 0;
+}
+
+.mw-red {
+  background-color: #f44336;
+}
+.mw-green {
+  background-color: #4caf50;
+}
+.mw-yellow {
+  background-color: #ffeb3b;
+}
+.mw-selected {
+  border: 4px solid black;
+}
+
+.connect-4-table {
+  margin: auto;
+  border-collapse: separate;
+}
+
+.circles {
+  -moz-border-radius: 100%;
+  -webkit-border-radius: 100%;
+  width: 80px;
+  height: 80px;
+  background-color: dimgrey;
+  border-spacing: 0;
+  border: 4px solid black;
+}
+.dark .circles {
+  border: 4px solid silver;
+}
+
+.chosen {
+  border: 7px dashed yellow;
+}
+
+.dark .chosen {
+  border: 7px dashed yellow;
+}
+
+/* Mobile adjustment */
+@media only screen and (max-device-width: 480px) {
+  .circles {
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    width: 50px;
+    height: 50px;
+    background-color: dimgrey;
+    border-spacing: 0;
+    border: 4px solid black;
+  }
+
+  .chosen {
+    border: 4px dashed yellow;
+  }
+}
+
+.color-blue {
+  background-color: blue;
+}
+
+.color-red {
+  background-color: red;
+}
+
+/*https://codepen.io/metagrapher/pen/tgcLl*/
+/*and*/
+/*https://css-tricks.com/almanac/properties/a/animation/*/
+
+/* Blue winning color animation */
+.color-blue-win {
+  animation: colorchange-blue 3s infinite; /* animation-name followed by duration in seconds*/
+  /* you could also use milliseconds (ms) or something like 2.5s */
+  -webkit-animation: colorchange-blue 3s infinite; /* Chrome and Safari */
+}
+
+@keyframes colorchange-blue {
+  0% {
+    background-color: blue;
+  }
+  10% {
+    background-color: blue;
+  }
+  40% {
+    background-color: green;
+  }
+  60% {
+    background-color: green;
+  }
+  90% {
+    background-color: blue;
+  }
+  100% {
+    background-color: blue;
+  }
+}
+
+@-webkit-keyframes colorchange-blue /* Safari and Chrome - necessary duplicate */ {
+  0% {
+    background-color: blue;
+  }
+  10% {
+    background-color: blue;
+  }
+  40% {
+    background-color: green;
+  }
+  60% {
+    background-color: green;
+  }
+  90% {
+    background-color: blue;
+  }
+  100% {
+    background-color: blue;
+  }
+}
+
+/* Red winning color animation */
+.color-red-win {
+  animation: colorchange-red 3s infinite; /* animation-name followed by duration in seconds*/
+  /* you could also use milliseconds (ms) or something like 2.5s */
+  -webkit-animation: colorchange-red 3s infinite; /* Chrome and Safari */
+}
+
+@keyframes colorchange-red {
+  0% {
+    background-color: red;
+  }
+  10% {
+    background-color: red;
+  }
+  40% {
+    background-color: green;
+  }
+  60% {
+    background-color: green;
+  }
+  90% {
+    background-color: red;
+  }
+  100% {
+    background-color: red;
+  }
+}
+
+@-webkit-keyframes colorchange-red /* Safari and Chrome - necessary duplicate */ {
+  0% {
+    background-color: red;
+  }
+  10% {
+    background-color: red;
+  }
+  40% {
+    background-color: green;
+  }
+  60% {
+    background-color: green;
+  }
+  90% {
+    background-color: red;
+  }
+  100% {
+    background-color: red;
+  }
+}

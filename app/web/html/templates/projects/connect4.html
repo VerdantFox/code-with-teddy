@@ -1,0 +1,288 @@
+{% extends "shared/base.html" %}
+{% set active_nav_item = 2 %}
+{% set page_title = "Connect 4" %}
+<!-- prettier-ignore-start -->
+{% block meta_description %}Play connect 4 either against and AI opponent or hot seat on the same machine.{% endblock meta_description %}
+<!-- prettier-ignore-end -->
+
+{% block custom_js_end %}
+  <script
+    nonce="{{ request.state.nonce }}"
+    src="{{ url_for('html:static', path='/js/custom/connect4.js') }}?{{ static_version }}"
+  ></script>
+{% endblock custom_js_end %}
+{% block custom_css %}
+  <link
+    rel="stylesheet"
+    href="{{ url_for('html:static', path='css/connect4.css') }}?{{ static_id }}"
+  />
+{% endblock custom_css %}
+
+{% block content %}
+  <div class="section-container">
+    <div class="@prose blog-prose max-w-2xl">
+      <section>
+        <div class="mt-64">
+          <h1>Connect 4</h1>
+          <p>
+            Who doesn't enjoy a good board game? This is the classic board game,
+            Connect 4. Touching any of the below headers
+            {{ render_partial('shared/partials/icons/caret-right-bold.html', title='open dropdown menu', class="h-5 w-5 inline-block") }}
+            will drop-down relevant information about the game. If you want to
+            read more about the game and AI implementation, click
+            <a
+              href="/blog/how-i-built-a-connect-4-ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              >here to read my blog article on the subject</a
+            >. Thanks for playing. Have fun! 😀
+          </p>
+        </div>
+      </section>
+      <section>
+        <div x-data="{expanded: false}">
+          <div
+            :aria-expanded="expanded"
+            class="hover:cursor-pointer"
+            @click="expanded = !expanded"
+          >
+            <h2 x-cloak>
+              The rules
+              {{ render_partial('shared/partials/icons/caret-right-bold.html', title='open dropdown menu', class="h-8 w-8 inline-block", xshow="!expanded") }}
+              {{ render_partial('shared/partials/icons/caret-down-bold.html', title='close dropdown menu', class="h-8 w-8 inline-block", xshow="expanded") }}
+            </h2>
+          </div>
+          <div x-cloak x-show="expanded" x-transition>
+            <p>
+              The game is played on a 7-column-wide by 6-row-tall vertical
+              board. One player is 🔴 red and the other is 🔵 blue. The 🔴 red
+              player plays first. Players take turns placing chips into columns
+              on the board. When a colored chip is placed into a column, it
+              falls to the bottom available space in that column. The first
+              player to get 4 chips in a row (horizontally, vertically, or
+              diagonally) is the winner.
+            </p>
+          </div>
+        </div>
+        <div x-data="{expanded: false}">
+          <div
+            :aria-expanded="expanded"
+            class="hover:cursor-pointer"
+            @click="expanded = !expanded"
+          >
+            <h2 x-cloak>
+              How to play
+              {{ render_partial('shared/partials/icons/caret-right-bold.html', title='open dropdown menu', class="h-8 w-8 inline-block", xshow="!expanded") }}
+              {{ render_partial('shared/partials/icons/caret-down-bold.html', title='close dropdown menu', class="h-8 w-8 inline-block", xshow="expanded") }}
+            </h2>
+          </div>
+          <div x-cloak x-show="expanded" x-transition>
+            <p>
+              Both the 🔴 red player and the 🔵 blue player can be set to 🧐
+              "human" or 🤖 "computer/AI" (we'll call such players "computer" or
+              "AI" interchangeably). Thus the game can be played with
+              🧐human-vs-🧐human, 🧐human-vs-🤖computer, or
+              🤖computer-vs-🤖computer. To adjust if a player is a "human" or a
+              "computer", flip the "Is Computer" switch under each player's
+              colored avatar.
+            </p>
+            <p>
+              If a player is set to 🧐 "human", that player can take their turn
+              by clicking on the column they wish to drop their chip into. By
+              default, if a player is set to 🤖 "computer", the AI will
+              automatically take that player's turn. After each turn, the game
+              will check for a winner or a tie (no more moves left). If there is
+              a winner or a tie, the game will end, the winner will be displayed
+              along with their winning combination, and each player's
+              win-loss-draw score will be updated. At this point (or any point
+              during the game) the "Reset Board" button can be clicked to reset
+              the board to the starting state, ready for a new game. The "Reset
+              Scores" button will reset the win-loss-draw scores for both
+              players.
+            </p>
+          </div>
+        </div>
+        <div x-data="{expanded: false}">
+          <div
+            :aria-expanded="expanded"
+            class="hover:cursor-pointer"
+            @click="expanded = !expanded"
+          >
+            <h2 x-cloak>
+              Settings adjustments
+              {{ render_partial('shared/partials/icons/caret-right-bold.html', title='open dropdown menu', class="h-8 w-8 inline-block", xshow="!expanded") }}
+              {{ render_partial('shared/partials/icons/caret-down-bold.html', title='close dropdown menu', class="h-8 w-8 inline-block", xshow="expanded") }}
+            </h2>
+          </div>
+          <div x-cloak x-show="expanded" x-transition>
+            <p>
+              Hopefully, all of the settings are intuitive and straightforward.
+              Just in case, here's a description of what each one does.
+            </p>
+            <h3>Is Computer</h3>
+            <p>
+              Sets whether the above-listed player is a 🤖 "computer/AI" or a 🧐
+              "human" player. If flipped on, the 🤖 AI will play for that player
+              and a 🧐 human cannot make moves for the player.
+            </p>
+            <h3>AI depth slider</h3>
+            <p>
+              Sets the depth of the 🤖 AI's search tree. The higher the depth,
+              the more likely the 🤖 AI will make a good move. The lower the
+              depth, the more likely the 🤖 AI will make a bad move. The default
+              is set to 4.
+            </p>
+            <h3>Auto-move</h3>
+            <p>
+              If an 🤖 AI player's "auto-move" switch is flipped "on", the 🤖 AI
+              player will automatically make a move when it is their turn. If
+              the switch is flipped "off", the 🤖 AI player will not make a move
+              automatically. Instead, you can touch that player's "move" button
+              to have them make a move.
+            </p>
+            <h3>Auto-reset until games played</h3>
+            <p>
+              By default, when a game ends, the board will stay in the end-game
+              state until the "Reset Board" button is touched. If the
+              "Auto-reset until games played =" switch is flipped on, the board
+              will automatically reset after the game ends.
+            </p>
+            <p>
+              This is useful for 🤖AI-vs-🤖AI matches where you want to see the
+              end win-loss-draw ratio for each 🤖 AI player after a certain
+              number of back-to-back games are played. This setting is paired
+              with a number field. When the total number of games played (wins +
+              losses + draws) reaches that number, the board will cease to
+              auto-reset. Setting this number-field to "0" will make the games
+              auto-reset indefinitely.
+            </p>
+            <h3>Show AI move weights</h3>
+            <p>
+              The 🤖 AI's moves are decided by looking into the future for a
+              certain number of moves (set by the above-mentioned "AI depth
+              slider"). See the below section "The implementation" for details
+              on the 🤖 AI's implementation. Ultimately, this results in
+              weighted values for each column, and the 🤖 AI will choose the
+              highest (most positive) weighted column (choosing randomly if
+              there are multiple equally-highest rated columns). If the "Show AI
+              move weights" switch is flipped on, these weighted column values
+              appear below the game board.
+            </p>
+            <h3>Show move animations</h3>
+            <p>
+              If this switch is flipped "on", each chip placed in a column will
+              show an animation of the chip falling to the bottom available
+              space. Otherwise, the chip will simply appear at the bottom
+              available space, sans falling.
+            </p>
+          </div>
+        </div>
+        <div x-data="{expanded: false}">
+          <div
+            :aria-expanded="expanded"
+            class="hover:cursor-pointer"
+            @click="expanded = !expanded"
+          >
+            <h2 x-cloak>
+              The implementation
+              {{ render_partial('shared/partials/icons/caret-right-bold.html', title='open dropdown menu', class="h-8 w-8 inline-block", xshow="!expanded") }}
+              {{ render_partial('shared/partials/icons/caret-down-bold.html', title='close dropdown menu', class="h-8 w-8 inline-block", xshow="expanded") }}
+            </h2>
+          </div>
+          <div x-cloak x-show="expanded" x-transition>
+            <p>
+              I wrote a whole blog article on the game implementation and how I
+              built the AI through 5 layers of iteration and testing. You can
+              find that blog article
+              <a
+                href="/blog/how-i-built-a-connect-4-ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                >here</a
+              >. But it's pretty involved, so I'll summarize a little bit about
+              the game and the final AI version AI version here.
+            </p>
+            <h3>Language choice</h3>
+            <p>
+              I wrote connect 4 in JavaScript so it runs entirely client-side
+              (ie once the page loads, you could continue playing without an
+              internet connection). The JavaScript code utilizes some of the
+              latest ES6 features, and it is not transpiled to an older version
+              of JavaScript. Thus it might not behave correctly on older
+              browsers. But that's not my audience here, so I'll just leave it
+              as is. It behaves well on the big 3 browsers (Chrome, Firefox, and
+              Edge) and that's good enough for me.
+            </p>
+            <p>
+              My most comfortable language is Python, so the JavaScript
+              implementation was more of a challenge, but ultimately it results
+              in a better user experience if server-side interactions are not
+              required. If you're interested in seeing the source code for the
+              game, I'll link to the JavaScript "<a
+                href="{{ url_for('html:static', path='/js/custom/connect_4.js') }}?{{ static_version }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                >here</a
+              >", and the HTML you can get (on a computer) by right-clicking
+              anywhere on the page and selecting "inspect".
+            </p>
+            <h3>The AI</h3>
+            <p>
+              The AI looks at future board states for potential wins for either
+              player and tries to pick moves that will result in wins for itself
+              and will avoid wins by its opponent. The AI plays out theoretical
+              moves for itself and its opponent a certain number of moves into
+              the future (set by its depth setting). First, it will put a chip
+              for its color in all available columns (potentially 7 columns),
+              and it will remember the resulting board states. For round 2, it
+              will put a chip for its opponent in each column from each board
+              state of round 1, alternating turns every round. This continues
+              until the number of rounds equals the AI's depth setting. At depth
+              0, the AI picks a random available move without evaluating win
+              chances.
+            </p>
+            <p>
+              Each round, after placing all available chips, the AI sees which
+              future board states resulted in wins for itself or wins for its
+              opponent. Potential future wins add positive weighted values
+              toward a column, while potential future losses (or missed wins)
+              add negative weighted values toward a column. At a given future
+              board state, after adding a weighted value to a winning column or
+              subtracting a weighted value from a losing column, that board
+              state will be discarded for calculations of future rounds (ie the
+              game has already ended at that point so there are no future boards
+              from that state). The AI detects "missed wins" by detecting if a
+              chip placement in round 1, followed by an opponent chip placement
+              in the same column in round 2 will block a win for the AI in round
+              3. Such "missed win" scenarios are treated like losses and result
+              in negative weighted values toward the column.
+            </p>
+
+            <p>
+              Lower numbered rounds (rounds with board states nearest the
+              current board state) result in quicker wins/losses, and thus they
+              are weighted higher than higher-numbered rounds (rounds with board
+              states in the more distant future). One can see how the time and
+              memory for round calculations will increase exponentially with an
+              increasing depth setting. In round 1 there are only 7 potential
+              board states to consider. In round 2, there are 7 x 7 = 49
+              potential board states. By round 6, there will be 7 x 7 x 7 x 7 x
+              7 x7 = 117,649 potential board states to calculate. Thus AI
+              calculations at depths 0-4 seem near-instant, calculations at
+              depth 5 have a half-second lag, calculations at depth 6 take a
+              couple of seconds, and soon there-after the system hangs from
+              taking too long to calculate. For more details on the game and the
+              AI's implementation, see the blog article linked above.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <hr class="section-container mb-16" />
+  <div id="connect-4-inner">
+    <div class="section-container mb-36">
+      {{ render_partial('projects/connect4_inner.html', request=request) }}
+    </div>
+  </div>
+{% endblock content %}
