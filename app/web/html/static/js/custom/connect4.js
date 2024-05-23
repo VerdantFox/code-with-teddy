@@ -160,7 +160,7 @@ class Player {
     this.drawCounter.textContent = this.draws
     document
       .querySelector(`#${this.color}-${this.lastGame}`)
-      .classList.add("font-weight-bold", "border")
+      ?.classList.add("font-weight-bold", "border")
   }
 }
 

@@ -2,6 +2,7 @@
 
 import base64
 import importlib
+import pkgutil
 import secrets
 from collections.abc import Awaitable, Callable
 
@@ -64,8 +65,7 @@ app = FastAPI()
 app.add_middleware(CSPMiddleware)
 
 
-# Users needs to be first to ensure proper redirect for auth errors
-modules = ["users", "auth", "blog", "errors", "games", "portfolio", "projects", "sitemap"]
+modules = [name for _, name, _ in pkgutil.iter_modules(routes.__path__)]
 route_modules = tuple(importlib.import_module(f"app.web.html.routes.{name}") for name in modules)
 for route_module in route_modules:
     app.include_router(route_module.router)

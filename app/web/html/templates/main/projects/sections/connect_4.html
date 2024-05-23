@@ -10,11 +10,12 @@
 {% set title = "Connect 4" %}
 {% set description = "This is my rendition of the classic board game, 'Connect 4'. I used it to practice writing and improving an AI opponent. It runs entirely client side with vanilla JavaScript." %}
 {# Will create it locally in the future #}
-{% set visit_href = "https://codewithteddy.dev/connect-4" %}
+{% set visit_href = url_for('html:connect_4') %}
+{% set blog_href = url_for('html:read_blog_post', slug='how-i-built-a-connect-4-ai') %}
 {% set github_href = "https://github.com/VerdantFox/code-with-teddy/blob/main/app/web/html/static/js/custom/connect4.js" %}
 {%
   set tags = [
   ("JavaScript (Vanilla)", "https://developer.mozilla.org/en-US/docs/Web/JavaScript")
   ]
 %}
-{{ render_partial('main/projects/sections/project_template.html', images=images, title=title, description=description, visit_href=visit_href, github_href=github_href, tags=tags) }}
+{{ render_partial('main/projects/sections/project_template.html', images=images, title=title, description=description, visit_href=visit_href, github_href=github_href, blog_href=blog_href, tags=tags) }}

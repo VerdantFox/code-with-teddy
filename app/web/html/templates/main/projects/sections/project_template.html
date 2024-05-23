@@ -31,6 +31,16 @@
         ><span>GitHub</span>
         {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
       >
+      {% if blog_href %}
+        <a
+          href="{{ blog_href }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link flex items-start justify-center gap-1"
+          ><span>Blog</span>
+          {{ render_partial('shared/partials/icons/arrow-square-out.html', class="h-5 w-5", aria_hidden="true") }}</a
+        >
+      {% endif %}
     </div>
     <p id="technologies-label-website" class="screenreader">
       Technologies used
