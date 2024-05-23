@@ -1,7 +1,10 @@
-<div id="game" class="grid grid-cols-6 gap-12">
+<div
+  id="game"
+  class="grid grid-cols-6 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-12"
+>
   <!-- Game board -->
   <!-- Includes top message, circle grid, reset board/score, and settings -->
-  <div class="col-span-4 order-2">
+  <div class="sm:col-span-2 lg:col-span-4 lg:order-2">
     <p id="message" class="text-xl text-center font-semibold mb-8"></p>
 
     <!-- Circle grid -->
@@ -38,16 +41,13 @@
     </div>
 
     <!-- Settings -->
-    <div class="grid grid-cols-2 gap-6 w-full">
-      <div class="">
-        <div class="custom-control custom-switch">
-          {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='auto_reset', is_true=False, field_label_text='Auto-reset until games played = (0 means continue forever)', id="auto-reset-switch") }}
-        </div>
+    <div class="grid grid-cols-2 max-sm:grid-cols-1 gap-6 w-full">
+      <div class="flex items-center justify-center">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='auto_reset', is_true=False, field_label_text='<span>Auto-reset until games played</span><br><span> = (0 means continue forever)</span>', id="auto-reset-switch") }}
       </div>
-      <div class="">
+      <div class="flex items-center justify-center">
         <label hidden for="total-games"
-          >Until this many games played...<br />(0 means continue
-          forever)</label
+          >Until this many games played...(0 means continue forever)</label
         >
         <input
           class="form-field"
@@ -61,23 +61,19 @@
         />
       </div>
 
-      <div class="">
-        <div class="custom-control custom-switch">
-          {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='show-move-weights-switch', is_true=False, field_label_text='Show AI move weights', id="show-move-weights-switch") }}
-        </div>
+      <div class="flex items-center justify-center">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='show-move-weights-switch', is_true=False, field_label_text='Show AI move weights', id="show-move-weights-switch") }}
       </div>
-      <div class="">
-        <div class="custom-control custom-switch">
-          {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='show-move-animations-switch', is_true=True, field_label_text='Show move animations', id="show-move-animations-switch") }}
-        </div>
+      <div class="flex items-center justify-center">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='show-move-animations-switch', is_true=True, field_label_text='Show move animations', id="show-move-animations-switch") }}
       </div>
     </div>
   </div>
 
   <!-- Red player panel -->
-  <div class="text-center order-1 player-section">
+  <div class="text-center sm:order-1 player-section">
     <p>Red player<br />(<span id="red-description">human</span>)</p>
-    <div class="pic-wrapper">
+    <div class="flex items-center justify-center">
       <img
         id="red-pic"
         class="avatar"
@@ -109,9 +105,9 @@
   </div>
 
   <!-- Blue player panel -->
-  <div class="text-center order-3 player-section">
+  <div class="text-center sm:order-3 player-section">
     <p>Blue player<br />(<span id="blue-description">human</span>)</p>
-    <div>
+    <div class="flex items-center justify-center">
       <img
         class="avatar"
         id="blue-pic"

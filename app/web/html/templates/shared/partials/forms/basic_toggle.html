@@ -29,7 +29,7 @@
       @click="$refs.toggle.click(); $refs.checkbox.click(); $refs.toggle.focus(); $dispatch('change', value, value, { bubbles: true })"
       :id="$id('toggle-label')"
     >
-      {{ field_label_text }}
+      {{ field_label_text | safe }}
     </label>
 
     <!-- Button -->
