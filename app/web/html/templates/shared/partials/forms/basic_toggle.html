@@ -1,19 +1,32 @@
 {% if not extra_fields %}
   {% set extra_fields = {} %}
 {% endif %}
+{% if not is_true %}
+  {% set is_true = False %}
+{% endif %}
 <!-- Toggle -->
 <div class="flex flex-col gap-2">
   <div
-    x-data="{ value: {{ field_data if field_data else 'false' }} }"
+    x-data="{ value: {{ is_true | tojson }} }"
     class="flex items-center justify-center"
     x-id="['toggle-label']"
   >
-    <input id="{{ id }}" type="hidden" name="{{ field_name }}" :value="value" />
+    <input
+      x-ref="checkbox"
+      id="{{ id }}"
+      type="checkbox"
+      class="hidden"
+      name="{{ field_name }}"
+      {% if is_true %}
+        checked
+      {% endif %}
+      :checked="value"
+    />
 
     <!-- Label -->
     <label
       for="{{ id }}"
-      @click="$refs.toggle.click(); $refs.toggle.focus()"
+      @click="$refs.toggle.click(); $refs.checkbox.click(); $refs.toggle.focus(); $dispatch('change', value, value, { bubbles: true })"
       :id="$id('toggle-label')"
     >
       {{ field_label_text }}
@@ -23,7 +36,7 @@
     <button
       x-ref="toggle"
       x-cloak="true"
-      @click="value = ! value{% if click_extras %}{{ click_extras }}{% endif %}"
+      @click="value = ! value; $refs.checkbox.click(); $dispatch('change', value, { bubbles: true }){% if click_extras %}{{ click_extras }}{% endif %}"
       type="button"
       role="switch"
       :aria-checked="value"

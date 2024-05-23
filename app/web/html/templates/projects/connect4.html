@@ -282,7 +282,7 @@
   <hr class="section-container mb-16" />
   <div id="connect-4-inner">
     <div class="section-container mb-36">
-      {{ render_partial('projects/connect4_inner.html', request=request) }}
+      {{ render_partial('projects/connect4_inner.html', request=request, nonce=nonce) }}
     </div>
   </div>
 {% endblock content %}

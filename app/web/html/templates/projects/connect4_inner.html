@@ -2,7 +2,7 @@
   <!-- Game board -->
   <!-- Includes top message, circle grid, reset board/score, and settings -->
   <div class="col-span-4 order-2">
-    <p id="message" class="fs-1-6"></p>
+    <p id="message" class="text-xl text-center font-semibold mb-8"></p>
 
     <!-- Circle grid -->
     <table id="board" class="connect-4-table pb-14">
@@ -41,18 +41,7 @@
     <div class="grid grid-cols-2 gap-6 w-full">
       <div class="">
         <div class="custom-control custom-switch">
-          <input
-            type="checkbox"
-            class="custom-control-input"
-            id="auto-reset-switch"
-          />
-          <label
-            class="custom-control-label cursor-pointer"
-            for="auto-reset-switch"
-            >Auto-reset until games played =<br />(0 means continue
-            forever)</label
-          >
-          {# {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='auto_reset', field_data='false', field_label_text='Auto-reset until games played = (0 means continue forever)', id="auto-reset-switch") }} #}
+          {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='auto_reset', is_true=False, field_label_text='Auto-reset until games played = (0 means continue forever)', id="auto-reset-switch") }}
         </div>
       </div>
       <div class="">
@@ -74,31 +63,12 @@
 
       <div class="">
         <div class="custom-control custom-switch">
-          <input
-            type="checkbox"
-            class="custom-control-input"
-            id="show-move-weights-switch"
-          />
-          <label
-            class="custom-control-label cursor-pointer"
-            for="show-move-weights-switch"
-            >Show AI move weights</label
-          >
+          {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='show-move-weights-switch', is_true=False, field_label_text='Show AI move weights', id="show-move-weights-switch") }}
         </div>
       </div>
       <div class="">
         <div class="custom-control custom-switch">
-          <input
-            type="checkbox"
-            class="custom-control-input"
-            id="show-move-animations-switch"
-            checked
-          />
-          <label
-            class="custom-control-label cursor-pointer"
-            for="show-move-animations-switch"
-            >Show move animations</label
-          >
+          {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='show-move-animations-switch', is_true=True, field_label_text='Show move animations', id="show-move-animations-switch") }}
         </div>
       </div>
     </div>
@@ -125,32 +95,14 @@
     </p>
     <div id="red-settings" class="flex flex-col gap-4">
       <div class="custom-control custom-switch">
-        <input type="checkbox" class="custom-control-input" id="red-switch" />
-        <label class="custom-control-label cursor-pointer" for="red-switch"
-          >Is Computer</label
-        >
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='red-switch', is_true=False, field_label_text='Is Computer', id="red-switch") }}
       </div>
       <label for="red-depth"
         >Depth: <span id="red-depth-display">0</span></label
       >
-      <input
-        type="range"
-        class="custom-range"
-        min="0"
-        max="6"
-        id="red-depth"
-        value="4"
-      />
+      <input type="range" min="0" max="6" id="red-depth" value="4" />
       <div class="custom-control custom-switch">
-        <input
-          type="checkbox"
-          class="custom-control-input"
-          id="red-auto-move"
-          checked
-        />
-        <label class="custom-control-label cursor-pointer" for="red-auto-move"
-          >Auto-move</label
-        >
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='red-auto-move', is_true=True, field_label_text='Auto move', id="red-auto-move") }}
       </div>
       <button id="red-move-button" class="btn btn-filled" disabled>Move</button>
     </div>
@@ -177,15 +129,7 @@
     </p>
     <div id="blue-settings" class="flex flex-col gap-4">
       <div class="custom-control custom-switch">
-        <input
-          type="checkbox"
-          class="custom-control-input"
-          id="blue-switch"
-          checked
-        />
-        <label class="custom-control-label cursor-pointer" for="blue-switch"
-          >Is Computer</label
-        >
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='blue-switch', is_true=True, field_label_text='Is Computer', id="blue-switch") }}
       </div>
       <label for="blue-depth"
         >Depth: <span id="blue-depth-display">0</span></label
@@ -199,15 +143,7 @@
         value="4"
       />
       <div class="custom-control custom-switch">
-        <input
-          type="checkbox"
-          class="custom-control-input"
-          id="blue-auto-move"
-          checked
-        />
-        <label class="custom-control-label cursor-pointer" for="blue-auto-move"
-          >Auto-move</label
-        >
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='blue-auto-move', is_true=True, field_label_text='Auto move', id="blue-auto-move") }}
       </div>
       <button id="blue-move-button" class="btn btn-filled" disabled>
         Move

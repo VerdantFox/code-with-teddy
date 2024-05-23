@@ -100,8 +100,6 @@ class Player {
     this.depthDisplay = document.querySelector(`#${this.color}-depth-display`)
     this.autoMoveSetting = document.querySelector(`#${this.color}-auto-move`)
     this.moveButton = document.querySelector(`#${this.color}-move-button`)
-    console.log(`#${this.color}-auto-move`)
-    console.log(this.autoMoveSetting)
     this.autoMove = this.autoMoveSetting.checked
     this.setIsAI(this.isComputerSetting.checked)
     this.depth = parseInt(this.depthSetting.value)
@@ -586,7 +584,7 @@ class Game {
   setShowAIMoveWeights(show) {
     this.boardHTML.classList.remove("mb-4")
     if (show) {
-      this.aiMoveWeightsRow.style.display = "block"
+      this.aiMoveWeightsRow.style.display = ""
     } else {
       this.aiMoveWeightsRow.style.display = "none"
       this.boardHTML.classList.add("mb-4")
@@ -706,7 +704,10 @@ class Game {
   async makeMove(column) {
     if (this.gameOver) return
     const row = this.board.topRow(column)
-    if (row === null) return
+    if (row === null) {
+      this.nextMove()
+      return
+    }
     await this.animateMove(column, row)
     this.board.updateGrid(column, row, this.turn)
     this.turn.lastMove = gridPoint(column, row)

@@ -24,7 +24,7 @@ h3 {
   background-color: #ffeb3b;
 }
 .mw-selected {
-  border: 4px solid black;
+  border: 4px solid gray;
 }
 
 .connect-4-table {
@@ -43,6 +43,10 @@ h3 {
 }
 .dark .circles {
   border: 4px solid silver;
+}
+
+.ai-weight {
+  color: black;
 }
 
 .chosen {
