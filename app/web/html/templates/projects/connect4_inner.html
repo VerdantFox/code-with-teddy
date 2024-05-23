@@ -1,0 +1,149 @@
+<div
+  id="game"
+  class="grid grid-cols-6 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-12"
+>
+  <!-- Game board -->
+  <!-- Includes top message, circle grid, reset board/score, and settings -->
+  <div class="sm:col-span-2 lg:col-span-4 lg:order-2">
+    <p id="message" class="text-xl text-center font-semibold mb-8"></p>
+
+    <!-- Circle grid -->
+    <table id="board" class="connect-4-table pb-14">
+      {% for row in range(6) %}
+        <tr>
+          {% for col in range(7) %}
+            <td
+              id="circle-{{ col }}-{{ row }}"
+              class="circles cursor-pointer"
+            ></td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      <tr id="ai-move-weights-row">
+        {% for col in range(7) %}
+          <td id="ai-weight-{{ col }}" class="ai-weight">&nbsp;</td>
+        {% endfor %}
+      </tr>
+    </table>
+
+    <!-- Reset buttons -->
+    <div class="flex gap-6 mb-8 font-bold">
+      <div class="flex-grow">
+        <button id="reset-board" class="btn btn-filled w-full">
+          Reset Board
+        </button>
+      </div>
+      <div class="flex-grow">
+        <button id="reset-score" class="btn btn-filled-danger w-full">
+          Reset Score
+        </button>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="grid grid-cols-2 max-sm:grid-cols-1 gap-6 w-full">
+      <div class="flex items-center justify-center">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='auto_reset', is_true=False, field_label_text='<span>Auto-reset until games played</span><br><span> = (0 means continue forever)</span>', id="auto-reset-switch") }}
+      </div>
+      <div class="flex items-center justify-center">
+        <label hidden for="total-games"
+          >Until this many games played...(0 means continue forever)</label
+        >
+        <input
+          class="form-field"
+          id="total-games"
+          min="0"
+          name="total-games"
+          step="1"
+          pattern="^[-\d]\d*$"
+          type="number"
+          value="10"
+        />
+      </div>
+
+      <div class="flex items-center justify-center">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='show-move-weights-switch', is_true=False, field_label_text='Show AI move weights', id="show-move-weights-switch") }}
+      </div>
+      <div class="flex items-center justify-center">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='show-move-animations-switch', is_true=True, field_label_text='Show move animations', id="show-move-animations-switch") }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Red player panel -->
+  <div class="text-center sm:order-1 player-section">
+    <p>Red player<br />(<span id="red-description">human</span>)</p>
+    <div class="flex items-center justify-center">
+      <img
+        id="red-pic"
+        class="avatar"
+        src="{{ url_for('html:static', path='media/connect4/fox-red.png') }}"
+        alt="Red Player"
+      />
+    </div>
+    <p>
+      Red Score:<br />(W-L-D)<br /><span id="red-score"
+        ><span id="red-wins">0</span>-<span id="red-losses">0</span>-<span
+          id="red-draws"
+          >0</span
+        ></span
+      >
+    </p>
+    <div id="red-settings" class="flex flex-col gap-4">
+      <div class="custom-control custom-switch">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='red-switch', is_true=False, field_label_text='Is Computer', id="red-switch") }}
+      </div>
+      <label for="red-depth"
+        >Depth: <span id="red-depth-display">0</span></label
+      >
+      <input type="range" min="0" max="6" id="red-depth" value="4" />
+      <div class="custom-control custom-switch">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='red-auto-move', is_true=True, field_label_text='Auto move', id="red-auto-move") }}
+      </div>
+      <button id="red-move-button" class="btn btn-filled" disabled>Move</button>
+    </div>
+  </div>
+
+  <!-- Blue player panel -->
+  <div class="text-center sm:order-3 player-section">
+    <p>Blue player<br />(<span id="blue-description">human</span>)</p>
+    <div class="flex items-center justify-center">
+      <img
+        class="avatar"
+        id="blue-pic"
+        src="{{ url_for('html:static', path='media/connect4/fox-blue.png') }}"
+        alt="Blue Player"
+      />
+    </div>
+    <p>
+      Blue Score:<br />(W-L-D)<br /><span id="blue-score"
+        ><span id="blue-wins">0</span>-<span id="blue-losses">0</span>-<span
+          id="blue-draws"
+          >0</span
+        ></span
+      >
+    </p>
+    <div id="blue-settings" class="flex flex-col gap-4">
+      <div class="custom-control custom-switch">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='blue-switch', is_true=True, field_label_text='Is Computer', id="blue-switch") }}
+      </div>
+      <label for="blue-depth"
+        >Depth: <span id="blue-depth-display">0</span></label
+      >
+      <input
+        type="range"
+        class="custom-range"
+        min="0"
+        max="6"
+        id="blue-depth"
+        value="4"
+      />
+      <div class="custom-control custom-switch">
+        {{ render_partial('shared/partials/forms/basic_toggle.html', field_name='blue-auto-move', is_true=True, field_label_text='Auto move', id="blue-auto-move") }}
+      </div>
+      <button id="blue-move-button" class="btn btn-filled" disabled>
+        Move
+      </button>
+    </div>
+  </div>
+</div>

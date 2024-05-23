@@ -83,6 +83,14 @@
     @apply text-primary-700 hover:text-primary-500 active:text-primary-400 dark:text-primary-300 dark:hover:text-primary-500  dark:active:text-primary-600 fill-primary-700 hover:fill-primary-500 active:fill-primary-400 dark:fill-primary-300 dark:hover:fill-primary-500  dark:active:fill-primary-600 stroke-primary-700 hover:stroke-primary-500 active:stroke-primary-400 dark:stroke-primary-300 dark:hover:stroke-primary-500  dark:active:stroke-primary-600 transition duration-300;
   }
 
+  /* Fields */
+  .form-field {
+    @apply rounded-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400;
+  }
+  .form-field-errors {
+    @apply border-red-700 dark:border-red-400;
+  }
+
   .link-underlined {
     @apply link border-b border-grayscale-300 hover:border-primary-500 dark:border-grayscale-600 dark:hover:border-primary-500 active:border-primary-400 dark:active:border-primary-600;
   }
