@@ -1,5 +1,5 @@
 <section class="">
-  <div class="section-container mb-52">
+  <div class="section-container mb-32">
     <h2 class="text-5xl mb-16 text-center font-semibold">History</h2>
     <div class="relative lg:h-[83rem]">
       <!-- Center line -->
@@ -322,5 +322,54 @@
         </ul>
       </article>
     </div>
+  </div>
+</section>
+
+<section>
+  <div class="max-w-xl mx-auto px-4 mb-32">
+    <picture class="block mx-auto max-sm:hidden">
+      <source
+        srcset="
+          {{ url_for('html:static', path='/media/main/about/teddy_portrait_wide.webp') }}
+        "
+        type="image/webp"
+      />
+      <source
+        srcset="
+          {{ url_for('html:static', path='/media/main/about/teddy_portrait_wide.jpg') }}
+        "
+        type="image/jpg"
+      />
+      <img
+        src="{{ url_for('html:static', path='/media/main/about/teddy_portrait_wide.jpg') }}"
+        alt="Teddy Williams"
+        class="block mx-auto rounded-2xl"
+        height="853"
+        width="1280"
+        loading="lazy"
+      />
+    </picture>
+    <picture class="block mx-auto mb-24 sm:hidden">
+      <source
+        srcset="
+          {{ url_for('html:static', path='/media/main/about/teddy_portrait.webp') }}
+        "
+        type="image/webp"
+      />
+      <source
+        srcset="
+          {{ url_for('html:static', path='/media/main/about/teddy_portrait.jpg') }}
+        "
+        type="image/jpg"
+      />
+      <img
+        src="{{ url_for('html:static', path='/media/main/about/teddy_portrait.jpg') }}"
+        alt="Teddy Williams"
+        class="block mx-auto xs:w-96 xs:h-96 rounded-2xl"
+        height="853"
+        width="853"
+        loading="lazy"
+      />
+    </picture>
   </div>
 </section>
