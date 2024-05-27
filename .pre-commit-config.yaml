@@ -27,7 +27,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.4.4"
+    rev: "v0.4.5"
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes", "--exit-non-zero-on-fix"]
@@ -94,7 +94,7 @@ repos:
           - types-markdown==3.6.0.20240316
           - types-pyyaml==6.0.12.20240311
           - types-pytz==2024.1.0.20240417
-          - types-requests==2.31.0.20240406
+          - types-requests==2.32.0.20240523
 
   # - repo: local
   #   hooks:

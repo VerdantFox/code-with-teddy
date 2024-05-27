@@ -6,7 +6,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-if [[ $* == *--help* ]]; then  # --help flag
+if [[ $* == *--help* ]] || [[ -z $* ]]; then  # --help flag or no flag
     echo "Usage: ./scripts/update-requirements.sh [OPTIONS]"
     echo
     echo "Update project dependencies and lock files."
