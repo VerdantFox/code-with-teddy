@@ -17,7 +17,7 @@ A list of stuff that needs to get done for the project, roughly in order of impo
 - [ ] Add projects to projects page (plus individual pages as needed)
   - [ ] Finance (complete first)
   - [x] Twisted towers
-  - [ ] Connect 4 (remake first)
+  - [x] Connect 4 (remake first)
   - [x] Moth hunt
   - [x] File renamer
   - [ ] Portfolio website (link to blog post about technologies)
@@ -39,13 +39,13 @@ A list of stuff that needs to get done for the project, roughly in order of impo
 - [ ] Make projects searchable
 - [ ] Refactor to separate db models from services models
   - [ ] Add sqlite database option (for faster tests)
-- [ ] Set up logging
+- [x] Set up logging
   - [x] log to files that clean up automatically
   - [ ] See if other info should be logged
   - [x] Connect with Sentry for logging
 - [ ] Rebuild projects
   - [ ] Finance
-  - [ ] Connect 4
+  - [x] Connect 4
   - [ ] Analytics
 - [ ] New projects
   - [ ] Games API (plus blog post series)
