@@ -156,6 +156,7 @@ def fixture_get_integration_environment(request: pytest.FixtureRequest) -> UIDet
     all_opt = request.config.getoption("--all")
     playwright_opt = str(request.config.getoption("--playwright")).upper()
     env_opt = "local" if all_opt else playwright_opt  # pragma: no branch
+    env_opt = env_opt.upper()
 
     try:
         environment = Environment[env_opt]

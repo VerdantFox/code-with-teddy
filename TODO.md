@@ -1,17 +1,14 @@
 # Todos
 
-A list of stuff that needs to get done for the project, roughly in order of importance.
+A list of stuff that needs to get done for the project, categorized and roughly in order of importance.
 
-- [x] Write tests
-  - [x] functional tests against FastAPI
-  - [x] unit tests for high-value, low-level functions
-  - [x] playwright end-to-end tests
-  - [ ] Integration tests (maybe)
-  - [ ] Locust stress tests
-- [x] Set up alembic migrations
-  - [x] Initial migration
-  - [x] Get alembic working with deploy script
-  - [ ] Use alembic in tests
+## Bugs
+
+- [x] FIX BUG: When changing pages with HTMX boost, extra CSS + JS isn't loaded (e.g. blog post page code block CSS)
+  - The [`head-support` extension](https://htmx.org/extensions/head-support/) should solve this
+
+## Features
+
 - [ ] Add resume to "experience" page
 - [ ] Add blog comment likes
 - [ ] Add projects to projects page (plus individual pages as needed)
@@ -29,20 +26,17 @@ A list of stuff that needs to get done for the project, roughly in order of impo
   - [ ] Emails to other subscribers for blog post comments
   - [x] Emails for recover password
   - [x] Supply domain to whoever so emails don't go to spam
-- [x] Index site (add sitemap.xml, robots.txt, etc.)
 - [ ] Look up extra security desired
   - [x] CSP
   - [x] Replace python-jose dependency
   - [x] Look into code scanning errors
   - [ ] etc.
-- [ ] Make nginx brotli work
-- [ ] Make projects searchable
-- [ ] Refactor to separate db models from services models
-  - [ ] Add sqlite database option (for faster tests)
 - [x] Set up logging
   - [x] log to files that clean up automatically
   - [ ] See if other info should be logged
   - [x] Connect with Sentry for logging
+- [ ] Make nginx brotli work
+- [ ] Make projects searchable
 - [ ] Rebuild projects
   - [ ] Finance
   - [x] Connect 4
@@ -50,3 +44,25 @@ A list of stuff that needs to get done for the project, roughly in order of impo
 - [ ] New projects
   - [ ] Games API (plus blog post series)
   - [ ] Multiplayer sockets game (plus blog posts)
+
+## Refactors
+
+- [ ] Refactor to separate db models from services models
+  - [ ] Add sqlite database option (for faster tests)
+
+## Tests
+
+- [x] Write tests
+  - [x] functional tests against FastAPI
+  - [x] unit tests for high-value, low-level functions
+  - [x] playwright end-to-end tests
+  - [ ] Integration tests (maybe)
+  - [ ] Locust stress tests
+- [x] Set up alembic migrations
+  - [x] Initial migration
+  - [x] Get alembic working with deploy script
+  - [ ] Use alembic in tests
+
+## Done (clear these out when not relevant)
+
+- [x] Index site (add sitemap.xml, robots.txt, etc.)
