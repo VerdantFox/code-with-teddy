@@ -56,6 +56,8 @@ ubuntu:
 sudo apt-get install xdotool
 ```
 
+Install npx for updating node dependencies.
+
 ## Running the app
 
 ### Start the database locally

@@ -50,7 +50,7 @@ async def healthcheck(
     request: Request,  # noqa: ARG001 (unused argument)
 ) -> HTMLResponse:
     """Return the portfolio healthcheck page."""
-    with sentry_sdk.configure_scope() as scope:
-        if scope.transaction:
-            scope.transaction.sampled = False
+    scope = sentry_sdk.get_current_scope()
+    if scope.transaction:
+        scope.transaction.sampled = False
     return HTMLResponse(content="ok")

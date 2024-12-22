@@ -12,14 +12,14 @@ name = "code-with-teddy"
 version = "1.0"
 description = "Teddy's portfolio website."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 classifiers = [
     "Framework :: FastAPI",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.12",
 ]
 maintainers = [
-    {name = "Theodore Williams", email = "theodore.f.williams@gmail.com"},
+    { name = "Theodore Williams", email = "theodore.f.williams@gmail.com" },
 ]
 # Dependencies specified here should ideally not be pinned, unless
 # recommended by the package itself. This follows best practices
@@ -77,7 +77,7 @@ dependencies = [
     # Pytz: timezone library
     "pytz",
     # Sentry-sdk: error tracking
-    "sentry-sdk[fastapi,sqlalchemy]",  # aiohttp, httpx (dev deps)
+    "sentry-sdk[fastapi,sqlalchemy]", # aiohttp, httpx (dev deps)
     # SQLAlchemy: database toolkit
     "sqlalchemy[asyncio]",
     # Uv: Python package manager
@@ -161,10 +161,10 @@ build-backend = "hatchling.build"
 # Use the Pydantic plugin for better checking of Pydantic models.
 # References: https://pydantic-docs.helpmanual.io/mypy_plugin/
 # https://numpy.org/devdocs/reference/typing.html#mypy-plugin
-plugins = ["pydantic.mypy", ]
+plugins = ["pydantic.mypy"]
 exclude = "venv|tmp"
 
-python_version = "3.11"
+python_version = "3.12"
 
 # Type-checks the interior of functions without type annotations.
 check_untyped_defs = true
@@ -188,9 +188,7 @@ disallow_untyped_defs = false
 
 # Pytest
 [tool.pytest.ini_options]
-testpaths = [
-    "tests",
-]
+testpaths = ["tests"]
 filterwarnings = [
     # Ignore warnings from all sources so that we can ignore warnings from
     # external libraries that we can't control.
@@ -216,17 +214,13 @@ exclude_lines = [
     "def __repr__",
     "def __str__",
 ]
-include = [
-    "app/*",
-    "scripts/*",
-    "tests/*",
-]
-skip_covered = true  # Don't show fully covered files in the report
+include = ["app/*", "scripts/*", "tests/*"]
+skip_covered = true # Don't show fully covered files in the report
 
 # Ruff
 [tool.ruff]
-line-length= 100
-target-version = "py310"
+line-length = 100
+target-version = "py312"
 
 
 [tool.ruff.lint]
@@ -251,39 +245,39 @@ select = [
     "FBT",   # flake8-boolean-trap
     "FLY",   # flynt
     # "FURB",  # Refurb (In preview)
-    "G",     # flake8-logging-format
-    "I",     # isort
-    "ICN",   # flake8-import-conventions
-    "INP",   # flake8-no-pep420
-    "ISC",   # flake8-implicit-str-concat
+    "G",   # flake8-logging-format
+    "I",   # isort
+    "ICN", # flake8-import-conventions
+    "INP", # flake8-no-pep420
+    "ISC", # flake8-implicit-str-concat
     # "LOG",   # flake8-logging (In preview)
-    "N",     # pep8-naming
-    "NPY",   # NumPy-specific rules
-    "PERF",  # Perflint
-    "PD",    # pandas-vet
-    "PGH",   # pygrep-hooks
-    "PIE",   # flake8-pie
-    "PL",    # pylint
-    "PLC",   # pylint-convention
-    "PLE",   # pylint-error
-    "PLR",   # pylint-refactor
-    "PLW",   # pylint-warning
-    "PT",    # flake8-pytest-style
-    "PTH",   # flake8-use-pathlib
-    "Q",     # flake8-quotes
-    "RET",   # flake8-return
-    "RSE",   # flake8-raise
-    "RUF",   # ruff-specific rules
-    "S",     # flake8-bandit
-    "SIM",   # flake8-simplify
-    "SLF",   # flake8-self
-    "T10",   # flake8-debugger
-    "T20",   # flake8-print
-    "TID",   # flake8-tidy-imports
-    "TRY",   # tryceratops
-    "UP",    # pyupgrade
-    "W",     # pycodestyle warnings
-    "YTT",   # flake8-2020
+    "N",    # pep8-naming
+    "NPY",  # NumPy-specific rules
+    "PERF", # Perflint
+    "PD",   # pandas-vet
+    "PGH",  # pygrep-hooks
+    "PIE",  # flake8-pie
+    "PL",   # pylint
+    "PLC",  # pylint-convention
+    "PLE",  # pylint-error
+    "PLR",  # pylint-refactor
+    "PLW",  # pylint-warning
+    "PT",   # flake8-pytest-style
+    "PTH",  # flake8-use-pathlib
+    "Q",    # flake8-quotes
+    "RET",  # flake8-return
+    "RSE",  # flake8-raise
+    "RUF",  # ruff-specific rules
+    "S",    # flake8-bandit
+    "SIM",  # flake8-simplify
+    "SLF",  # flake8-self
+    "T10",  # flake8-debugger
+    "T20",  # flake8-print
+    "TID",  # flake8-tidy-imports
+    "TRY",  # tryceratops
+    "UP",   # pyupgrade
+    "W",    # pycodestyle warnings
+    "YTT",  # flake8-2020
 ]
 # Roles to ignore
 ignore = [
@@ -300,18 +294,18 @@ ignore = [
 ]
 # Don't automatically fix these errors, but still report them
 unfixable = [
-    "ERA001",  # eradicate commented out code
-    "T20",     # flake8-print
-    "RUF100",  # unused-noqa
+    "ERA001", # eradicate commented out code
+    "T20",    # flake8-print
+    "RUF100", # unused-noqa
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"**/__init__.py" = ["D104"]  # Missing docstring in public package
+"**/__init__.py" = ["D104"] # Missing docstring in public package
 "scripts/*" = [
-    "FBT003",  # boolean-positional-value-in-call (needed for typer default arg)
-    "S101",    # use of assert
-    "S311",    # random-not-for-cryptography
-    "T201",    # 'print' found
+    "FBT003", # boolean-positional-value-in-call (needed for typer default arg)
+    "S101",   # use of assert
+    "S311",   # random-not-for-cryptography
+    "T201",   # 'print' found
 ]
 "scripts/alembic.py" = ["S603"] # subprocess-without-shell-equals-true
 "migrations/versions/*" = ["D103"] # Missing docstring in public function

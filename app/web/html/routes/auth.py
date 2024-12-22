@@ -48,9 +48,9 @@ async def refresh_access_token(
     remaining_time: int | None = None,
 ) -> _TemplateResponse:
     """Refresh the access token, if one is already set."""
-    with sentry_sdk.configure_scope() as scope:
-        if scope.transaction:
-            scope.transaction.sampled = False
+    scope = sentry_sdk.get_current_scope()
+    if scope.transaction:
+        scope.transaction.sampled = False
 
     if not access_token:
         return templates.TemplateResponse(

@@ -32,7 +32,7 @@ fi
 
 if [[ $* == *--node* ]] || [[ $* == *--all* ]]; then  # --node or --all flag
     echo "Updating node packages"
-    ncu -u
+    npx npm-check-updates -u
     npm update
 fi
 

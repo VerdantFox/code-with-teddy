@@ -33,7 +33,7 @@ IS_ACTIVE = test_models.UserModelKeys.IS_ACTIVE
 
 
 @pytest.fixture(autouse=True)
-async def _clean_db_fixture_module(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
+async def _clean_db_fixture_module(clean_db_module: None, anyio_backend: str) -> None:
     """Clean the database after the module."""
 
 
@@ -222,11 +222,9 @@ CREATE_USER_TEST_CASES = [
                 {
                     "type": "value_error",
                     "loc": ["body", "email"],
-                    "msg": "value is not a valid email address: The email address is not valid. It must have exactly one @-sign.",
+                    "msg": "value is not a valid email address: An email address must have an @-sign.",
                     "input": "a",
-                    "ctx": {
-                        "reason": "The email address is not valid. It must have exactly one @-sign."
-                    },
+                    "ctx": {"reason": "An email address must have an @-sign."},
                 },
                 {
                     "type": "string_too_short",
@@ -350,11 +348,9 @@ PATCH_USER_TEST_CASES = [
                 {
                     "type": "value_error",
                     "loc": ["body", "email"],
-                    "msg": "value is not a valid email address: The email address is not valid. It must have exactly one @-sign.",
+                    "msg": "value is not a valid email address: An email address must have an @-sign.",
                     "input": "a",
-                    "ctx": {
-                        "reason": "The email address is not valid. It must have exactly one @-sign."
-                    },
+                    "ctx": {"reason": "An email address must have an @-sign."},
                 },
                 {
                     "type": "string_too_short",
