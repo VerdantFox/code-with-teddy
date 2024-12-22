@@ -22,6 +22,7 @@ from typing import Annotated
 
 import faker
 import typer
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app import permissions
@@ -219,7 +220,19 @@ def typer_main(
     ] = "postgresql+psycopg://postgres:postgres@localhost:5432/postgres",
 ) -> None:
     """Create a postgres docker container and postgres database with tables."""
-    asyncio.run(populate_database(connection_string=connection_string))
+    try:
+        asyncio.run(populate_database(connection_string=connection_string))
+    except OperationalError as e:
+        typer.echo(f"Error: {e}")
+        typer.echo("Failed to connect to the postgres instance.")
+        typer.echo(
+            "You can start the local postgres instance with `./dev_tools/start-local-postgres.sh`."
+        )
+        typer.echo(
+            "For docker deployed app, set the --connection-string to the postgres"
+            " connection string (in ./secrets/db_connection_string) replacing db -> localhost."
+        )
+        raise typer.Exit(1) from e
 
 
 if __name__ == "__main__":

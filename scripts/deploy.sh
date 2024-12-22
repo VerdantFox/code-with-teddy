@@ -85,7 +85,7 @@ source_environment() {
     eval "${globals}"
 }
 
-# Announcee global variables
+# Announce global variables
 announce_vars() {
     if [ "${DEBUG:-}" != "1" ]; then return; fi
     log DEBUG "Global variables set:"
@@ -114,7 +114,7 @@ update_branch() {
     git pull
 }
 
-# Install crontabs (in production)
+# Install crontab (in production)
 # Can use `crontab -l` to check if the crontab exists and `crontab -r` to remove the crontab.
 # Crontab has 3 jobs:
 # - Every 5 minutes run this deploy script, only if the 'release-branch' has changed

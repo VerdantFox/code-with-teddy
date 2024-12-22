@@ -2,28 +2,7 @@
 
 Database migrations are necessary to update existing databases, especially when those databases contain data. So, for example, if you need to add/remove a table, add/remove a field from a table, or change an existing field, you'll need to run a database migration. And when I say "table", I also mean an SQLAlchemy model class corresponding to those tables.
 
-Let's discuss how to perform database migrations with [alembic](https://alembic.readthedocs.io/en/latest/). alembic is a simple wrapper on [Alembic](https://alembic.sqlalchemy.org/en/latest/index.html), a database migration tool for [SQLAlchemy](https://www.sqlalchemy.org/). From alembic's documentation:
-
-> alembic is an extension that configures Alembic in the proper way to work with your Flask and Flask-SQLAlchemy application. In terms of the actual database migrations, everything is handled by Alembic so you get exactly the same functionality.
-
-alembic configures Alembic to work well with Flask, provides an app context for our Flask-SQLAlchemy integration, and provides some command line utility.
-
-## Key code bits
-
-We initialize a `flask_migrate.Migrate` object and the run `init_app` on it to further initialize it with our database and the Flask app.
-
-```python
-from flask_migrate import Migrate
-
-...
-
-app = ...  # our initialized Flask app
-db = ...  # our initialized SQLAlchemy db
-migrate = Migrate()
-migrate.init_app(app, db)
-```
-
-Now that we have an initialized `flask_migrate.Migrate` object, we can now call alembic commands on the command line.
+Let's discuss how to perform database migrations with [Alembic](https://alembic.sqlalchemy.org/en/latest/index.html), a database migration tool for [SQLAlchemy](https://www.sqlalchemy.org/).
 
 ## Alembic command line tool
 
@@ -131,7 +110,7 @@ Running a migration upgrade with `--sql` **does not upgrade a live database**; i
 
 TL, DR: We need to run `python -m scripts.alembic stamp head` to perform the initial migration.
 
-[I followed a guide by Miguel Grinberg, maintainer of Flask-Migration for the initial database migration](https://blog.miguelgrinberg.com/post/how-to-add-alembic-to-an-existing-project). Typically, when alembic is used on a new database, we'd generate the initial migration by calling `python -m scripts.alembic migrate -m MESSAGE`, which would generate a new migration file by comparing an empty database with our existing database models. However, we already have a database (at least in dev). Therefore, to generate our initial migration file, we need to **get** an empty database. I created a local docker database without any tables. Then I ran `python -m scripts.alembic migrate -m "Initial migration"`. This command generated the file `6b99ee86edc9_initial_migration.py`. The script's contents describe how to create all our database tables from scratch.
+Typically, when alembic is used on a new database, we'd generate the initial migration by calling `python -m scripts.alembic migrate -m MESSAGE`, which would generate a new migration file by comparing an empty database with our existing database models. However, we already have a database. Therefore, to generate our initial migration file, we need to **get** an empty database. I created a local docker database without any tables. Then I ran `python -m scripts.alembic migrate -m "Initial migration"`. This command generated the file `6b99ee86edc9_initial_migration.py`. The script's contents describe how to create all our database tables from scratch.
 
 Typically, to run a migration, once the appropriate migration file is generated, you'd run `python -m scripts.alembic upgrade`. However, our dev database is already upgraded to the latest version, so this command won't work. So instead, we run `python -m scripts.alembic stamp head` to indicate to the **existing** database that it is already migrated to the latest version.
 

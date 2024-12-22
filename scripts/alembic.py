@@ -101,4 +101,13 @@ def current() -> None:
 
 
 if __name__ == "__main__":
-    cli_app()
+    try:
+        cli_app()
+    except subprocess.CalledProcessError as e:
+        typer.echo(f"Error: {e}")
+        typer.echo(
+            "Likely a connection problem. Check if the database is running"
+            " and the connection string is correct. Can set the connection string"
+            " with the `DB_CONNECTION_STRING` environment variable."
+        )
+        typer.Exit(1)

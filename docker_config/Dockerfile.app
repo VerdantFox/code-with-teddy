@@ -9,6 +9,9 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 # https://stackoverflow.com/questions/59812009/what-is-the-use-of-pythonunbuffered-in-docker-file
 ENV PYTHONUNBUFFERED 1
+# https://github.com/astral-sh/uv-docker-example/blob/main/Dockerfile
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
 
 # Update package lists and install curl (to install 'uv')
 # DL3008: Pin versions in apt get install
@@ -23,17 +26,18 @@ RUN apt-get update && \
 # Set virtual environment for 'uv'
 ENV VIRTUAL_ENV=/opt/venv
 
-# Install 'uv' then create a python virtual environment
+# Install 'uv'
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && /root/.cargo/bin/uv venv /opt/venv
+COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
+# Create a python virtual environment
+RUN uv venv /opt/venv
 
 
 # Install python dependencies
 COPY ./requirements-prod.txt .
 # Install production dependencies with a cache for quicker future installs
 RUN --mount=type=cache,target=/root/.cache \
-    /root/.cargo/bin/uv pip install -r requirements-prod.txt
+    uv pip install -r requirements-prod.txt
 
 # Final production stage
 FROM python:3.12-slim
