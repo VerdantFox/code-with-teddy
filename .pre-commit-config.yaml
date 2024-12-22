@@ -7,7 +7,7 @@
 # To update hooks:
 #     pre-commit autoupdate
 default_language_version:
-  python: python3.11
+  python: python3.12
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -45,7 +45,7 @@ repos:
     hooks:
       - id: shellcheck
         # Seems to be broken on python 3.11
-        language_version: python3.10
+        language_version: python3.12
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.13.0

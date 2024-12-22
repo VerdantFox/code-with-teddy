@@ -46,6 +46,16 @@ You'll need to install Docker to run the website locally. Even if not running th
 
 Docker and Docker Compose configurations are in `docker_config`.
 
+### Tools
+
+Install xdotool for run-dev script
+
+ubuntu:
+
+```shell
+sudo apt-get install xdotool
+```
+
 ## Running the app
 
 ### Start the database locally
