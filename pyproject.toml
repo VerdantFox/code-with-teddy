@@ -282,8 +282,6 @@ select = [
 # Roles to ignore
 ignore = [
     "A003",   # builtin-attribute-shadowing. Shadowing `id` in a model for instance.
-    "ANN101", # Missing type annotation for self in class method
-    "ANN102", # Missing type annotation for cls in classmethod
     "ANN401", # No dynamically typed expressions (like "Any")
     "COM812", # Missing trailing comma (can cause ruff formatter conflicts)
     "D105",   # Missing docstring in magic method
@@ -311,7 +309,6 @@ unfixable = [
 "migrations/versions/*" = ["D103"] # Missing docstring in public function
 "tests/*" = [
     "ANN002",  # Missing type annotation for *args
-    "ANN003",  # Missing type annotation for **kwargs
     "ANN201",  # Missing return type annotation for function
     "E501",    # line-too-long
     "PLR2004", # Magic value comparison
