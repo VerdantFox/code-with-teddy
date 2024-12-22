@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from collections.abc import Iterable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from http import HTTPStatus
 from logging import getLogger
 from typing import Self
@@ -388,7 +388,7 @@ async def update_existing_bp_fields(  # noqa: C901 (complexity)
         blog_post.series_id = data.series_id
     if blog_post.series_position != data.series_position:
         blog_post.series_position = data.series_position
-    blog_post.updated_timestamp = datetime.now().astimezone(timezone.utc)
+    blog_post.updated_timestamp = datetime.now().astimezone(UTC)
     return blog_post
 
 
@@ -413,7 +413,7 @@ async def set_new_bp_fields(
     html_description = markdown_parser.markdown_to_html(data.description)
     html_content = markdown_parser.markdown_to_html(data.content)
     tags = await _get_bp_tags(db=db, tags=data.tags)
-    now = datetime.now().astimezone(timezone.utc)
+    now = datetime.now().astimezone(UTC)
     return db_models.BlogPost(
         title=data.title,
         slug=blog_utils.get_slug(data.title),
@@ -574,7 +574,7 @@ async def commit_media_to_db(  # noqa: PLR0913 (too-many-arguments)
         name=name,
         locations=locations_str,
         media_type=media_type,
-        created_timestamp=datetime.now().astimezone(timezone.utc),
+        created_timestamp=datetime.now().astimezone(UTC),
         position=position,
     )
     db.add(bp_media_object)
@@ -622,7 +622,7 @@ async def update_existing_comment(
     html_content = generate_comment_html(md_content)
     comment.md_content = md_content
     comment.html_content = html_content
-    comment.updated_timestamp = datetime.now().astimezone(timezone.utc)
+    comment.updated_timestamp = datetime.now().astimezone(UTC)
     if current_user.is_authenticated:
         comment.user_id = current_user.id
     await db.commit()
@@ -633,7 +633,7 @@ async def update_existing_comment(
 def generate_comment(data: CommentInputPreview) -> db_models.BlogPostComment:
     """Generate a blog post comment."""
     html_content = generate_comment_html(data.content)
-    now = datetime.now().astimezone(timezone.utc)
+    now = datetime.now().astimezone(UTC)
     return db_models.BlogPostComment(
         blog_post_id=data.bp_id,
         name=data.name,

@@ -39,7 +39,7 @@ def fixture_page_session(page_session_session: Page) -> Generator[Page, Any, Any
     assert not console_msg_set
 
 
-@pytest.fixture()
+@pytest.fixture
 def page(page: Page) -> Generator[Page, Any, Any]:
     """Ensure the console is empty after each test for the function-scoped page."""
     console_msgs = []

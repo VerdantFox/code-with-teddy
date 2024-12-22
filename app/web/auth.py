@@ -1,7 +1,7 @@
 """auth: Authentication for the web app."""
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
@@ -103,14 +103,14 @@ async def refresh_token(
         current_expires_at_float = float(payload["exp"])  # type: ignore[arg-type]
         current_expires_at = datetime.fromtimestamp(
             current_expires_at_float,
-            tz=timezone.utc,
+            tz=UTC,
         )
-        if current_expires_at - datetime.now(timezone.utc) > timedelta(
+        if current_expires_at - datetime.now(UTC) > timedelta(
             minutes=remaining_time,
         ):
             return encode_access_token(payload=payload)
 
-    new_expires_at = datetime.now(timezone.utc) + TOKEN_EXPIRATION
+    new_expires_at = datetime.now(UTC) + TOKEN_EXPIRATION
     payload["exp"] = new_expires_at
     return encode_access_token(payload=payload)
 
@@ -130,7 +130,7 @@ async def parse_access_token(access_token: str) -> dict[str, str | int | datetim
 
 def create_access_token(user: db_models.User) -> web_models.Token:
     """Create an access token for the user."""
-    expires_at = datetime.now(timezone.utc) + TOKEN_EXPIRATION
+    expires_at = datetime.now(UTC) + TOKEN_EXPIRATION
     payload: dict[str, str | int | datetime] = {
         "sub": user.username,
         "user_id": user.id,

@@ -16,7 +16,7 @@ import asyncio
 import os
 import random
 import textwrap
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Annotated
 
@@ -35,7 +35,7 @@ DB_STRING_KEY = "DB_CONNECTION_STRING"
 EXAMPLE_BP_DIR = Path(__file__).parent.parent / "tests" / "data" / "example_blog_posts"
 
 # datetime constants
-TIMEZONE = timezone.utc
+TIMEZONE = UTC
 TODAY = datetime.now(tz=TIMEZONE)
 YESTERDAY = TODAY - timedelta(days=1)
 TOMORROW = TODAY + timedelta(days=1)

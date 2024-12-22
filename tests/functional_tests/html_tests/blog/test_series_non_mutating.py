@@ -19,7 +19,7 @@ LIST_BLOG_SERIES_TITLE = "Manage Series"
 # Fixtures
 # ----------------------------------------------------------------------------
 @pytest.fixture(scope="module", autouse=True)
-def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
+def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:
     """Clean the database after the module."""
 
 

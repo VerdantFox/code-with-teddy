@@ -41,8 +41,7 @@ BASIC_USER = {
 def basic_user(**kwargs: Any) -> db_models.User:
     """Return a basic user."""
     user_dict = {key.value: value for key, value in BASIC_USER.items()}
-    for key, value in kwargs.items():
-        user_dict[key] = value
+    user_dict |= kwargs
     user_dict.pop(UserModelKeys.PASSWORD.value)
     return db_models.User(**user_dict)
 
@@ -118,8 +117,7 @@ BASIC_BLOG_POST = {
 def basic_blog_post(**kwargs: Any) -> blog_handler.SaveBlogInput:
     """Return a simple blog post."""
     blog_post_dict = {key.value: value for key, value in BASIC_BLOG_POST.items()}
-    for key, value in kwargs.items():
-        blog_post_dict[key] = value
+    blog_post_dict |= kwargs
     return blog_handler.SaveBlogInput(**blog_post_dict)
 
 

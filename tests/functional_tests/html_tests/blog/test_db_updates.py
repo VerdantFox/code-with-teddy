@@ -9,7 +9,7 @@ from tests.functional_tests.html_tests.conftest import StrToSoup
 
 
 @pytest.fixture(autouse=True)
-async def _clean_db_fixture(clean_db: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
+async def _clean_db_fixture(clean_db: None, anyio_backend: str) -> None:
     """Clean the database after each test."""
 
 

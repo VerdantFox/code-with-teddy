@@ -11,7 +11,7 @@ TOKEN_URL = "api/v1/auth/token"
 
 
 @pytest.fixture(autouse=True)
-async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
+async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:
     """Clean the database after the module."""
 
 
@@ -20,8 +20,8 @@ class GetAccessTokenTestCase(TestCase):
 
     data: dict[str, str]
     expected_status_code: int = status.HTTP_200_OK
-    expected_strings: list[str] = []  # noqa: RUF012
-    expected_json: dict[str, str] = {}  # noqa: RUF012
+    expected_strings: list[str] = []  # noqa: RUF012 (mutable default)
+    expected_json: dict[str, str] = {}  # noqa: RUF012 (mutable default)
 
 
 ACCESS_TOKEN = "access_token"

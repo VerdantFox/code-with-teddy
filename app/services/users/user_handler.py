@@ -1,7 +1,7 @@
 """user_handler: functions and classes for handling users."""
 
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from http import HTTPStatus
 from logging import getLogger
 from uuid import uuid4
@@ -169,8 +169,7 @@ async def create_pw_reset_token(
     # Delete any existing tokens older than PW_RESET_TOKEN_EXPIRATION_MINUTES
     stmt = delete(db_models.PasswordResetToken).where(
         db_models.PasswordResetToken.created_timestamp
-        < datetime.now().astimezone(timezone.utc)
-        - timedelta(minutes=PW_RESET_TOKEN_EXPIRATION_MINUTES)
+        < datetime.now().astimezone(UTC) - timedelta(minutes=PW_RESET_TOKEN_EXPIRATION_MINUTES)
     )
     await db.execute(stmt)
 
@@ -179,8 +178,8 @@ async def create_pw_reset_token(
     pw_reset_token = db_models.PasswordResetToken(
         user_id=user.id,
         encrypted_query=encryption_handler.encrypt(query),
-        created_timestamp=datetime.now().astimezone(timezone.utc),
-        expires_timestamp=datetime.now().astimezone(timezone.utc)
+        created_timestamp=datetime.now().astimezone(UTC),
+        expires_timestamp=datetime.now().astimezone(UTC)
         + timedelta(minutes=PW_RESET_TOKEN_EXPIRATION_MINUTES),
     )
     db.add(pw_reset_token)
@@ -201,8 +200,8 @@ async def assert_token_is_valid(db: AsyncSession, query: str) -> db_models.Passw
         token = result.scalars().one()
     except sqlalchemy.orm.exc.NoResultFound as e:
         raise errors.PasswordResetTokenNotFoundError from e
-    token_dt = token.expires_timestamp.astimezone(timezone.utc)
-    if token_dt < datetime.now().astimezone(timezone.utc):
+    token_dt = token.expires_timestamp.astimezone(UTC)
+    if token_dt < datetime.now().astimezone(UTC):
         raise errors.PasswordResetTokenExpiredError
     return token
 
@@ -219,8 +218,8 @@ async def reset_password_from_token(db: AsyncSession, query: str, password: str)
         pw_reset_token = get_token_result.scalars().one()
     except sqlalchemy.orm.exc.NoResultFound as e:
         raise errors.PasswordResetTokenNotFoundError from e
-    token_dt = pw_reset_token.expires_timestamp.astimezone(timezone.utc)
-    if token_dt < datetime.now().astimezone(timezone.utc):
+    token_dt = pw_reset_token.expires_timestamp.astimezone(UTC)
+    if token_dt < datetime.now().astimezone(UTC):
         raise errors.PasswordResetTokenExpiredError
     get_user_stmt = select(db_models.User).where(db_models.User.id == pw_reset_token.user_id)
     get_user_result = await db.execute(get_user_stmt)

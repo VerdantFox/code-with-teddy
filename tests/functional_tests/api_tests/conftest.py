@@ -13,7 +13,7 @@ from tests.data import models as test_models
 TOKEN_URL = "api/v1/auth/token"
 
 
-@pytest.fixture()
+@pytest.fixture
 async def logged_in_basic_user_module(
     test_client: TestClient,
     basic_user_module: db_models.User,
@@ -25,7 +25,7 @@ async def logged_in_basic_user_module(
     test_client.headers.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 async def logged_in_admin_user_module(
     test_client: TestClient,
     admin_user_module: db_models.User,

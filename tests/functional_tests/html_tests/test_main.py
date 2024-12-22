@@ -1,6 +1,6 @@
 """test_main: Test the GET pages on the main site."""
 
-from xml.etree import ElementTree
+from xml.etree import ElementTree as ET
 
 import pytest
 from fastapi import status
@@ -11,7 +11,7 @@ from tests.functional_tests import BASE_URL
 
 
 @pytest.fixture(autouse=True)
-async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
+async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:
     """Clean the database after the module completes."""
 
 
@@ -83,7 +83,7 @@ def test_get_sitemap_xml_succeeds(test_client: TestClient):
     assert response.status_code == status.HTTP_200_OK
 
     # Should parse as XML
-    ElementTree.fromstring(response.text)  # noqa: S314 (xml-vulnerability)
+    ET.fromstring(response.text)  # noqa: S314 (xml-vulnerability)
     assert "urlset" in response.text
     assert f"<loc>{BASE_URL}</loc>" in response.text
     assert f"<loc>{BASE_URL}/blog/module-blog-post</loc>" in response.text

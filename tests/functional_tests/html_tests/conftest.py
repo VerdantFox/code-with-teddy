@@ -29,7 +29,7 @@ def str_to_soup() -> StrToSoup:  # pragma: no cover
 
 
 # ----------------------------- Logged In Users ------------------------------
-@pytest.fixture()
+@pytest.fixture
 async def logged_in_basic_user(
     test_client: TestClient,
     basic_user: db_models.User,
@@ -39,7 +39,7 @@ async def logged_in_basic_user(
     test_client.cookies.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 async def logged_in_basic_user_module(
     test_client: TestClient,
     basic_user_module: db_models.User,
@@ -62,7 +62,7 @@ async def set_basic_user_login_cookie(
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 async def logged_in_basic_user_2_module(
     test_client: TestClient,
     basic_user_2_module: db_models.User,
@@ -81,7 +81,7 @@ async def set_basic_user_2_login_cookie(
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 async def logged_in_admin_user(
     test_client: TestClient,
     admin_user: db_models.User,
@@ -91,7 +91,7 @@ async def logged_in_admin_user(
     test_client.cookies.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 async def logged_in_admin_user_module(
     test_client: TestClient,
     admin_user_module: db_models.User,

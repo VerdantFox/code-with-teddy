@@ -21,12 +21,12 @@ PERMISSION = "You do not have permission to perform this action"
 # Fixtures
 # ----------------------------------------------------------------------------
 @pytest.fixture(autouse=True)
-async def _clean_db_fixture_module(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
+async def _clean_db_fixture_module(clean_db_module: None, anyio_backend: str) -> None:
     """Clean the database after the module."""
 
 
 @pytest.fixture(autouse=True)
-async def _clean_db_fixture_function(clean_db_except_users: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
+async def _clean_db_fixture_function(clean_db_except_users: None, anyio_backend: str) -> None:
     """Clean the database after each function."""
 
 

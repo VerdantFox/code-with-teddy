@@ -12,7 +12,7 @@ ENDPOINT = "/blog/create"
 
 
 @pytest.fixture(autouse=True)
-async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:  # noqa: ARG001 (unused-arg)
+async def _clean_db_fixture(clean_db_module: None, anyio_backend: str) -> None:
     """Clean the database after each test."""
 
 
