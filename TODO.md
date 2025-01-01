@@ -9,6 +9,7 @@ A list of stuff that needs to get done for the project, categorized and roughly 
 
 ## Features
 
+- [ ] Add certbot to auto-renew SSL OR use DNS provider's API to grab certs
 - [ ] Add resume to "experience" page
 - [ ] Add blog comment likes
 - [ ] Add projects to projects page (plus individual pages as needed)
