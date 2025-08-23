@@ -69,6 +69,7 @@ main() {
 echo_usage() {
     echo 'Run the app locally in development mode.'
     echo
+    # shellcheck disable=SC2016
     echo 'This script requires tmux to be installed. `sudo apt-get install tmux`'
     echo
     echo 'OPTIONS:'
