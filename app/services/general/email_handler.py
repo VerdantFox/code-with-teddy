@@ -3,7 +3,7 @@
 import textwrap
 from logging import getLogger
 
-from mailersend import emails as mailersend_emails
+from mailersend import EmailBuilder, MailerSendClient
 
 from app.datastore import db_models
 from app.settings import settings
@@ -112,7 +112,6 @@ def send_comment_notification_emails(
     html_content = textwrap.dedent(
         f"""\
         {EMAIL_CSS}
-        </style>
         <h1>New comment on <a href="{settings.base_url}/blog/{post.slug}#comments ">{post.title!r}</a></h1>
         <p>Commenter: {comment.name}</p>
         <p>comment:</p>
@@ -190,34 +189,73 @@ def send_transaction_email(  # noqa: PLR0913 (too-many-arguments)
     reply_email: str = settings.site_email_address,
     reply_name: str = "Code with Teddy",
 ) -> TransactionEmailResponse:
-    """Send an email to a recipient."""
-    mailer = mailersend_emails.NewEmail(settings.mailersend_api_key)
+    """Send an email to a recipient using MailerSend's API."""
+    if not settings.mailersend_api_key:
+        return {}, ""
 
-    mail_body: MailBodyType = {}
-    mail_from = {
-        "name": from_name,
-        "email": from_email,
+    try:
+        return _build_and_send_email(
+            from_email=from_email,
+            from_name=from_name,
+            to_email=to_email,
+            to_name=to_name,
+            reply_email=reply_email,
+            reply_name=reply_name,
+            subject=subject,
+            html_content=html_content,
+            text_content=text_content,
+        )
+    except Exception as e:
+        error_message = f"Exception occurred while sending email: {e!s}\n"
+        logger.exception("Failed to send email: %s", error_message)
+        return {}, error_message
+
+
+def _build_and_send_email(  # noqa: PLR0913 (too-many-arguments)
+    *,
+    from_email: str,
+    from_name: str,
+    to_email: str,
+    to_name: str,
+    reply_email: str,
+    reply_name: str,
+    subject: str,
+    html_content: str,
+    text_content: str,
+) -> TransactionEmailResponse:
+    """Build and send email, return mail_body and response_str."""
+    ms = MailerSendClient(api_key=settings.mailersend_api_key)
+
+    # Build email using the new EmailBuilder pattern
+    email = (
+        EmailBuilder()
+        .from_email(from_email, from_name)
+        .to_many([{"email": to_email, "name": to_name or to_email}])
+        .reply_to(reply_email, reply_name)
+        .subject(subject)
+        .html(html_content)
+        .text(text_content)
+        .build()
+    )
+
+    # Send the email
+    response = ms.emails.send(email)
+
+    # Create mail_body dict for backward compatibility
+    mail_body: MailBodyType = {
+        "from": {"name": from_name, "email": from_email},
+        "to": [{"name": to_name or to_email, "email": to_email}],
+        "reply_to": {"name": reply_name, "email": reply_email},
+        "subject": subject,
+        "html_content": html_content,
+        "text_content": text_content,
     }
-    recipients = [
-        {
-            "name": to_name or to_email,
-            "email": to_email,
-        }
-    ]
-    reply_to = {
-        "name": reply_name,
-        "email": reply_email,
-    }
-    mailer.set_mail_from(mail_from, mail_body)
-    mailer.set_mail_to(recipients, mail_body)
-    mailer.set_subject(subject, mail_body)
-    mailer.set_html_content(html_content, mail_body)
-    mailer.set_plaintext_content(text_content, mail_body)
-    mailer.set_reply_to(reply_to, mail_body)
 
-    response_str = mailer.send(mail_body)
-
-    if response_str != "202\n":  # pragma: no cover
+    # Check response status
+    if response.success:
+        response_str = f"{response.status_code}\n"
+    else:
+        response_str = f"Error {response.status_code}: {response.data}\n"
         logger.error("Failed to send email: %s\n\nProblematic email: %s", response_str, mail_body)
 
     return mail_body, response_str

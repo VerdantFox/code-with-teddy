@@ -476,9 +476,9 @@ jinja2==3.1.6 \
     # via
     #   code-with-teddy (pyproject.toml)
     #   jinja-partials
-mailersend==0.5.8 \
-    --hash=sha256:24292c10ad180570ed76e90b4e7daede5d9cd98713860206a540f1ff900258fe \
-    --hash=sha256:c96d196278d5771346563d56b54b83b9290ca32768a451aed8f3dabd6b0ae1b8
+mailersend==2.0.0 \
+    --hash=sha256:9f121909eb55716197c0c64d92760091ea4c4a965eebb3245f6634d8bcce0607 \
+    --hash=sha256:a5280db088c7af11dacf6eab68da4c7d597c30e8fa6a54b20a739aa7df2acc4b
     # via code-with-teddy (pyproject.toml)
 mako==1.3.10 \
     --hash=sha256:99579a6f39583fa7e5630a28c3c1f440e4e97a414b80372649c0ce338da2ea28 \
