@@ -91,7 +91,7 @@ DEFAULT_DATA = {
 
 def test_live_edit_blog_post_as_guest_fails(test_client: TestClient):
     """Test that a guest cannot live edit a blog post."""
-    response = test_client.post(LIVE_EDIT_ENDPOINT, data=DEFAULT_DATA, allow_redirects=False)
+    response = test_client.post(LIVE_EDIT_ENDPOINT, data=DEFAULT_DATA, follow_redirects=False)
     assert response.status_code == status.HTTP_303_SEE_OTHER
     response = test_client.post(LIVE_EDIT_ENDPOINT, data=DEFAULT_DATA)
     assert response.status_code == status.HTTP_200_OK
