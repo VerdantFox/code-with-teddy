@@ -44,12 +44,10 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     """Add option to run playwright tests."""
     environments = ["local", "prod"]
     help_msg = (
-        "Run API integration tests against the specified environment. Options:" f" {environments}"
+        f"Run API integration tests against the specified environment. Options: {environments}"
     )
     parser.addoption("--integration", action="store", help=help_msg)
-    help_msg = (
-        "Run UI playwright tests against the specified environment. Options:" f" {environments}"
-    )
+    help_msg = f"Run UI playwright tests against the specified environment. Options: {environments}"
     parser.addoption("--playwright", action="store", help=help_msg)
     help_msg = "Run all tests including integration and playwright end-to-end tests."
     parser.addoption("--all", action="store_true", help=help_msg)

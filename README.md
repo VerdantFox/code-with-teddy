@@ -47,7 +47,7 @@ npm install
 
 ### Docker
 
-You'll need to install Docker to run the website locally. Even if not running the app itself in Docker, its used for running the Postgres database. You can install Docker from [here](https://docs.docker.com/get-docker/). Deployments use Docker and Docker Compose, so you'll need to install Docker Compose as well. You can install Docker Compose from [here](https://docs.docker.com/compose/install/).
+You'll need to install Docker to run the website locally. Even if not running the app itself in Docker, its used for running the Postgres database. [You can install Docker from here](https://docs.docker.com/get-docker/). Deployments use Docker and Docker Compose, so you'll need to install Docker Compose as well. [You can install Docker Compose from here](https://docs.docker.com/compose/install/).
 
 Docker and Docker Compose configurations are in `docker_config`.
 

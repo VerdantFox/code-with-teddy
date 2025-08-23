@@ -199,7 +199,7 @@ def typer_main(  # noqa: PLR0913 too-many-arguments
     teardown: Annotated[bool, typer.Option(help=TEARDOWN_HELP)] = True,
     create_db: Annotated[bool, typer.Option(help=CREATE_DB_HELP)] = True,
     migration_version: Annotated[
-        Optional[str],  # noqa: UP007
+        Optional[str],  # noqa: UP045
         typer.Option("--migrate", help=MIGRATION_HELP),
     ] = None,
     populate: Annotated[bool, typer.Option(help="Populate the database with dummy data.")] = True,

@@ -224,7 +224,7 @@ async def add_several_blog_posts_module(
     blog_post_inputs = [
         test_models.basic_blog_post(
             title=f"basic_{i}",
-            tags=[f"foo_{i+j}" for j in range(3)],
+            tags=[f"foo_{i + j}" for j in range(3)],
             content=f"test blog post {i}. " * i,
             likes=i,
             views=i * 10,
