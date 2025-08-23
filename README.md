@@ -6,12 +6,17 @@ My portfolio, blog, and mini-projects website, revamped for 2024
 
 You'll need to install a few things to get the website running locally. The website is built with Python and FastAPI for the backend, and uses TailwindCSS, Alpine.js and HTMX on the front end. The database is Postgres with the SQLAlchemy ORM.
 
+### Extra tools
+
+- Install `tmux` for run-dev script
+- Install `npx` for updating node dependencies.
+
 ### Python
 
-First, install [uv](https://github.com/astral-sh/uv) for package management. I recommend installing [pipx](https://github.com/pypa/pipx) and then:
+First, install [uv](https://github.com/astral-sh/uv) for package management. I recommend installing it with the following command:
 
 ```bash
-pipx install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 Then install python environment:
@@ -46,18 +51,6 @@ You'll need to install Docker to run the website locally. Even if not running th
 
 Docker and Docker Compose configurations are in `docker_config`.
 
-### Tools
-
-Install xdotool for run-dev script
-
-ubuntu:
-
-```shell
-sudo apt-get install xdotool
-```
-
-Install npx for updating node dependencies.
-
 ## Running the app
 
 ### Start the database locally
@@ -75,7 +68,7 @@ python -m scripts.start_local_postgres
 To run the app locally, you can use the following command:
 
 ```bash
-python -m scripts.run_dev
+./run-dev.sh
 ```
 
 This will start an instance of `tailwind` that will build the CSS and watch for changes. It will also update the Python requirements, start up the Postgres database docker container if it is not already running, and start the FastAPI server.
