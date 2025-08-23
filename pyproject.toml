@@ -120,6 +120,8 @@ dev = [
     "pytest-mock",
     # Pytest-playwright: Playwright support for pytest
     "pytest-playwright",
+    # Pytest-rerunfailures: re-run failed tests
+    "pytest-rerunfailures",
     # Pyyaml: YAML parser
     "pyyaml",
     # Requests: HTTP client
@@ -189,6 +191,7 @@ disallow_untyped_defs = false
 # Pytest
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--reruns 2"
 filterwarnings = [
     # Ignore warnings from all sources so that we can ignore warnings from
     # external libraries that we can't control.

@@ -40,3 +40,4 @@ secrets/
 webroot/
 node_modules/
 certs/
+.vscode/

@@ -1116,6 +1116,7 @@ packaging==25.0 \
     #   build
     #   gunicorn
     #   pytest
+    #   pytest-rerunfailures
 pathspec==0.12.1 \
     --hash=sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08 \
     --hash=sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712
@@ -1594,6 +1595,7 @@ pytest==8.4.1 \
     #   pytest-cov
     #   pytest-mock
     #   pytest-playwright
+    #   pytest-rerunfailures
 pytest-base-url==2.1.0 \
     --hash=sha256:02748589a54f9e63fcbe62301d6b0496da0d10231b753e950c63e03aee745d45 \
     --hash=sha256:3ad15611778764d451927b2a53240c1a7a591b521ea44cebfe45849d2d2812e6
@@ -1609,6 +1611,10 @@ pytest-mock==3.14.1 \
 pytest-playwright==0.7.0 \
     --hash=sha256:2516d0871fa606634bfe32afbcc0342d68da2dbff97fe3459849e9c428486da2 \
     --hash=sha256:b3f2ea514bbead96d26376fac182f68dcd6571e7cb41680a89ff1673c05d60b6
+    # via code-with-teddy (pyproject.toml)
+pytest-rerunfailures==15.1 \
+    --hash=sha256:c6040368abd7b8138c5b67288be17d6e5611b7368755ce0465dda0362c8ece80 \
+    --hash=sha256:f674c3594845aba8b23c78e99b1ff8068556cc6a8b277f728071fdc4f4b0b355
     # via code-with-teddy (pyproject.toml)
 python-dotenv==1.1.1 \
     --hash=sha256:31f23644fe2602f88ff55e1f5c79ba497e01224ee7737937930c448e4d0e24dc \
