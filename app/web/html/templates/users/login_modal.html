@@ -6,6 +6,7 @@
   @keydown.escape.window="loginModalOpen = false"
   class="pointer-events-auto top-0 bottom-0 fixed px-6 py-6 w-full block backdrop-blur transition w-full"
   x-trap.inert="loginModalOpen"
+  @click.self="loginModalOpen = false"
 >
   <div
     class="relative mx-auto max-w-xl rounded-xl mt-16 border-2 border-grayscale-700 dark:border-transparent shadow-xl"
@@ -19,7 +20,6 @@
     </button>
     <div
       class="flex flex-col rounded-xl px-6 py-6 bg-grayscale-50/90 text-md font-medium text-grayscale-800 shadow-2xl shadow-grayscale-800/5 ring-1 ring-grayscale-900/5 dark:bg-grayscale-800/90 dark:text-grayscale-200 dark:ring-white/10"
-      @click.away="loginModalOpen = false"
     >
       <h2 class="text-4xl mt-10 mb-10 font-bold">Sign In</h2>
       {{ render_partial('users/partials/login_form.html', request=request, login_form=login_form, message=message, use_htmx=True) }}
