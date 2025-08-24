@@ -102,23 +102,35 @@ DEPENDENCIES = {
         url="https://unpkg.com/htmx.org@{version}/dist/htmx.min.js",
         bundle_path=JS_BUNDLED_NON_DEFERRED,
         add_version=True,
+        # 👇 Keep < 2 b/c response-targets extension is broken in >=2
+        # (symptom: no "signed out" alert)
+        version_pin="1.9.12",
     ),
     "HTMX--response targets extension": Dependency(
         name="HTMX--response targets extension",
-        api_name="htmx-ext-response-targets",
-        url="https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@{version}",
+        # api_name="htmx-ext-response-targets",  # HTMX-V2 name  # noqa: ERA001
+        # url="https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@{version}",  # HTMX-V2 url  # noqa: ERA001,E501
+        api_name="htmx.org",
+        url="https://unpkg.com/htmx.org@{version}/dist/ext/response-targets.js",
         bundle_path=JS_BUNDLED_NON_DEFERRED,
         add_version=True,
         minify=True,
-        version_pin="2.0.2",  # For some reason 2.0.3 uses module imports that break things...
+        # 👇 Keep < 2 b/c response-targets extension is broken in >=2
+        # (symptom: no "signed out" alert)
+        version_pin="1.9.12",
     ),
     "HTMX--alpine morph extension": Dependency(
         name="HTMX--alpine morph extension",
-        api_name="htmx-ext-alpine-morph",
-        url="https://unpkg.com/htmx-ext-alpine-morph@{version}/alpine-morph.js",
+        # api_name="htmx-ext-alpine-morph",  # HTMX-V2 name  # noqa: ERA001
+        # url="https://unpkg.com/htmx-ext-alpine-morph@{version}/alpine-morph.js",  # HTMX-V2 url  # noqa: ERA001,E501
+        api_name="htmx.org",
+        url="https://unpkg.com/htmx.org@{version}/dist/ext/alpine-morph.js",
         bundle_path=JS_BUNDLED_NON_DEFERRED,
         add_version=True,
         minify=True,
+        # 👇 Keep < 2 b/c response-targets extension is broken in >=2
+        # (symptom: no "signed out" alert)
+        version_pin="1.9.12",
     ),
     "Simple Notify--JS": Dependency(
         name="Simple Notify--JS",
@@ -219,17 +231,25 @@ def write_to_files(dependencies: dict[str, Dependency]) -> None:
     clear_files(JS_BUNDLED_DEFERRED, JS_BUNDLED_NON_DEFERRED, CSS_BUNDLED)
     for dependency in dependencies.values():
         write_to_file(dependency)
+    fix_files_newline(JS_BUNDLED_DEFERRED, JS_BUNDLED_NON_DEFERRED, CSS_BUNDLED)
 
 
-def clear_files(*path: Path) -> None:
+def clear_files(*paths: Path) -> None:
     """Clear the contents of the files."""
     # First create file if it doesn't exist
-    for p in path:
+    for p in paths:
         p.touch(exist_ok=True)
 
     # Then clear the contents
-    for p in path:
+    for p in paths:
         p.write_text("")
+
+
+def fix_files_newline(*paths: Path) -> None:
+    """Fix the newline characters in the specified files."""
+    for p in paths:
+        content = p.read_text()
+        p.write_text(content.rstrip("\n") + "\n")
 
 
 def write_to_file(dependency: Dependency) -> None:
