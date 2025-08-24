@@ -1,7 +1,107 @@
+/* === Tailwind v4 setup (CSS-first) === */
 @import "tailwindcss";
 
-@config "./tailwind.config.js";
+/* Use a .dark class (v3-style) instead of media query for dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
 
+/* Optional but recommended so form controls, scrollbars, etc. pick correct palette */
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
+
+/* Tell Tailwind where to scan for classes (helps when auto-detection misses some) */
+@source "./app/web/html/templates";
+@source "./app/web/html/static";
+@source "./app";
+
+/* Load official plugins */
+@plugin "@tailwindcss/container-queries";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Fonts */
+  --font-sans: "Roboto", "sans-serif";
+
+  /* Breakpoints (px → rem @16px) */
+  --breakpoint-xs: 28.125rem; /* 450px */
+  --breakpoint-sm: 40rem; /* 640px */
+  --breakpoint-md: 48rem; /* 768px */
+  --breakpoint-lg: 64rem; /* 1024px */
+  --breakpoint-xl: 80rem; /* 1280px */
+  --breakpoint-2xl: 100rem; /* 1600px */
+
+  /* Colors */
+  /* primary */
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
+  --color-primary-950: #022c22;
+
+  /* offset */
+  --color-offset-50: #f5f3ff;
+  --color-offset-100: #ede9fe;
+  --color-offset-200: #ddd6fe;
+  --color-offset-300: #c4b5fd;
+  --color-offset-400: #a78bfa;
+  --color-offset-500: #8b5cf6;
+  --color-offset-600: #7c3aed;
+  --color-offset-700: #6d28d9;
+  --color-offset-800: #5b21b6;
+  --color-offset-900: #4c1d95;
+  --color-offset-950: #2e1065;
+
+  /* grayscale */
+  --color-grayscale-50: #fafaf9;
+  --color-grayscale-100: #f5f5f4;
+  --color-grayscale-200: #e7e5e4;
+  --color-grayscale-300: #d6d3d1;
+  --color-grayscale-400: #a8a29e;
+  --color-grayscale-500: #78716c;
+  --color-grayscale-600: #57534e;
+  --color-grayscale-700: #44403c;
+  --color-grayscale-800: #292524;
+  --color-grayscale-900: #1c1917;
+  --color-grayscale-950: #0c0a09;
+
+  /* third */
+  --color-third-50: #fefce8;
+  --color-third-100: #fef9c3;
+  --color-third-200: #fef08a;
+  --color-third-300: #fde047;
+  --color-third-400: #facc15;
+  --color-third-500: #eab308;
+  --color-third-600: #ca8a04;
+  --color-third-700: #a16207;
+  --color-third-800: #854d0e;
+  --color-third-900: #713f12;
+  --color-third-950: #422006;
+
+  /* muted */
+  --color-muted-50: #f4f4f2;
+  --color-muted-100: #e4e3dd;
+  --color-muted-200: #cbc9bd;
+  --color-muted-300: #ada897;
+  --color-muted-400: #958f7a;
+  --color-muted-500: #867f6c;
+  --color-muted-600: #736a5b;
+  --color-muted-700: #5d554b;
+  --color-muted-800: #514a43;
+  --color-muted-900: #47413c;
+  --color-muted-950: #1c1917;
+}
+
+/* Base layer */
 @layer base {
   /* Start scrollbar styling */
   * {
@@ -40,6 +140,12 @@
 
   .transition-shadow-bg-transform {
     transition-property: background-color, opacity, transform, box-shadow;
+  }
+
+  /* Tailwind 4 button cursor defaults to `cursor:default`. Overwrite to `cursor: pointer` */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
 
@@ -105,25 +211,24 @@
   }
 }
 
-@layer utilities {
-  .wiggle-once {
-    display: inline-block;
-    animation: wiggle 0.3s linear;
-  }
+@utility wiggle-once {
+  display: inline-block;
+  animation: wiggle 0.3s linear;
+}
 
-  @keyframes wiggle {
-    33% {
-      transform: rotate(10deg);
-    }
-    66% {
-      transform: rotate(-10deg);
-    }
-    100% {
-      transform: rotate(0deg);
-    }
+@keyframes wiggle {
+  33% {
+    transform: rotate(10deg);
+  }
+  66% {
+    transform: rotate(-10deg);
+  }
+  100% {
+    transform: rotate(0deg);
   }
 }
 
+/* Outside layers — global helpers */
 [x-cloak] {
   display: none !important;
 }
@@ -154,14 +259,14 @@
   clip: rect(1px, 1px, 1px, 1px); /* All other browsers */
 }
 
-/* SweetAlert  2 overwrites */
+/* SweetAlert2 overwrites */
 div.swal2-popup {
   @apply dark:bg-grayscale-800 text-grayscale-800 dark:text-white;
 }
 button.swal2-confirm.swal2-styled {
-  @apply border-0! border-transparent! bg-primary-600! dark:bg-primary-800! ring-[3px]! ring-transparent!
-         focus:ring-primary-500! focus-visible:ring-primary-500!
-         dark:focus:ring-primary-700! dark:focus-visible:ring-primary-700!;
+  @apply !border-0 !border-transparent !bg-primary-600 dark:!bg-primary-800 !ring-[3px] !ring-transparent
+         focus:!ring-primary-500 focus-visible:!ring-primary-500
+         dark:focus:!ring-primary-700 dark:focus-visible:!ring-primary-700;
 }
 
 /* Simple-notify overwrites */
