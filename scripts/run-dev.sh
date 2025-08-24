@@ -78,7 +78,7 @@ echo_usage() {
     echo '                     Start/Do not start Browser Sync. Default: --no-browser-sync.'
     echo '  -p/-np, --start-postgres/--no-start-postgres'
     echo '                     Start/Do not start Postgres. Default: --start-postgres.'
-    echo '  --kill-tmux       Kill the existing tmux session and exit. Default: false.'
+    echo '  -k/--kill-tmux       Kill the existing tmux session and exit. Default: false.'
 }
 
 # Parse command line options
