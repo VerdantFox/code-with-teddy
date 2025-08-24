@@ -110,6 +110,7 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_NON_DEFERRED,
         add_version=True,
         minify=True,
+        version_pin="2.0.2",  # For some reason 2.0.3 uses module imports that break things...
     ),
     "HTMX--alpine morph extension": Dependency(
         name="HTMX--alpine morph extension",
