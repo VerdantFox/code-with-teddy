@@ -65,19 +65,19 @@
         <div class="flex flex-col gap-4 items-start">
           <a
             href="{{ url_for('html:static', path='/media/executables/file_renamer.exe') }}"
-            class="btn btn-filled w-[28rem] max-sm:w-full"
+            class="btn btn-filled w-112 max-sm:w-full"
             download="file_renamer.exe"
           >
             {{ render_partial('shared/partials/icons/download.html', class="h-6 w-6 ") }}
             Download for Windows
           </a>
-          <button class="btn btn-filled w-[28rem] max-sm:w-full" disabled>
+          <button class="btn btn-filled w-112 max-sm:w-full" disabled>
             {{ render_partial('shared/partials/icons/download.html', class="h-6 w-6 ") }}
             Download for Mac (currently unavailable)
           </button>
           <a
             href="{{ url_for('html:static', path='/media/executables/file_renamer_linux') }}"
-            class="btn btn-filled w-[28rem] max-sm:w-full"
+            class="btn btn-filled w-112 max-sm:w-full"
             download="file_renamer_linux"
           >
             {{ render_partial('shared/partials/icons/download.html', class="h-6 w-6 ") }}

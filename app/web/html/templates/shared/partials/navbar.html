@@ -116,7 +116,7 @@
                 >{{ nav_item.get("name") }}
                 <span
                   :class="selected & (!navAtTop | hover) ? 'from-primary-600/0 via-primary-600/40 to-primary-600/0 dark:from-primary-400/0 dark:via-primary-400/40 dark:to-primary-400/0' : ''"
-                  class="absolute inset-x-1 -bottom-px h-px bg-gradient-to-r"
+                  class="absolute inset-x-1 -bottom-px h-px bg-linear-to-r"
                 ></span
               ></a>
             </li>
@@ -245,7 +245,7 @@
                     class="block text-sm text-gray-700 dark:text-white hover:bg-grayscale-100 dark:hover:bg-grayscale-600 flex justify-between items-center gap-1 pr-4"
                   >
                     <button
-                      class="flex-grow flex items-center gap-2 pl-4 py-2 w-full text-left"
+                      class="grow flex items-center gap-2 pl-4 py-2 w-full text-left"
                       role="menuitem"
                       id="user-menu-item-0"
                       @click="loginModalOpen = true"

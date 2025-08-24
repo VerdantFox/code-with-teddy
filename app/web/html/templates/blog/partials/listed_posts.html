@@ -10,7 +10,7 @@
           x-cloak
           x-show="compact"
           x-transition:enter.delay.500ms
-          class="w-40 max-md:w-32 max-sm:hidden flex-shrink-0"
+          class="w-40 max-md:w-32 max-sm:hidden shrink-0"
         >
           <a href="{{ url_for('html:read_blog_post', slug=blog_post.slug) }}">
             {{ render_partial('blog/partials/thumbnail.html', class="w-full", request=request, blog_post=blog_post) }}

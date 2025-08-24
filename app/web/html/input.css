@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@config "./tailwind.config.js";
 
 @layer base {
   /* Start scrollbar styling */
@@ -49,38 +49,34 @@
   }
 
   /* Buttons */
-  .btn-base {
-    @apply inline-block flex gap-4 items-center justify-center;
-  }
-
   .btn {
-    @apply cursor-pointer btn-base px-8 py-4 text-lg rounded-xl;
+    @apply cursor-pointer inline-block flex gap-4 items-center justify-center px-8 py-4 text-lg rounded-xl;
   }
 
   .btn-sm {
-    @apply cursor-pointer btn-base px-4 py-2 text-base rounded-md;
+    @apply cursor-pointer inline-block flex gap-4 items-center justify-center px-4 py-2 text-base rounded-md;
   }
 
   .btn-filled {
-    @apply text-white bg-primary-700 bg-primary-700 hover:bg-primary-800 active:bg-primary-900 disabled:text-primary-100 disabled:bg-primary-800 disabled:opacity-50 transition-bg-color duration-300;
+    @apply text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 disabled:text-primary-100 disabled:bg-primary-800 disabled:opacity-50 [transition-property:background-color,opacity] duration-300;
   }
 
   .btn-filled-danger {
-    @apply text-white bg-pink-700 hover:bg-pink-800 active:bg-pink-900 disabled:text-pink-100 disabled:bg-pink-800 disabled:opacity-50 transition-bg-color duration-300;
+    @apply text-white bg-pink-700 hover:bg-pink-800 active:bg-pink-900 disabled:text-pink-100 disabled:bg-pink-800 disabled:opacity-50 [transition-property:background-color,opacity] duration-300;
   }
 
   .btn-outline {
-    @apply text-primary-700 dark:text-primary-50 bg-white border dark:bg-grayscale-800 border-primary-700 dark:border-primary-50 hover:bg-primary-50 dark:hover:bg-grayscale-700 active:bg-primary-100 dark:active:bg-grayscale-600 disabled:hover:bg-white dark:disabled:hover:bg-grayscale-800  disabled:opacity-50 dark:focus-visible:ring-4 dark:focus-visible:ring-grayscale-300 transition duration-300;
+    @apply text-primary-700 dark:text-primary-50 bg-white border dark:bg-grayscale-800 border-primary-700 dark:border-primary-50 hover:bg-primary-50 dark:hover:bg-grayscale-700 active:bg-primary-100 dark:active:bg-grayscale-600 disabled:hover:bg-white dark:disabled:hover:bg-grayscale-800 disabled:opacity-50 dark:focus-visible:ring-4 dark:focus-visible:ring-grayscale-300 transition duration-300;
   }
 
   /* Use on the icon inside the button with 'group' on the button */
   .icon-btn {
-    @apply stroke-grayscale-500 dark:stroke-grayscale-300 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600  dark:group-hover:fill-primary-300 dark:hover:stroke-primary-300 group-active:stroke-primary-500 group-active:fill-primary-500 dark:group-active:stroke-primary-400 dark:group-active:fill-primary-400 transition duration-300;
+    @apply stroke-grayscale-500 dark:stroke-grayscale-300 fill-grayscale-500 dark:fill-grayscale-300 group-hover:fill-primary-600 group-hover:stroke-primary-600 dark:group-hover:fill-primary-300 dark:hover:stroke-primary-300 group-active:stroke-primary-500 group-active:fill-primary-500 dark:group-active:stroke-primary-400 dark:group-active:fill-primary-400 transition duration-300;
   }
 
   /* Links */
   .link {
-    @apply text-primary-700 hover:text-primary-500 active:text-primary-400 dark:text-primary-300 dark:hover:text-primary-500  dark:active:text-primary-600 fill-primary-700 hover:fill-primary-500 active:fill-primary-400 dark:fill-primary-300 dark:hover:fill-primary-500  dark:active:fill-primary-600 stroke-primary-700 hover:stroke-primary-500 active:stroke-primary-400 dark:stroke-primary-300 dark:hover:stroke-primary-500  dark:active:stroke-primary-600 transition duration-300;
+    @apply text-primary-700 hover:text-primary-500 active:text-primary-400 dark:text-primary-300 dark:hover:text-primary-500 dark:active:text-primary-600 fill-primary-700 hover:fill-primary-500 active:fill-primary-400 dark:fill-primary-300 dark:hover:fill-primary-500 dark:active:fill-primary-600 stroke-primary-700 hover:stroke-primary-500 active:stroke-primary-400 dark:stroke-primary-300 dark:hover:stroke-primary-500 dark:active:stroke-primary-600 transition duration-300;
   }
 
   /* Fields */
@@ -92,7 +88,16 @@
   }
 
   .link-underlined {
-    @apply link border-b border-grayscale-300 hover:border-primary-500 dark:border-grayscale-600 dark:hover:border-primary-500 active:border-primary-400 dark:active:border-primary-600;
+    @apply text-primary-700 hover:text-primary-500 active:text-primary-400
+          dark:text-primary-300 dark:hover:text-primary-500 dark:active:text-primary-600
+          fill-primary-700 hover:fill-primary-500 active:fill-primary-400
+          dark:fill-primary-300 dark:hover:fill-primary-500 dark:active:fill-primary-600
+          stroke-primary-700 hover:stroke-primary-500 active:stroke-primary-400
+          dark:stroke-primary-300 dark:hover:stroke-primary-500 dark:active:stroke-primary-600
+          transition duration-300
+          border-b border-grayscale-300 hover:border-primary-500
+          dark:border-grayscale-600 dark:hover:border-primary-500
+          active:border-primary-400 dark:active:border-primary-600;
   }
 
   .tippy-box {
@@ -154,7 +159,9 @@ div.swal2-popup {
   @apply dark:bg-grayscale-800 text-grayscale-800 dark:text-white;
 }
 button.swal2-confirm.swal2-styled {
-  @apply border-0 border-transparent   bg-primary-600 dark:bg-primary-800 ring-[3px] ring-transparent focus:ring-primary-500 focus-visible:ring-primary-500 dark:focus:ring-primary-700 dark:focus-visible:ring-primary-700 !important;
+  @apply border-0! border-transparent! bg-primary-600! dark:bg-primary-800! ring-[3px]! ring-transparent!
+         focus:ring-primary-500! focus-visible:ring-primary-500!
+         dark:focus:ring-primary-700! dark:focus-visible:ring-primary-700!;
 }
 
 /* Simple-notify overwrites */
@@ -197,16 +204,40 @@ div.highlight.not-prose {
   @apply border-2 border-grayscale-300 dark:border-grayscale-600 bg-white dark:bg-grayscale-900;
 }
 
+/* Typography container */
 .blog-prose {
-  @apply prose-xl max-xs:prose-xl prose-h4:text-2xl max-xs:prose-h4:text-xl prose-ul:list-disc prose-ol:list-decimal prose-li:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:leading-8 prose-a:link prose-a:link-underlined prose-headings:font-semibold
+  @apply prose-xl max-xs:prose-xl prose-h4:text-2xl max-xs:prose-h4:text-xl
+         prose-ul:list-disc prose-ol:list-decimal prose-li:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:leading-8
+         prose-headings:font-semibold
 
-  prose-code:bg-grayscale-200 dark:prose-code:bg-grayscale-700 prose-code:rounded prose-code:py-0.5 prose-code:px-1
+         prose-code:bg-grayscale-200 dark:prose-code:bg-grayscale-700 prose-code:rounded prose-code:py-0.5 prose-code:px-1
 
-  prose-blockquote:border-l-8 prose-blockquote:border-primary-300 dark:prose-blockquote:border-primary-900 prose-blockquote:bg-grayscale-100 dark:prose-blockquote:bg-grayscale-800 prose-blockquote:rounded-r-lg prose-blockquote:pr-4 prose-blockquote:py-0.5 prose-blockquote:text-grayscale-500 prose-blockquote:dark:text-grayscale-400
+         prose-blockquote:border-l-8 prose-blockquote:border-primary-300 dark:prose-blockquote:border-primary-900
+         prose-blockquote:bg-grayscale-100 dark:prose-blockquote:bg-grayscale-800 prose-blockquote:rounded-r-lg
+         prose-blockquote:pr-4 prose-blockquote:py-0.5 prose-blockquote:text-grayscale-500 prose-blockquote:dark:text-grayscale-400
 
-  prose-video:my-6 prose-video:max-h-96
+         prose-video:my-6 prose-video:max-h-96
 
-  prose-table:border-collapse prose-th:border prose-td:border prose-td:border-grayscale-700 dark:prose-td:border-grayscale-100 prose-th:border-grayscale-700 dark:prose-th:border-grayscale-100 prose-th:p-2 prose-td:p-2 prose-th:bg-offset-200 even:prose-tr:bg-offset-100  odd:prose-tr:bg-offset-50 dark:prose-th:bg-grayscale-800 odd:dark:prose-tr:bg-grayscale-600 even:dark:prose-tr:bg-grayscale-700;
+         prose-table:border-collapse prose-th:border prose-td:border
+         prose-td:border-grayscale-700 dark:prose-td:border-grayscale-100
+         prose-th:border-grayscale-700 dark:prose-th:border-grayscale-100
+         prose-th:p-2 prose-td:p-2 prose-th:bg-offset-200
+         even:prose-tr:bg-offset-100 odd:prose-tr:bg-offset-50
+         dark:prose-th:bg-grayscale-800 odd:dark:prose-tr:bg-grayscale-600 even:dark:prose-tr:bg-grayscale-700;
+}
+
+/* Apply link styles inside prose without using `prose-a:link` */
+.blog-prose a {
+  @apply text-primary-700 hover:text-primary-500 active:text-primary-400
+         dark:text-primary-300 dark:hover:text-primary-500 dark:active:text-primary-600
+         fill-primary-700 hover:fill-primary-500 active:fill-primary-400
+         dark:fill-primary-300 dark:hover:fill-primary-500 dark:active:fill-primary-600
+         stroke-primary-700 hover:stroke-primary-500 active:stroke-primary-400
+         dark:stroke-primary-300 dark:hover:stroke-primary-500 dark:active:stroke-primary-600
+         transition duration-300
+         border-b border-grayscale-300 hover:border-primary-500
+         dark:border-grayscale-600 dark:hover:border-primary-500
+         active:border-primary-400 dark:active:border-primary-600;
 }
 
 .comment-button {
