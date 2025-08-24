@@ -96,18 +96,9 @@ h3 {
   background-color: red;
 }
 
-/* https://codepen.io/metagrapher/pen/tgcLl */
-
-/* and */
-
-/* https://css-tricks.com/almanac/properties/a/animation/ */
-
 /* Blue winning color animation */
 .color-blue-win {
-  /* animation-name followed by duration in seconds */
-
-  /* you could also use milliseconds (ms) or something like 2.5s */
-  animation: colorchange-blue 3s infinite; /* Chrome and Safari */
+  animation: colorchange-blue 3s infinite;
 }
 
 @keyframes colorchange-blue {
@@ -136,67 +127,12 @@ h3 {
   }
 }
 
-@keyframes colorchange-blue /* Safari and Chrome - necessary duplicate */ {
-  0% {
-    background-color: blue;
-  }
-
-  10% {
-    background-color: blue;
-  }
-
-  40% {
-    background-color: green;
-  }
-
-  60% {
-    background-color: green;
-  }
-
-  90% {
-    background-color: blue;
-  }
-
-  100% {
-    background-color: blue;
-  }
-}
-
 /* Red winning color animation */
 .color-red-win {
-  /* animation-name followed by duration in seconds */
-
-  /* you could also use milliseconds (ms) or something like 2.5s */
-  animation: colorchange-red 3s infinite; /* Chrome and Safari */
+  animation: colorchange-red 3s infinite;
 }
 
 @keyframes colorchange-red {
-  0% {
-    background-color: red;
-  }
-
-  10% {
-    background-color: red;
-  }
-
-  40% {
-    background-color: green;
-  }
-
-  60% {
-    background-color: green;
-  }
-
-  90% {
-    background-color: red;
-  }
-
-  100% {
-    background-color: red;
-  }
-}
-
-@keyframes colorchange-red /* Safari and Chrome - necessary duplicate */ {
   0% {
     background-color: red;
   }

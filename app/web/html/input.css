@@ -1,5 +1,5 @@
 /* === Tailwind v4 setup (CSS-first) === */
-@import url("tailwindcss");
+@import "tailwindcss";
 
 /* Use a .dark class (v3-style) instead of media query for dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
