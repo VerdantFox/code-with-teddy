@@ -1,5 +1,5 @@
 /* === Tailwind v4 setup (CSS-first) === */
-@import "tailwindcss";
+@import url("tailwindcss");
 
 /* Use a .dark class (v3-style) instead of media query for dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -8,6 +8,7 @@
 :root {
   color-scheme: light;
 }
+
 .dark {
   color-scheme: dark;
 }
@@ -35,6 +36,7 @@
   --breakpoint-2xl: 100rem; /* 1600px */
 
   /* Colors */
+
   /* primary */
   --color-primary-50: #ecfdf5;
   --color-primary-100: #d1fae5;
@@ -118,6 +120,7 @@
   .dark {
     scrollbar-color: #78716c #44403c;
   }
+
   /* This next selector applies the 'dark' color-scheme to all other scrollbars on the page */
   .dark * {
     scrollbar-color: #78716c #44403c;
@@ -128,6 +131,7 @@
     background-size: cover;
     background-image: url("/static/media/shared/notches-dark.svg");
   }
+
   /* End scrollbar styling */
 
   .transition-bg-color {
@@ -189,6 +193,7 @@
   .form-field {
     @apply rounded-lg focus-visible:ring-4 focus-visible:ring-primary-300 text-grayscale-700 dark:bg-grayscale-700 dark:text-white dark:placeholder:text-grayscale-400;
   }
+
   .form-field-errors {
     @apply border-red-700 dark:border-red-400;
   }
@@ -220,9 +225,11 @@
   33% {
     transform: rotate(10deg);
   }
+
   66% {
     transform: rotate(-10deg);
   }
+
   100% {
     transform: rotate(0deg);
   }
@@ -250,19 +257,11 @@
   @apply font-semibold bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-white border border-orange-700 dark:border-orange-200;
 }
 
-.screenreader {
-  position: absolute !important; /* Outside the DOM flow */
-  height: 1px;
-  width: 1px; /* Nearly collapsed */
-  overflow: hidden;
-  clip: rect(1px 1px 1px 1px); /* IE 7+ only support clip without commas */
-  clip: rect(1px, 1px, 1px, 1px); /* All other browsers */
-}
-
 /* SweetAlert2 overwrites */
 div.swal2-popup {
   @apply dark:bg-grayscale-800 text-grayscale-800 dark:text-white;
 }
+
 button.swal2-confirm.swal2-styled {
   @apply !border-0 !border-transparent !bg-primary-600 dark:!bg-primary-800 !ring-[3px] !ring-transparent
          focus:!ring-primary-500 focus-visible:!ring-primary-500
@@ -273,9 +272,11 @@ button.swal2-confirm.swal2-styled {
 .sn-notify {
   @apply dark:bg-grayscale-800;
 }
+
 .sn-notify-title {
   @apply dark:text-white;
 }
+
 .sn-notify-text {
   @apply dark:text-white;
 }
@@ -289,6 +290,7 @@ button.swal2-confirm.swal2-styled {
 .htmx-fade-in-300ms.htmx-added {
   opacity: 0.05;
 }
+
 .htmx-fade-in-300ms {
   opacity: 1;
   transition: opacity 1s ease-out;
@@ -300,10 +302,12 @@ button.swal2-confirm.swal2-styled {
 }
 
 /* This is a triple-backtick code block anywhere in a blog post */
+
 /* For some reason they were 2xl. Made lg so that we'd need less horizontal scroll */
 div.highlight.not-prose {
   @apply text-lg max-xs:text-base;
 }
+
 /* This is a triple-backtick code block in a comments section of a blog post */
 #comments-section div.highlight.not-prose {
   @apply border-2 border-grayscale-300 dark:border-grayscale-600 bg-white dark:bg-grayscale-900;

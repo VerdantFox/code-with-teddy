@@ -61,11 +61,13 @@ repos:
     rev: "0.0.2"
     hooks:
       - id: stylelint
+        args: ["--fix", "--config", ".stylelintrc.json"]
         additional_dependencies:
-          # Find releases here:
+          # Manually update releases to match package.json
+          # OR find releases here:
           # stylelint: https://github.com/stylelint/stylelint/releases
           # stylelint-config-standard: https://github.com/stylelint/stylelint-config-standard/releases
-          ["stylelint@15.11.0", "stylelint-config-standard@34.0.0"]
+          ["stylelint@16.23.1", "stylelint-config-standard@39.0.0"]
 
   # Prettier is fairly slow, so put towards the end
   - repo: https://github.com/pre-commit/mirrors-prettier

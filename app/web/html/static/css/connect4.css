@@ -9,6 +9,7 @@ h3 {
   height: auto;
   padding: 25px;
 }
+
 .active-player {
   padding: 0;
 }
@@ -16,12 +17,15 @@ h3 {
 .mw-red {
   background-color: #f44336;
 }
+
 .mw-green {
   background-color: #4caf50;
 }
+
 .mw-yellow {
   background-color: #ffeb3b;
 }
+
 .mw-selected {
   border: 4px solid gray;
 }
@@ -32,14 +36,14 @@ h3 {
 }
 
 .circles {
-  -moz-border-radius: 100%;
-  -webkit-border-radius: 100%;
+  border-radius: 100%;
   width: 80px;
   height: 80px;
   background-color: dimgrey;
   border-spacing: 0;
   border: 4px solid black;
 }
+
 .dark .circles {
   border: 4px solid silver;
 }
@@ -56,25 +60,28 @@ h3 {
   border: 7px dashed yellow;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .circles {
     width: 70px;
     height: 70px;
   }
 }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
   .circles {
     width: 60px;
     height: 60px;
   }
 }
-@media (max-width: 450px) {
+
+@media (width <= 450px) {
   .circles {
     width: 50px;
     height: 50px;
   }
 }
-@media (max-width: 380px) {
+
+@media (width <= 380px) {
   .circles {
     width: 40px;
     height: 40px;
@@ -89,54 +96,67 @@ h3 {
   background-color: red;
 }
 
-/*https://codepen.io/metagrapher/pen/tgcLl*/
-/*and*/
-/*https://css-tricks.com/almanac/properties/a/animation/*/
+/* https://codepen.io/metagrapher/pen/tgcLl */
+
+/* and */
+
+/* https://css-tricks.com/almanac/properties/a/animation/ */
 
 /* Blue winning color animation */
 .color-blue-win {
-  animation: colorchange-blue 3s infinite; /* animation-name followed by duration in seconds*/
+  /* animation-name followed by duration in seconds */
+
   /* you could also use milliseconds (ms) or something like 2.5s */
-  -webkit-animation: colorchange-blue 3s infinite; /* Chrome and Safari */
+  animation: colorchange-blue 3s infinite; /* Chrome and Safari */
 }
 
 @keyframes colorchange-blue {
   0% {
     background-color: blue;
   }
+
   10% {
     background-color: blue;
   }
+
   40% {
     background-color: green;
   }
+
   60% {
     background-color: green;
   }
+
   90% {
     background-color: blue;
   }
+
   100% {
     background-color: blue;
   }
 }
 
-@-webkit-keyframes colorchange-blue /* Safari and Chrome - necessary duplicate */ {
+@keyframes colorchange-blue /* Safari and Chrome - necessary duplicate */ {
   0% {
     background-color: blue;
   }
+
   10% {
     background-color: blue;
   }
+
   40% {
     background-color: green;
   }
+
   60% {
     background-color: green;
   }
+
   90% {
     background-color: blue;
   }
+
   100% {
     background-color: blue;
   }
@@ -144,48 +164,59 @@ h3 {
 
 /* Red winning color animation */
 .color-red-win {
-  animation: colorchange-red 3s infinite; /* animation-name followed by duration in seconds*/
+  /* animation-name followed by duration in seconds */
+
   /* you could also use milliseconds (ms) or something like 2.5s */
-  -webkit-animation: colorchange-red 3s infinite; /* Chrome and Safari */
+  animation: colorchange-red 3s infinite; /* Chrome and Safari */
 }
 
 @keyframes colorchange-red {
   0% {
     background-color: red;
   }
+
   10% {
     background-color: red;
   }
+
   40% {
     background-color: green;
   }
+
   60% {
     background-color: green;
   }
+
   90% {
     background-color: red;
   }
+
   100% {
     background-color: red;
   }
 }
 
-@-webkit-keyframes colorchange-red /* Safari and Chrome - necessary duplicate */ {
+@keyframes colorchange-red /* Safari and Chrome - necessary duplicate */ {
   0% {
     background-color: red;
   }
+
   10% {
     background-color: red;
   }
+
   40% {
     background-color: green;
   }
+
   60% {
     background-color: green;
   }
+
   90% {
     background-color: red;
   }
+
   100% {
     background-color: red;
   }
