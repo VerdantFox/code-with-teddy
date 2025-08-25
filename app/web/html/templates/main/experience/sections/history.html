@@ -1,17 +1,17 @@
 <section class="">
   <div class="section-container mb-32">
     <h2 class="text-5xl mb-16 text-center font-semibold">History</h2>
-    <div class="relative lg:h-332">
+    <div class="relative md:h-545 lg:h-350">
       <!-- Center line -->
       <div
         class="max-md:hidden absolute top-0 left-1/2 max-lg:left-5 lg:-translate-x-1/2 bg-grayscale-700 dark:bg-grayscale-400 w-2 h-full -z-10"
       ></div>
 
       <!-- Years -->
-      {# For Tailwind parsing: <div class="top-8 top-28 top-48 top-68 top-88 top-108 top-128 top-148 top-168 top-188 top-208 top-228 top-248 top-268 top-288 top-308 top-328 top-348 top-368 top-388 top-408
+      {# For Tailwind parsing: <div class="top-[2rem] top-[7rem] top-[12rem] top-[17rem] top-[22rem] top-[27rem] top-[32rem] top-[37rem] top-[42rem] top-[47rem] top-[52rem] top-[57rem] top-[62rem] top-[67rem] top-[72rem] top-[77rem] top-[82rem] top-[87rem] top-[92rem] top-[97rem] top-[102rem] top-[107rem] top-[112rem]
 
-      top-12 top-44 top-76 top-108 top-140 top-172 top-204 top-236 top-268 top-300 top-332 top-364 top-396 top-428 top-460 top-492 top-524 "></div> #}
-      {% for year in range(2009, 2025) %}
+      top-[3rem] top-[11rem] top-[19rem] top-[27rem] top-[35rem] top-[43rem] top-[51rem] top-[59rem] top-[67rem] top-[75rem] top-[83rem] top-[91rem] top-[99rem] top-[107rem] top-[115rem] top-[123rem] top-[131rem] top-[139rem] top-[147rem]"></div> #}
+      {% for year in range(2009, 2026) %}
         <span
           aria-hidden="true"
           class="max-lg:hidden absolute bg-primary-700 border-2 border-transparent dark:bg-grayscale-800 dark:border-primary-800 text-white font-semibold px-6 py-2 rounded-xl top-[{{ loop.index * 5 - 3 }}rem] left-1/2 max-lg:left-6 -translate-x-1/2"
