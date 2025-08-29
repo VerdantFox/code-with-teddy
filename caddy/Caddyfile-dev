@@ -1,0 +1,38 @@
+# Caddy dev configuration file
+{
+	# Global options
+	email theodore.f.williams@gmail.com
+
+	# Get some error in log file about not being able to install some packages w/o this
+	skip_install_trust
+}
+
+
+# Development server
+# Will serve over HTTPS. However, I can't get the certificates to accept correctly...
+localhost {
+	# Enable gzip compression
+	encode gzip
+
+	# Static file serving with caching (handle this FIRST)
+	handle /static/* {
+		uri strip_prefix /static
+		root * /static
+		file_server {
+			precompressed gzip
+		}
+		header Cache-Control "private, max-age=31536000" # One year
+		header Expires "Thu, 31 Dec 2037 23:55:55 GMT"
+	}
+
+	# All other requests go to the web app
+	handle {
+		reverse_proxy web_app:8000 {
+			header_up Host {host}
+		}
+	}
+
+	tls internal {
+		on_demand
+	}
+}

@@ -34,6 +34,7 @@ STOP=${STOP:-0}
 START=${START:-1}
 FROM_SCRATCH=${FROM_SCRATCH:-0}
 IF_NEEDED=${IF_NEEDED:-0}
+MODE_SET=${MODE_SET:-0}
 
 # crontab can't find docker compose without PATH defined
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
@@ -42,7 +43,7 @@ export TZ=America/Denver
 # Log files
 DATE="$(date +"%Y-%m-%d")"
 CRON_LOG="$(pwd)/logs/${DATE}_crontab.log"
-NGINX_LOG="$(pwd)/logs/${DATE}_nginx.log"
+CADDY_LOG="$(pwd)/logs/${DATE}_caddy.log"
 CERTBOT_LOG="$(pwd)/logs/${DATE}_certbot.log"
 WEB_APP_LOG="$(pwd)/logs/${DATE}_web_app.log"
 DB_LOG="$(pwd)/logs/${DATE}_db.log"
@@ -216,9 +217,10 @@ start_containers() {
 # Logs docker containers output to log files
 log_containers() {
     log INFO "Establishing docker container logging..."
-    # Logs dir created earlier, so no need to re-create here
-    touch "$NGINX_LOG"
-    docker logs --follow nginx &>> "$NGINX_LOG" &
+    # make the directory if it doesn't already exist
+    mkdir -p "$(dirname "$CADDY_LOG")"
+    touch "$CADDY_LOG"
+    docker logs --follow caddy &>> "$CADDY_LOG" &
     touch "$WEB_APP_LOG"
     docker logs --follow web_app &>> "$WEB_APP_LOG" &
     touch "$DB_LOG"
@@ -270,9 +272,9 @@ do
             ;;
         --debug) DEBUG=1
             ;;
-        --prod) PROD=1
+        --prod) PROD=1; MODE_SET=1
             ;;
-        --dev) PROD=0
+        --dev) PROD=0; MODE_SET=1
             ;;
         --down) BUILD=0; START=0; STOP=1
             ;;
@@ -289,5 +291,14 @@ do
     esac
     shift
 done
+
+# -------------------- VALIDATE ARGUMENTS --------------------
+if [ "${MODE_SET:-}" != "1" ]; then
+    echo "Error: Either --prod or --dev must be specified."
+    echo
+    echo_usage
+    exit 1
+fi
+
 # -------------------- RUN MAIN --------------------
 main

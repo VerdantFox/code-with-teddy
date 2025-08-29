@@ -5,3 +5,4 @@ app/web/html/static/*
 !requirements-*.txt
 !.gitignore
 !nginx/*
+!caddy/*

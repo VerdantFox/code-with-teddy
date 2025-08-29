@@ -80,6 +80,8 @@ dependencies = [
     "sentry-sdk[fastapi,sqlalchemy]", # aiohttp, httpx (dev deps)
     # SQLAlchemy: database toolkit
     "sqlalchemy[asyncio]",
+    # Typer: CLI toolkit (needed in prod for Alembic migrations)
+    "typer[all]",
     # Uv: Python package manager
     "uv",
     # Uvicorn: ASGI server
@@ -136,8 +138,6 @@ dev = [
     "sqlalchemy-utils",
     # Tenacity: retrying library
     "tenacity",
-    # Typer: CLI toolkit
-    "typer[all]",
     # Types-*: type stubs for external libraries
     "types-bleach",
     "types-markdown",

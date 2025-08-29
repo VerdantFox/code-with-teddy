@@ -94,54 +94,44 @@ services:
       timeout: 5s
       retries: 3
 
-  nginx-dev:
-    build:
-      context: .
-      dockerfile: ./docker_config/Dockerfile.nginx
-      args:
-        - NGINX_FILE=./nginx/nginx-dev.conf
-    container_name: nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    volumes:
-      - ./app/web/html/static:/static
-    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
-    profiles:
-      - dev
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/healthcheck"]
-      start_period: 10s
-      interval: 15s
-      timeout: 5s
-      retries: 3
-
-  nginx:
-    build:
-      context: .
-      dockerfile: ./docker_config/Dockerfile.nginx
-      args:
-        - NGINX_FILE=./nginx/nginx.conf
-    container_name: nginx
+  caddy-dev:
+    image: caddy:2.10
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile-dev"]
+    container_name: caddy
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
     volumes:
+      - ./caddy:/etc/caddy
       - ./app/web/html/static:/static
-      - ./certs:/etc/ssl
-    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+      - caddy_data:/data
+      - caddy_config:/config
+    profiles:
+      - dev
+
+  caddy:
+    image: caddy:2.10
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy:/etc/caddy
+      - ./app/web/html/static:/static
+      - caddy_data:/data
+      - caddy_config:/config
     profiles:
       - prod
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/healthcheck"]
-      start_period: 10s
-      interval: 15s
-      timeout: 5s
-      retries: 3
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:
 
 secrets:
   db_password:

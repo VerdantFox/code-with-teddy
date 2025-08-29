@@ -1,0 +1,63 @@
+# Caddy production configuration file
+# Production configuration with automatic HTTPS
+{
+	# Global options
+	email theodore.f.williams@gmail.com
+	# Enable access logging
+	log {
+		output stdout
+		format console
+	}
+}
+
+# Redirect www.codewithteddy.dev to codewithteddy.dev
+www.codewithteddy.dev {
+	redir https://codewithteddy.dev{uri} permanent
+}
+
+# Redirect all codewithteddy.com domains to codewithteddy.dev
+*.codewithteddy.com, codewithteddy.com {
+	redir https://codewithteddy.dev{uri} permanent
+}
+
+# Main site configuration
+codewithteddy.dev {
+	# Enable gzip compression
+	encode gzip
+
+	# Set max body size (equivalent to nginx client_max_body_size 4G)
+	request_body {
+		max_size 4GB
+	}
+
+	# Static file serving with caching
+	handle /static/* {
+		uri strip_prefix /static
+		root * /static
+		file_server {
+			precompressed gzip
+		}
+		header Cache-Control "private, max-age=31536000" # One year
+		header Expires "Thu, 31 Dec 2037 23:55:55 GMT"
+	}
+
+
+	# All other requests go to the web app
+	handle {
+		reverse_proxy web_app:8000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	# Security headers
+	header {
+		# Remove server header for security
+		-Server
+		# Add security headers
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}
