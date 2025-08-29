@@ -33,7 +33,9 @@ jobs:
       - name: Install python dependencies
         run: |
           pip install uv
-          uv pip install -r requirements-dev.txt --system
+          uv venv venv
+          source venv/bin/activate
+          uv pip install -r requirements-dev.txt
       - name: Install npm dependencies
         run: npm install
       - uses: pre-commit/action@v3.0.1
@@ -56,7 +58,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install uv
-          uv pip install -r requirements-dev.txt --system
+          uv venv venv
+          source venv/bin/activate
+          uv pip install -r requirements-dev.txt
       - name: Test with pytest
         run: pytest --tb=line
 
