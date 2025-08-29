@@ -327,7 +327,7 @@ async def create_series(
         series = await blog_handler.create_series(
             db=db, name=form.name.data, description=form.description.data
         )
-    except sqlalchemy.exc.IntegrityError:
+    except sqlalchemy.exc.IntegrityError:  # ty: ignore[unresolved-attribute]
         logger.exception(err_msg_title)
         FlashMessage(
             title=err_msg_title,
@@ -392,7 +392,7 @@ async def update_series(
         series = await blog_handler.update_series(
             db=db, series=series, name=form.name.data, description=form.description.data
         )
-    except sqlalchemy.exc.IntegrityError:
+    except sqlalchemy.exc.IntegrityError:  # ty: ignore[unresolved-attribute]
         await db.rollback()
         await db.refresh(series, attribute_names=["id", "name", "description", "posts"])
         await db.refresh(current_user)
@@ -648,7 +648,7 @@ async def comment_post_preview(
     if form.content.errors:
         return HTMLResponse()
     if current_user.is_authenticated:
-        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used for mypy)
+        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used for type checker)
         form_data_dict["name"] = current_user.full_name or current_user.username
     user_id = current_user.id if current_user.is_authenticated else None
     try:
@@ -708,7 +708,7 @@ async def comment_blog_post(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     if current_user.is_authenticated:
-        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used mypy)
+        assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used type checker)
         form_data_dict["name"] = current_user.full_name or current_user.username
     user_id = current_user.id if current_user.is_authenticated else None
     try:

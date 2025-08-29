@@ -28,7 +28,7 @@ def upgrade() -> None:
         sa.Column("description", sa.String(), nullable=False),
         sa.Column(
             "ts_vector",
-            app.datastore.db_models.TSVector(),  # type: ignore[attr-defined]
+            app.datastore.db_models.TSVector(),  # ty: ignore[unresolved-attribute]
             sa.Computed("to_tsvector('english', name || ' ' || description)", persisted=True),
             nullable=False,
         ),
@@ -92,7 +92,7 @@ def upgrade() -> None:
         sa.Column("series_position", sa.Integer(), nullable=True),
         sa.Column(
             "ts_vector",
-            app.datastore.db_models.TSVector(),  # type: ignore[attr-defined]
+            app.datastore.db_models.TSVector(),  # ty: ignore[unresolved-attribute]
             sa.Computed("to_tsvector('english', title || ' ' || markdown_content)", persisted=True),
             nullable=False,
         ),

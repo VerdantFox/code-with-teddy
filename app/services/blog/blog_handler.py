@@ -29,12 +29,12 @@ class SaveBlogInput(BaseModel, arbitrary_types_allowed=True):
     """Input data model for saving a blog post."""
 
     existing_bp: db_models.BlogPost | None = None
-    title: str
+    title: str = ""
     tags: transforms.CoercedList = []
     can_comment: transforms.CoercedBool = True
     is_published: transforms.CoercedBool = False
-    description: str
-    content: str
+    description: str = ""
+    content: str = ""
     thumbnail_url: str | None = None
     series_id: int | None = None
     series_position: int | None = None
@@ -63,7 +63,7 @@ class CommentInputPreview(BaseModel, arbitrary_types_allowed=True):
     user_id: int | None = None
     name: str | None = None
     email: str | None = None
-    content: str
+    content: str = ""
 
 
 class SaveCommentInput(CommentInputPreview):
@@ -214,7 +214,7 @@ async def get_series_from_id(*, db: AsyncSession, series_id: int) -> db_models.B
         )
         result = await db.execute(stmt)
         return result.scalars().one()
-    except sqlalchemy.exc.NoResultFound as e:
+    except sqlalchemy.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]
         raise errors.BlogPostSeriesNotFoundError from e
 
 
@@ -266,7 +266,7 @@ async def get_bp_from_id(
             stmt = stmt.with_for_update()
         result = await db.execute(stmt)
         return result.scalars().one()
-    except sqlalchemy.exc.NoResultFound as e:
+    except sqlalchemy.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]
         raise errors.BlogPostNotFoundError from e
 
 
@@ -276,7 +276,7 @@ async def get_bp_from_slug(db: AsyncSession, slug: str) -> db_models.BlogPost:
         stmt = _get_bp_statement().filter(db_models.BlogPost.slug == slug)
         result = await db.execute(stmt)
         return result.scalars().one()
-    except sqlalchemy.exc.NoResultFound:
+    except sqlalchemy.exc.NoResultFound:  # ty: ignore[unresolved-attribute]
         # FIXME: This maybe should raise an error that redirects to the new slug
         return await _get_bp_from_slug_history(db=db, slug=slug)
 
@@ -298,7 +298,7 @@ async def _get_bp_from_slug_history(db: AsyncSession, slug: str) -> db_models.Bl
         )
         result = await db.execute(stmt)
         slug_object = result.scalars().one()
-    except sqlalchemy.exc.NoResultFound as e:
+    except sqlalchemy.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]
         raise errors.BlogPostNotFoundError from e
     else:
         return slug_object.blog_post
@@ -311,7 +311,7 @@ async def save_blog_post(db: AsyncSession, data: SaveBlogInput) -> SaveBlogRespo
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
     try:
         blog_post = await _save_bp_to_db(data=data, db=db)
-    except sqlalchemy.exc.IntegrityError as e:
+    except sqlalchemy.exc.IntegrityError as e:  # ty: ignore[unresolved-attribute]
         return await _create_bp_save_sqlalchemy_error_response(
             db=db,
             e=e,
@@ -321,7 +321,7 @@ async def save_blog_post(db: AsyncSession, data: SaveBlogInput) -> SaveBlogRespo
     return SaveBlogResponse(
         success=True,
         blog_post=blog_post,
-        message="Blog post saved successfully",
+        err_msg="Blog post saved successfully",
         field_errors=field_errors,
     )
 
@@ -351,7 +351,7 @@ async def update_existing_bp_fields(  # noqa: C901 (complexity)
 ) -> db_models.BlogPost:
     """Update an existing blog post's fields."""
     blog_post = data.existing_bp
-    # For mypy, can't actually be None at this point
+    # For type checker, can't actually be None at this point
     assert blog_post is not None  # noqa: S101 (assert)
 
     if blog_post.title != data.title:
@@ -462,7 +462,7 @@ async def _get_existing_bp_tags_from_list(
 
 async def _create_bp_save_sqlalchemy_error_response(
     db: AsyncSession,
-    e: sqlalchemy.exc.IntegrityError,
+    e: sqlalchemy.exc.IntegrityError,  # ty: ignore[unresolved-attribute]
     field_errors: defaultdict[str, list[str]],
 ) -> SaveBlogResponse:
     """Create a response for a SQLAlchemy IntegrityError.
@@ -522,7 +522,7 @@ async def reorder_media_for_blog_post(
     result = await db.execute(stmt)
     try:
         media = result.scalars().one()
-    except sqlalchemy.exc.NoResultFound as e:
+    except sqlalchemy.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]
         raise errors.BlogPostMediaNotFoundError from e
     media.position = position
     await db.commit()
@@ -540,7 +540,7 @@ async def delete_media_from_blog_post(
     result = await db.execute(stmt)
     try:
         media = result.scalars().one()
-    except sqlalchemy.exc.NoResultFound as e:
+    except sqlalchemy.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]
         raise errors.BlogPostMediaNotFoundError from e
     media_locations = media.locations_to_list()
     for location in media_locations:
@@ -706,5 +706,5 @@ async def get_comment_from_id(db: AsyncSession, comment_id: int) -> db_models.Bl
         )
         result = await db.execute(stmt)
         return result.scalars().one()
-    except sqlalchemy.exc.NoResultFound as e:
+    except sqlalchemy.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]
         raise errors.BlogPostCommentNotFoundError from e

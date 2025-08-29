@@ -20,9 +20,6 @@ venv/
 # Static files to not track
 blog_uploaded/
 
-# Mypy
-.mypy_cache/
-
 # ruff
 .ruff_cache
 

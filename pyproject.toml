@@ -106,8 +106,6 @@ dev = [
     "faker",
     # HTTPX: async HTTP client
     "httpx",
-    # Mypy: static type checker
-    "mypy",
     # Pip-tools: dependency management
     "pip-tools",
     # Playwright: browser automation
@@ -138,6 +136,8 @@ dev = [
     "sqlalchemy-utils",
     # Tenacity: retrying library
     "tenacity",
+    # Ty: static type checker
+    "ty",
     # Types-*: type stubs for external libraries
     "types-bleach",
     "types-markdown",
@@ -154,41 +154,11 @@ issues = "https://github.com/VerdantFox/code-with-teddy/issues"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+
 # --------------------------------------------------------------------------
 # Tool configurations
 # --------------------------------------------------------------------------
-# Mypy
-# Reference: https://mypy.readthedocs.io/en/stable/config_file.html
-[tool.mypy]
-# Use the Pydantic plugin for better checking of Pydantic models.
-# References: https://pydantic-docs.helpmanual.io/mypy_plugin/
-# https://numpy.org/devdocs/reference/typing.html#mypy-plugin
-plugins = ["pydantic.mypy"]
-exclude = "venv|tmp"
-
-python_version = "3.12"
-
-# Type-checks the interior of functions without type annotations.
-check_untyped_defs = true
-# Require type annotations on all definitions.
-disallow_untyped_defs = true
-# Skip check against external imports that are missing type hints
-ignore_missing_imports = true
-# Append an error code to each reported message.
-show_error_codes = true
-# Require types to overlap in order to allow equality comparisons.
-strict_equality = true
-# Report unnecessary "cast" calls.
-warn_redundant_casts = true
-# Report unnecessary "# type: ignore" directives.
-warn_unused_ignores = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-implicit_optional = true
-disallow_untyped_defs = false
-
-# Pytest
+# ------------------------------ Pytest ------------------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--reruns 2"
@@ -202,10 +172,12 @@ filterwarnings = [
     "error:::scripts",
 ]
 
+
 # Coverage
 [tool.coverage.run]
 branch = true
 concurrency = ["greenlet", "thread"]
+
 
 [tool.coverage.report]
 exclude_lines = [
@@ -220,14 +192,46 @@ exclude_lines = [
 include = ["app/*", "scripts/*", "tests/*"]
 skip_covered = true # Don't show fully covered files in the report
 
-# Ruff
+
+# ----------------------- Ty: type checker ---------------------------------
+# Reference: https://docs.astral.sh/ty/reference/configuration/
+[tool.ty.environment]
+python = "./venv"
+python-version = "3.12"
+
+
+# Rules references: https://docs.astral.sh/ty/reference/rules/
+# Most rules have a default value already ("error", "warn", "ignore")
+# This overwrites some of those rules
+[tool.ty.rules]
+invalid-ignore-comment = "error"
+possibly-unbound-attribute = "error"
+possibly-unbound-import = "error"
+redundant-cast = "error"
+undefined-reveal = "error"
+unknown-rule = "error"
+unresolved-global = "error"
+unsupported-base = "error"
+division-by-zero = "error"
+possibly-unresolved-reference = "error"
+unused-ignore-comment = "error"
+
+
+# ------------------------ Ruff: linter + formatter-------------------------
+# Reference: https://docs.astral.sh/ruff/configuration/
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 
 
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+
 [tool.ruff.lint]
 # Rules to run
+# Reference: https://docs.astral.sh/ruff/rules/
 select = [
     "A",     # flake8-builtins
     "ANN",   # flake8-annotations
@@ -299,6 +303,7 @@ unfixable = [
     "T20",    # flake8-print
     "RUF100", # unused-noqa
 ]
+
 
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["D104"] # Missing docstring in public package

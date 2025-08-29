@@ -162,7 +162,7 @@ def pil_save(
         raise ValueError(msg) from e
 
 
-def pil_thumbnail(pic: MediaFileProtocol, max_width: int, max_height: int) -> Image:
+def pil_thumbnail(pic: MediaFileProtocol, max_width: int, max_height: int) -> Image:  # ty: ignore[invalid-type-form]
     """Thumbnail with pillow."""
     image = Image.open(pic)
     output_size = (max_width, max_height)

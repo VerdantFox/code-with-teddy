@@ -65,7 +65,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 
                 await conn.run_sync(db_models.Base.metadata.create_all)
             else:
                 yield
-    except sqlalchemy.exc.OperationalError as e:  # pragma: no cover
+    except sqlalchemy.exc.OperationalError as e:  # ty: ignore[unresolved-attribute]  # pragma: no cover
         err_msg = (
             "Could not connect to the database. Check the connection string."
             " Is the server running on that host and accepting TCP/IP connections?"

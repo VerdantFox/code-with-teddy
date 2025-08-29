@@ -140,7 +140,7 @@ pre-commit run --all-files
 Lint checks include (but are not limited to):
 
 - ruff (lots of Python lint checks, auto-fixes, and autoformatting)
-- mypy (static Python type checking)
+- ty (static Python type checking)
 - prettier (HTML, CSS, JS, YAML formatting)
 
 ## Updating dependencies

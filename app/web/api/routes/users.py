@@ -94,7 +94,7 @@ async def create_user(
     db.add(user_model)
     try:
         await db.commit()
-    except sqlalchemy.exc.IntegrityError as e:
+    except sqlalchemy.exc.IntegrityError as e:  # ty: ignore[unresolved-attribute]
         if "ix_users_username" in str(e):
             err_msg = f"User with username '{user_in.username}' already exists."
             raise errors.UserAlreadyExistsError(err_msg) from e
@@ -128,7 +128,7 @@ async def update_current_user(
         setattr(current_user, field, value)
     try:
         await db.commit()
-    except sqlalchemy.exc.IntegrityError as e:
+    except sqlalchemy.exc.IntegrityError as e:  # ty: ignore[unresolved-attribute]
         if "ix_users_username" in str(e):
             err_msg = f"User with username '{user_in.username}' already exists."
             raise errors.UserAlreadyExistsError(err_msg) from e
@@ -164,7 +164,7 @@ async def update_user(
         setattr(user_model, field, value)
     try:
         await db.commit()
-    except sqlalchemy.exc.IntegrityError as e:
+    except sqlalchemy.exc.IntegrityError as e:  # ty: ignore[unresolved-attribute]
         if "ix_users_username" in str(e):
             err_msg = f"User with username '{user_in.username}' already exists."
             raise errors.UserAlreadyExistsError(err_msg) from e

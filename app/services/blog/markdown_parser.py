@@ -47,7 +47,7 @@ def markdown_to_html(markdown_content: str, *, update_headers: bool = True) -> H
         "pymdownx.mark",  # ==Mark== (highlight)
     ]
     md = Markdown(extensions=extensions)
-    assert hasattr(md, "toc")  # noqa: S101 (assert) -- for mypy
+    assert hasattr(md, "toc")  # noqa: S101 (assert) -- for type checker
     html = md.convert(markdown_content)
     html = update_html(html, update_headers=update_headers)
     html_with_oembed = parse_html(
@@ -56,7 +56,7 @@ def markdown_to_html(markdown_content: str, *, update_headers: bool = True) -> H
         urlize_all=True,
         maxwidth=MAX_MEDIA_WIDTH,
     )
-    return HTMLContent(content=html_with_oembed, toc=update_toc(md.toc))
+    return HTMLContent(content=html_with_oembed, toc=update_toc(md.toc))  # ty: ignore[invalid-argument-type]
 
 
 def update_html(html: str, *, update_headers: bool = True) -> str:
@@ -121,18 +121,18 @@ def _update_html_media(html_soup: BeautifulSoup) -> None:
 
 def _update_img(img: Tag) -> None:
     """Update the image tag."""
-    img["class"] = [*img.get("class", []), "rounded-lg", "mx-auto"]
+    img["class"] = [*img.get("class", []), "rounded-lg", "mx-auto"]  # ty: ignore[not-iterable]
     img["loading"] = "lazy"
     if img.attrs.get("src", "").endswith(".svg"):
         img["class"].extend(["w-4/5", "max-sm:w-full"])
-    if img.parent.name != "p":
+    if img.parent.name != "p":  # ty: ignore[possibly-unbound-attribute]
         return
-    img.parent["class"] = [*img.parent.get("class", []), "text-center"]
+    img.parent["class"] = [*img.parent.get("class", []), "text-center"]  # ty: ignore[not-iterable, possibly-unbound-attribute, possibly-unbound-implicit-call]
 
 
 def _update_video(video: Tag) -> None:
     """Update the video tag."""
-    video["class"] = [*video.get("class", []), "lazy"]
+    video["class"] = [*video.get("class", []), "lazy"]  # ty: ignore[not-iterable]
     for source in video.find_all("source"):
         if source.get("src"):
             source["data-src"] = source["src"]

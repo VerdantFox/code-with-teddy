@@ -217,7 +217,7 @@ async def register_post(
     user = register_response.user
     FlashMessage(
         title="Registration successful!",
-        msg=f"username: {user.username}",
+        text=f"username: {user.username}",
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return RedirectResponse(
@@ -277,7 +277,7 @@ class UserSettingsForm(Form):
             validators.EqualTo("password", message="Passwords must match"),
         ],
     )
-    timezone: StringField = SelectField(
+    timezone: SelectField = SelectField(
         "Timezone",
         choices=constants.TIMEZONES,
     )
@@ -454,7 +454,6 @@ async def get_password_reset(
 ) -> _TemplateResponse:
     """Return the password reset form."""
     form = PasswordResetForm()
-    form.reset_token_query = reset_token_query
     await user_handler.assert_token_is_valid(db=db, query=reset_token_query)
 
     return templates.TemplateResponse(

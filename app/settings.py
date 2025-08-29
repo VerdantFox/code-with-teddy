@@ -69,9 +69,12 @@ class Settings(BaseSettings):
                 return "http://localhost"
             case Environment.PROD:
                 return "https://codewithteddy.dev"
+            case _:
+                error_msg = "Invalid environment"
+                raise ValueError(error_msg)
 
 
-settings: Settings = Settings()
+settings: Settings = Settings()  # ty: ignore[missing-argument]  (missing params come from `.env` or `.env.local`)
 
 
 def update_settings(new_settings: Settings) -> None:

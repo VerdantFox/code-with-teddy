@@ -32,8 +32,8 @@ PASSWORD = "password"
 NEXT = "next"  # redirect_url is aliased to "next"
 
 # Form field values
-USERNAME_VAL: str = test_models.BASIC_USER[test_models.UserModelKeys.USERNAME]  # type: ignore[assignment]
-EMAIL_VAL: str = test_models.BASIC_USER[test_models.UserModelKeys.EMAIL]  # type: ignore[assignment]
+USERNAME_VAL: str = test_models.BASIC_USER[test_models.UserModelKeys.USERNAME]
+EMAIL_VAL: str = test_models.BASIC_USER[test_models.UserModelKeys.EMAIL]
 PASSWORD_VAL = test_models.PASSWORD_VAL
 REDIRECT_URL_VAL = "/foobar"
 BLANK = ""

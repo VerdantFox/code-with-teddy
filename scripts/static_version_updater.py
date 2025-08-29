@@ -51,14 +51,18 @@ def discover_files(
     return sorted(files)  # Sort for consistent ordering
 
 
-def get_tailwind_version() -> str:
-    """Get version hash for tailwind static files."""
+def get_tailwind_version() -> str | None:
+    """Get version hash for tailwind static files.
+
+    Returns:
+        Version hash if tailwind file exists, None otherwise.
+
+    """
     project_root = Path(__file__).parent.parent
     tailwind_file = project_root / "app/web/html/static/css/tailwind-styles.css"
 
     if not tailwind_file.exists():
-        msg = f"Tailwind file not found: {tailwind_file}"
-        raise FileNotFoundError(msg)
+        return None
 
     return get_file_hash(tailwind_file)[:8]
 
@@ -135,7 +139,126 @@ def get_current_versions_from_template() -> dict[str, str]:
     return current_versions
 
 
-def update_base_template() -> bool:  # noqa: C901 (too-complex)
+def _get_all_versions() -> tuple[dict[str, str], dict[str, str]]:
+    """Get current and new version hashes for all static file types.
+
+    Returns:
+        Tuple of (current_versions, new_versions) dictionaries.
+
+    """
+    current_versions = get_current_versions_from_template()
+    tailwind_version = get_tailwind_version()
+    libraries_version = get_libraries_version()
+    custom_version = get_custom_version()
+
+    new_versions = {
+        "libraries": libraries_version,
+        "custom": custom_version,
+    }
+
+    # Only include tailwind version if the file exists
+    if tailwind_version is not None:
+        new_versions["tailwind"] = tailwind_version
+
+    return current_versions, new_versions
+
+
+def _check_version_changes(
+    current_versions: dict[str, str], new_versions: dict[str, str]
+) -> tuple[bool, list[str]]:
+    """Check if any versions have changed.
+
+    Args:
+        current_versions: Current version hashes from template
+        new_versions: New version hashes from files
+
+    Returns:
+        Tuple of (versions_changed, changed_versions_list)
+
+    """
+    versions_changed = False
+    changed_versions = []
+
+    for version_type, new_hash in new_versions.items():
+        current_hash = current_versions.get(version_type, "")
+        if current_hash != new_hash:
+            versions_changed = True
+            changed_versions.append(f"{version_type}: {current_hash} -> {new_hash}")
+
+    return versions_changed, changed_versions
+
+
+def _update_template_content(base_template: Path, new_versions: dict[str, str]) -> None:
+    """Update the version lines in the base template file.
+
+    Args:
+        base_template: Path to the base template file
+        new_versions: Dictionary of new version hashes
+
+    """
+    # Read the current template
+    with base_template.open("r") as f:
+        content = f.read()
+
+    # Update the version lines
+    lines = content.splitlines()
+    libraries_version = new_versions["libraries"]
+    custom_version = new_versions["custom"]
+    tailwind_version = new_versions.get("tailwind")
+
+    for i, line in enumerate(lines):
+        if line.strip().startswith("{% set libraries_static_version ="):
+            lines[i] = f"{{% set libraries_static_version = '{libraries_version}' %}}"
+        elif line.strip().startswith("{% set custom_static_version ="):
+            lines[i] = f"{{% set custom_static_version = '{custom_version}' %}}"
+        elif (
+            line.strip().startswith("{% set tailwind_static_version =")
+            and tailwind_version is not None
+        ):
+            lines[i] = f"{{% set tailwind_static_version = '{tailwind_version}' %}}"
+    lines.append("")  # Ensure file ends with a newline
+
+    # Write the updated content
+    with base_template.open("w") as f:
+        f.write("\n".join(lines))
+
+
+def _print_version_results(
+    *,
+    versions_changed: bool,
+    changed_versions: list[str],
+    new_versions: dict[str, str],
+) -> None:
+    """Print the results of version checking and updating.
+
+    Args:
+        versions_changed: Whether any versions changed
+        changed_versions: List of version change descriptions
+        new_versions: Dictionary of new version hashes
+
+    """
+    tailwind_version = new_versions.get("tailwind")
+    libraries_version = new_versions["libraries"]
+    custom_version = new_versions["custom"]
+
+    if versions_changed:
+        print("Static file versions have changed:")
+        for change in changed_versions:
+            print(f"  {change}")
+        print("\nUpdated static versions:")
+    else:
+        print("No static file changes detected. Versions remain the same:")
+
+    # Print version information
+    if tailwind_version is not None:
+        print(f"  tailwind_static_version: {tailwind_version}")
+    else:
+        print("  tailwind_static_version: (not updated - file not found)")
+    print(f"  libraries_static_version: {libraries_version}")
+    print(f"  custom_static_version: {custom_version}")
+
+
+def update_base_template() -> bool:
     """Update the static version variables in base.html template.
 
     Returns:
@@ -150,59 +273,20 @@ def update_base_template() -> bool:  # noqa: C901 (too-complex)
         raise FileNotFoundError(msg)
 
     # Get current and new version hashes
-    current_versions = get_current_versions_from_template()
-    tailwind_version = get_tailwind_version()
-    libraries_version = get_libraries_version()
-    custom_version = get_custom_version()
-
-    new_versions = {
-        "tailwind": tailwind_version,
-        "libraries": libraries_version,
-        "custom": custom_version,
-    }
+    current_versions, new_versions = _get_all_versions()
 
     # Check if any versions changed
-    versions_changed = False
-    changed_versions = []
+    versions_changed, changed_versions = _check_version_changes(current_versions, new_versions)
 
-    for version_type, new_hash in new_versions.items():
-        current_hash = current_versions.get(version_type, "")
-        if current_hash != new_hash:
-            versions_changed = True
-            changed_versions.append(f"{version_type}: {current_hash} -> {new_hash}")
+    # Update the template file
+    _update_template_content(base_template, new_versions)
 
-    # Read the current template
-    with base_template.open("r") as f:
-        content = f.read()
-
-    # Update the version lines
-    lines = content.splitlines()
-    for i, line in enumerate(lines):
-        if line.strip().startswith("{% set libraries_static_version ="):
-            lines[i] = f"{{% set libraries_static_version = '{libraries_version}' %}}"
-        elif line.strip().startswith("{% set custom_static_version ="):
-            lines[i] = f"{{% set custom_static_version = '{custom_version}' %}}"
-        elif line.strip().startswith("{% set tailwind_static_version ="):
-            lines[i] = f"{{% set tailwind_static_version = '{tailwind_version}' %}}"
-    lines.append("")  # Ensure file ends with a newline
-
-    # Write the updated content
-    with base_template.open("w") as f:
-        f.write("\n".join(lines))
-
-    if versions_changed:
-        print("Static file versions have changed:")
-        for change in changed_versions:
-            print(f"  {change}")
-        print("\nUpdated static versions:")
-        print(f"  tailwind_static_version: {tailwind_version}")
-        print(f"  libraries_static_version: {libraries_version}")
-        print(f"  custom_static_version: {custom_version}")
-    else:
-        print("No static file changes detected. Versions remain the same:")
-        print(f"  tailwind_static_version: {tailwind_version}")
-        print(f"  libraries_static_version: {libraries_version}")
-        print(f"  custom_static_version: {custom_version}")
+    # Print results
+    _print_version_results(
+        versions_changed=versions_changed,
+        changed_versions=changed_versions,
+        new_versions=new_versions,
+    )
 
     return versions_changed
 

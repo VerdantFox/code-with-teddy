@@ -66,7 +66,7 @@ async def register_user(
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
     try:
         await db.commit()
-    except sqlalchemy.exc.IntegrityError as e:
+    except sqlalchemy.exc.IntegrityError as e:  # ty: ignore[unresolved-attribute]
         await db.rollback()
         if 'unique constraint "ix_users_email"' in str(e):
             field_errors["email"].append("Email already exists for another account.")
@@ -95,7 +95,7 @@ async def update_user(
 
     try:
         await db.commit()
-    except sqlalchemy.exc.IntegrityError as e:
+    except sqlalchemy.exc.IntegrityError as e:  # ty: ignore[unresolved-attribute]
         await db.rollback()
         await db.refresh(user)
         if "ix_users_email" in str(e):
@@ -142,7 +142,7 @@ async def send_pw_reset_email(
     """Send a password reset email."""
     try:
         user = await get_user_by_email(db, email)
-    except sqlalchemy.exc.NoResultFound:
+    except sqlalchemy.exc.NoResultFound:  # ty: ignore[unresolved-attribute]
         logger.info("User not found for email: %s", email)
         return
     query, _ = await create_pw_reset_token(db, user)
@@ -198,7 +198,7 @@ async def assert_token_is_valid(db: AsyncSession, query: str) -> db_models.Passw
     result = await db.execute(stmt)
     try:
         token = result.scalars().one()
-    except sqlalchemy.orm.exc.NoResultFound as e:
+    except sqlalchemy.orm.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]
         raise errors.PasswordResetTokenNotFoundError from e
     token_dt = token.expires_timestamp.astimezone(UTC)
     if token_dt < datetime.now().astimezone(UTC):
@@ -216,7 +216,7 @@ async def reset_password_from_token(db: AsyncSession, query: str, password: str)
     get_token_result = await db.execute(get_token_stmt)
     try:
         pw_reset_token = get_token_result.scalars().one()
-    except sqlalchemy.orm.exc.NoResultFound as e:
+    except sqlalchemy.orm.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]
         raise errors.PasswordResetTokenNotFoundError from e
     token_dt = pw_reset_token.expires_timestamp.astimezone(UTC)
     if token_dt < datetime.now().astimezone(UTC):
@@ -226,7 +226,7 @@ async def reset_password_from_token(db: AsyncSession, query: str, password: str)
     try:
         user = get_user_result.scalars().one()
     # Unlikely case where the user was deleted after the token was created
-    except sqlalchemy.orm.exc.NoResultFound as e:  # pragma: no cover
+    except sqlalchemy.orm.exc.NoResultFound as e:  # ty: ignore[unresolved-attribute]  # pragma: no cover
         raise errors.UserNotFoundError from e
     user.password_hash = auth_helpers.hash_password(password)
     db.add(user)

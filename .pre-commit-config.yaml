@@ -33,6 +33,16 @@ repos:
         args: ["--fix", "--show-fixes", "--exit-non-zero-on-fix"]
       - id: ruff-format
 
+  - repo: local
+    hooks:
+      - id: ty-check
+        name: ty-check
+        language: python
+        entry: ty check
+        pass_filenames: false
+        args: [--python=venv/]
+        additional_dependencies: [ty]
+
   - repo: https://github.com/asottile/blacken-docs
     rev: 1.19.1
     hooks:
@@ -94,16 +104,3 @@ repos:
         additional_dependencies:
           - "prettier@3.2.5"
           - "prettier-plugin-jinja-template"
-
-  # Mypy is fairly slow, so put towards the end
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.17.1"
-    hooks:
-      - id: mypy
-        additional_dependencies:
-          - pydantic==2.11.7
-          - types-bleach==6.2.0.20250809
-          - types-markdown==3.8.0.20250809
-          - types-pyyaml==6.0.12.20250822
-          - types-pytz==2025.2.0.20250809
-          - types-requests==2.32.4.20250809
