@@ -69,6 +69,16 @@ repos:
           # stylelint-config-standard: https://github.com/stylelint/stylelint-config-standard/releases
           ["stylelint@16.23.1", "stylelint-config-standard@39.0.0"]
 
+  # Update static file versions when static files change
+  - repo: local
+    hooks:
+      - id: static-version-updater
+        name: Update static file versions
+        entry: python scripts/static_version_updater.py
+        language: system
+        files: ^app/web/html/static/
+        pass_filenames: false
+
   # Prettier is fairly slow, so put towards the end
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: "v4.0.0-alpha.8"
@@ -97,37 +107,3 @@ repos:
           - types-pyyaml==6.0.12.20250822
           - types-pytz==2025.2.0.20250809
           - types-requests==2.32.4.20250809
-
-  # - repo: local
-  #   hooks:
-  #     - id: match-requirements
-  #       additional_dependencies:
-  #         - pyyaml==6.0
-  #         - toml==0.10.2
-  #         - rich==13.4.1
-  #       name: match-requirements
-  #       entry: python -m utils.abstracted.match-requirements
-  #       language: python
-  #       language_version: "3.10"
-  #       pass_filenames: false
-  #       files: ".pre-commit-config.yaml|requirements-prod.txt|requirements-dev.txt|pyproject.toml"
-  #     - id: ensure-prod-reqs
-
-  #       name: ensure-prod-reqs
-  #       # Have to run as "script" instead of "python" or subprocess takes 7X as long
-  #       # language: python
-  #       # language_version: "3.10"
-  #       # additional_dependencies:
-  #       #   - pipreqs==0.4.11
-  #       # entry: python -m utils.abstracted.ensure-prod-reqs
-  #       entry: ./utils/abstracted/ensure-prod-reqs.py
-  #       language: script
-  #       pass_filenames: false
-  #       files: "requirements-prod.txt|pyproject.toml|app/.*.py"
-  #     - id: jinja-ninja
-  #       additional_dependencies:
-  #         - jinjaninja==0.1.2
-  #       name: jinja-ninja
-  #       entry: jinja-ninja
-  #       language: python
-  #       types: [html]

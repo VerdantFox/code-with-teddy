@@ -1,5 +1,6 @@
-{% set libraries_static_version = 3 %}
-{% set static_version = 4 %}
+{% set libraries_static_version = '57298b48' %}
+{% set custom_static_version = '737444d5' %}
+{% set tailwind_static_version = 'f9679c0c' %}
 <!doctype html>
 <html
   lang="en"
@@ -44,7 +45,7 @@
   </body>
   <script
     nonce="{{ request.state.nonce }}"
-    src="{{ url_for('html:static', path='js/custom/script_end.js') }}?{{ static_version }}"
+    src="{{ url_for('html:static', path='js/custom/script_end.js') }}?{{ custom_static_version }}"
   ></script>
   <script nonce="{{ request.state.nonce }}">
     if (!htmx.config.inlineScriptNonce) {

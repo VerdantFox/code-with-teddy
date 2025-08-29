@@ -8,7 +8,7 @@
 {% block custom_js_end %}
   <script
     nonce="{{ request.state.nonce }}"
-    src="{{ url_for('html:static', path='/js/custom/connect4.js') }}?{{ static_version }}"
+    src="{{ url_for('html:static', path='/js/custom/connect4.js') }}?{{ custom_static_version }}"
   ></script>
 {% endblock custom_js_end %}
 {% block custom_css %}
@@ -219,7 +219,7 @@
               in a better user experience if server-side interactions are not
               required. If you're interested in seeing the source code for the
               game, I'll link to the JavaScript "<a
-                href="{{ url_for('html:static', path='/js/custom/connect_4.js') }}?{{ static_version }}"
+                href="{{ url_for('html:static', path='/js/custom/connect_4.js') }}?{{ custom_static_version }}"
                 target="_blank"
                 rel="noopener noreferrer"
                 >here</a
