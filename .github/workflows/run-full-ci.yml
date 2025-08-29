@@ -58,17 +58,15 @@ jobs:
       - name: Install dependencies
         run: |
           pip install uv
-          uv venv venv
-          source venv/bin/activate
-          uv pip install -r requirements-dev.txt
+          uv pip install -r requirements-dev.txt --system
       - name: Test with pytest
         run: pytest --tb=line
 
-  # Release job: (Run on push to the 'master' branch)
+  # Release job: (Run on push to the 'main' branch)
   # - Only run if 'lint' and 'test' jobs succeed
   # - Checks out the 'release-branch' (assumes 'release-branch' exists)
   # - Sets up some git credentials and fetches the latest git origin
-  # - Resets the 'release-branch' to reflect the 'master' branch
+  # - Resets the 'release-branch' to reflect the 'main' branch
   # - Pushes the updated 'release-branch' to our repository
   release:
     permissions:
