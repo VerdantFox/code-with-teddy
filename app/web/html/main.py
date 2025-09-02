@@ -39,23 +39,32 @@ class CSPMiddleware(BaseHTTPMiddleware):
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         """Add Content-Security-Policy header to all responses."""
-        # Generate a unique nonce
+        # Generate a unique nonce for this request
         nonce = base64.b64encode(secrets.token_bytes(16)).decode("utf-8")
 
-        # Add the nonce to the request object
+        # Add the nonce to the request object so templates can access it
         request.state.nonce = nonce
 
         response = await call_next(request)
-        # HTMX struggles with non-unsafe-inline CSP script
+
+        # Build comprehensive CSP policy with nonce
+        # HTMX and some inline scripts require 'unsafe-inline' as fallback
         csp_policy = [
             f"default-src {SELF}",
-            f"frame-src {YOUTUBE} {SCRATCH}",
+            (
+                f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL} {UNSAFE_INLINE} "
+                f"{SENTRY_JS_CDN} {SENTRY_BROWSER_CDN}"
+            ),
             f"style-src {SELF} {FONTS_BUNNY} {UNSAFE_INLINE}",
             f"font-src {SELF} {FONTS_BUNNY}",
-            f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL} {SENTRY_JS_CDN} {SENTRY_BROWSER_CDN}",
+            f"frame-src {YOUTUBE} {SCRATCH}",
             f"connect-src {SELF} {SENTRY_INGEST}",
             f"worker-src {SELF} {SENTRY_JS_CDN} {SENTRY_BROWSER_CDN} {BLOB}",
-            f"img-src * {DATA}",
+            f"img-src * {DATA} {BLOB}",
+            f"media-src {SELF} {DATA} {BLOB}",
+            "object-src 'none'",
+            f"base-uri {SELF}",
+            f"form-action {SELF}",
         ]
         response.headers["Content-Security-Policy"] = "; ".join(csp_policy)
         return response

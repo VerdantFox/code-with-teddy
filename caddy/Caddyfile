@@ -1,12 +1,17 @@
 # Caddy production configuration file
-# Production configuration with automatic HTTPS
 {
 	# Global options
 	email theodore.f.williams@gmail.com
-	# Enable access logging
+
 	log {
 		output stdout
-		format console
+		format json
+		level INFO
+	}
+
+	# Enable experimental features
+	servers {
+		protocols h1 h2 h3
 	}
 }
 
@@ -22,42 +27,120 @@ www.codewithteddy.dev {
 
 # Main site configuration
 codewithteddy.dev {
-	# Enable gzip compression
-	encode gzip
+	# Rate limiting
+	rate_limit {
+		zone dynamic_requests {
+			key {remote_host}
+			events 100
+			window 1m
+		}
+		zone api_requests {
+			key {remote_host}
+			events 30
+			window 1m
+			match {
+				path /api/*
+			}
+		}
+	}
 
-	# Set max body size (equivalent to nginx client_max_body_size 4G)
+	# Enhanced compression
+	encode {
+		gzip 6
+		brotli 6
+		zstd
+		match {
+			header Content-Type text/*
+			header Content-Type application/json*
+			header Content-Type application/javascript*
+			header Content-Type application/xml*
+		}
+	}
+
+	# Set max body size
 	request_body {
 		max_size 4GB
 	}
 
-	# Static file serving with caching
+	# Enhanced static file serving with better caching
 	handle /static/* {
 		uri strip_prefix /static
 		root * /static
 		file_server {
-			precompressed gzip
+			precompressed gzip br
 		}
-		header Cache-Control "private, max-age=31536000" # One year
-		header Expires "Thu, 31 Dec 2037 23:55:55 GMT"
+
+		# Different caching strategies for different file types
+		@static_assets {
+			path *.css *.js *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot
+		}
+		header @static_assets {
+			Cache-Control "public, max-age=31536000, immutable"
+			Expires "Thu, 31 Dec 2037 23:55:55 GMT"
+		}
+
+		# Blog HTML files: cache for 1 minute
+		@blog_html_files {
+			path_regexp ^/blog/.*\.html$
+		}
+		header @blog_html_files {
+			Cache-Control "public, max-age=60"
+		}
+
+		@html_files {
+			path *.html
+		}
+		header @html_files {
+			Cache-Control "public, max-age=3600"
+		}
+
+		@media_files {
+			path *.mp4 *.webm *.pdf
+		}
+		header @media_files {
+			Cache-Control "public, max-age=86400"
+		}
 	}
 
-
-	# All other requests go to the web app
+	# All other requests go to the web app with enhanced proxy configuration
 	handle {
 		reverse_proxy web_app:8000 {
 			header_up Host {host}
 			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+			header_up X-Forwarded-Port {server_port}
+
+			# Health check
+			health_uri /healthcheck
+			health_interval 30s
+			health_timeout 5s
+
+			# Load balancing configuration (ready for scaling)
+			lb_policy round_robin
+
+			# Timeouts
+			transport http {
+				dial_timeout 5s
+				response_header_timeout 10s
+				read_timeout 30s
+				write_timeout 30s
+			}
 		}
 	}
 
-	# Security headers
+	# Enhanced security headers (CSP handled by FastAPI for nonce support)
 	header {
 		# Remove server header for security
 		-Server
-		# Add security headers
+
+		# Static security headers (CSP is handled by FastAPI middleware)
 		X-Content-Type-Options nosniff
 		X-Frame-Options DENY
 		X-XSS-Protection "1; mode=block"
 		Referrer-Policy strict-origin-when-cross-origin
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		Cross-Origin-Opener-Policy "same-origin"
 	}
 }
