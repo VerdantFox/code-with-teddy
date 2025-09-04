@@ -30,7 +30,7 @@ codewithteddy.dev {
 	# Enhanced compression
 	encode {
 		gzip 6
-		brotli 6
+		# brotli 6  # Brotli plugin not included in base Caddy image
 		zstd
 		match {
 			header Content-Type text/*
@@ -50,7 +50,8 @@ codewithteddy.dev {
 		uri strip_prefix /static
 		root * /static
 		file_server {
-			precompressed gzip br
+			# precompressed gzip br  # Brotli not in base Caddy image
+			precompressed gzip
 		}
 
 		# Different caching strategies for different file types
