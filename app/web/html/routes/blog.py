@@ -65,6 +65,7 @@ COMMENT_FORM = "comment_form"
 LIKED_POSTS_COOKIE = "liked_posts"  # Sets a cookie with a list of liked posts, by id
 VIEWED_POSTS_COOKIE = "viewed_posts"  # Sets a cookie with a list of viewed posts, by id
 ERROR_SAVING_COMMENT = "Error saving comment"
+BLOG_POST_URL = "blog_post_url"
 
 
 class SearchForm(Form):
@@ -489,6 +490,7 @@ async def read_blog_post(
             BLOG_POST: bp,
             LIKED: liked,
             COMMENT_FORM: comment_form_class(),
+            BLOG_POST_URL: request.url_for("html:read_blog_post", slug=bp.slug),
         },
     )
     web_user_handlers.set_guest_user_id_cookie(guest_id=current_user.guest_id, response=response)
@@ -704,6 +706,7 @@ async def comment_blog_post(
                 constants.MESSAGE: FormErrorMessage(),
                 BLOG_POST: bp,
                 LIKED: liked,
+                BLOG_POST_URL: request.url_for("html:read_blog_post", slug=bp.slug),
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -729,6 +732,7 @@ async def comment_blog_post(
                 constants.MESSAGE: FormErrorMessage(),
                 BLOG_POST: bp,
                 LIKED: liked,
+                BLOG_POST_URL: request.url_for("html:read_blog_post", slug=bp.slug),
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -752,6 +756,7 @@ async def comment_blog_post(
                 BLOG_POST: bp,
                 "comment_preview": comment,
                 LIKED: liked,
+                BLOG_POST_URL: request.url_for("html:read_blog_post", slug=bp.slug),
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -776,6 +781,7 @@ async def comment_blog_post(
             COMMENT_FORM: comment_form_class(),
             BLOG_POST: bp,
             LIKED: liked,
+            BLOG_POST_URL: request.url_for("html:read_blog_post", slug=bp.slug),
         },
     )
     web_user_handlers.set_guest_user_id_cookie(guest_id=current_user.guest_id, response=response)

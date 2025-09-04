@@ -9,7 +9,7 @@
         <button
           class="px-3 py-1 border-2 border-grayscale-300 dark:border-grayscale-100 rounded-full hover:bg-grayscale-100 active:bg-grayscale-200 dark:hover:bg-grayscale-700 dark:active:bg-grayscale-600 transition duration-300"
           title="Copy blog article link to clipboard"
-          @click="copyTextToClipboard('{{ request.url }}', 'Blog article link copied!')"
+          @click="copyTextToClipboard('{{ blog_post_url }}', 'Blog article link copied!')"
         >
           {{ render_partial('shared/partials/icons/link-simple.html', class="h-7 w-7 inline-block ") }}
           share

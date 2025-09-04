@@ -207,7 +207,7 @@
           {% endif %}
 
           <!-- Comments -->
-          {{ render_partial('blog/partials/comments.html', request=request, current_user=current_user, blog_post=blog_post, liked=liked, comment_form=comment_form) }}
+          {{ render_partial('blog/partials/comments.html', request=request, current_user=current_user, blog_post=blog_post, liked=liked, comment_form=comment_form, blog_post_url=blog_post_url) }}
         </div>
 
         <!-- Series info -->
