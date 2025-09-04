@@ -27,23 +27,6 @@ www.codewithteddy.dev {
 
 # Main site configuration
 codewithteddy.dev {
-	# Rate limiting
-	rate_limit {
-		zone dynamic_requests {
-			key {remote_host}
-			events 100
-			window 1m
-		}
-		zone api_requests {
-			key {remote_host}
-			events 30
-			window 1m
-			match {
-				path /api/*
-			}
-		}
-	}
-
 	# Enhanced compression
 	encode {
 		gzip 6
