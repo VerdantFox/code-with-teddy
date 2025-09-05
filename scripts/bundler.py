@@ -33,6 +33,8 @@ class Dependency(BaseModel):
 
 
 DEPENDENCIES = {
+    # Plugin for Alpine.js (below).
+    # Alpine's Focus plugin allows you to manage focus on a page.
     "Alpine JS--focus plugin": Dependency(
         name="Alpine JS--focus plugin",
         api_name="@alpinejs/focus",
@@ -40,6 +42,9 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_DEFERRED,
         add_version=True,
     ),
+    # Plugin for Alpine.js (below).
+    # Alpine's Intersect plugin is a convenience wrapper for Intersection Observer
+    # that allows you to easily react when an element enters the viewport.
     "Alpine JS--intersect plugin": Dependency(
         name="Alpine JS--intersect plugin",
         api_name="@alpinejs/intersect",
@@ -47,6 +52,10 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_DEFERRED,
         add_version=True,
     ),
+    # Plugin for Alpine.js (below).
+    # Alpine's Morph plugin allows you to "morph" an element on the page into the
+    # provided HTML template, all while preserving any browser or Alpine state
+    # within the "morphed" element.
     "Alpine JS--morph plugin": Dependency(
         name="Alpine JS--morph plugin",
         api_name="@alpinejs/morph",
@@ -54,6 +63,8 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_DEFERRED,
         add_version=True,
     ),
+    # Plugin for Alpine.js (below).
+    # Alpine's Persist plugin allows you to persist Alpine state across page loads.
     "Alpine JS--persist plugin": Dependency(
         name="Alpine JS--persist plugin",
         api_name="@alpinejs/persist",
@@ -61,6 +72,9 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_DEFERRED,
         add_version=True,
     ),
+    # Alpine.js: Your new, lightweight, JavaScript framework.
+    # Alpine is a rugged, minimal tool for composing behavior directly in your markup.
+    # Think of it like jQuery for the modern web. Plop in a script tag and get going.
     "Alpine JS": Dependency(
         name="Alpine JS",
         api_name="alpinejs",
@@ -68,6 +82,10 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_DEFERRED,
         add_version=True,
     ),
+    # Given an element, such as a button, and a tooltip element describing it,
+    # Popper will automatically put the tooltip in the right place near the button.
+    # Used by Tippy.js below.
+    # https://popper.js.org/docs/v2/
     "Popper.js": Dependency(
         name="Popper.js",
         api_name="@popperjs/core",
@@ -75,6 +93,11 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_NON_DEFERRED,
         add_version=False,
     ),
+    # Tippy.js is the complete tooltip, popover, dropdown, and menu solution
+    # for the web, powered by Popper. It provides the logic and optional styling
+    # of elements that "pop out" from the flow of the document and float next to
+    # a target element.
+    # https://atomiks.github.io/tippyjs/
     "Tippy.js": Dependency(
         name="Tippy.js",  # Depends on popper.js
         api_name="tippy.js",
@@ -82,6 +105,7 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_NON_DEFERRED,
         add_version=True,
     ),
+    # Extra CSS animations for Tippy.js
     "Tippy--Scale subtle animation": Dependency(
         name="Tippy--Scale subtle animation",
         api_name="tippy.js",
@@ -89,6 +113,9 @@ DEPENDENCIES = {
         bundle_path=CSS_BUNDLED,
         add_version=True,
     ),
+    # Sweet Alert 2 is a beautiful, responsive, customizable, accessible (WAI-ARIA)
+    # replacement for JavaScript's popup boxes.
+    # https://sweetalert2.github.io
     "Sweet Alert 2": Dependency(
         name="Sweet Alert 2",
         api_name="sweetalert2",
@@ -96,6 +123,10 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_NON_DEFERRED,
         add_version=False,
     ),
+    # htmx gives you access to AJAX, CSS Transitions, WebSockets and Server Sent
+    # Events directly in HTML, using attributes, so you can build modern user
+    # interfaces with the simplicity and power of hypertext.
+    # https://htmx.org
     "HTMX": Dependency(
         name="HTMX",
         api_name="htmx.org",
@@ -106,6 +137,9 @@ DEPENDENCIES = {
         # (symptom: no "signed out" alert)
         version_pin="1.9.12",
     ),
+    # HTMX response targets extension allows you to specify different target
+    # elements to be swapped when different HTTP response codes are received.
+    # https://htmx.org/extensions/response-targets/
     "HTMX--response targets extension": Dependency(
         name="HTMX--response targets extension",
         # api_name="htmx-ext-response-targets",  # HTMX-V2 name  # noqa: ERA001
@@ -119,6 +153,9 @@ DEPENDENCIES = {
         # (symptom: no "signed out" alert)
         version_pin="1.9.12",
     ),
+    # Alpine.js now has a lightweight morph plugin and this extension allows you
+    # to use it as the swapping mechanism in htmx which is necessary to retain
+    # Alpine state when you have entire Alpine components swapped by htmx.
     "HTMX--alpine morph extension": Dependency(
         name="HTMX--alpine morph extension",
         # api_name="htmx-ext-alpine-morph",  # HTMX-V2 name  # noqa: ERA001
@@ -132,6 +169,9 @@ DEPENDENCIES = {
         # (symptom: no "signed out" alert)
         version_pin="1.9.12",
     ),
+    # Simple Notify is a pure Javascript library to show nice and customizable alert notifications.
+    # Repo with info: https://github.com/simple-notify/simple-notify
+    # Try it out: https://simple-notify.github.io/simple-notify/
     "Simple Notify--JS": Dependency(
         name="Simple Notify--JS",
         api_name="simple-notify",
@@ -139,6 +179,7 @@ DEPENDENCIES = {
         bundle_path=JS_BUNDLED_NON_DEFERRED,
         add_version=True,
     ),
+    # CSS for Simple Notify package described above.
     "Simple Notify--CSS": Dependency(
         name="Simple Notify--CSS",
         api_name="simple-notify",
@@ -146,6 +187,9 @@ DEPENDENCIES = {
         bundle_path=CSS_BUNDLED,
         add_version=True,
     ),
+    # Freezeframe.js is a library that pauses animated .gifs and enables them to
+    # animate on mouse hover / mouse click / touch event, or triggered manually.
+    # https://github.com/ctrl-freaks/freezeframe.js
     "Freezeframe": Dependency(
         name="Freezeframe",
         api_name="freezeframe",
