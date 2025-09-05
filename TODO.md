@@ -43,6 +43,7 @@ A list of stuff that needs to get done for the project, categorized and roughly 
 - [ ] New projects
   - [ ] Games API (plus blog post series)
   - [ ] Multiplayer sockets game (plus blog posts)
+- [ ] Add contact form
 
 ## Refactors
 
