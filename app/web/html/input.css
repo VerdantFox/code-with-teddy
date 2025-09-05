@@ -296,6 +296,16 @@ button.swal2-confirm.swal2-styled {
   transition: opacity 1s ease-out;
 }
 
+::selection {
+  background-color: #a7f3d0; /* --color-primary-200: light green */
+  color: #292524; /* --color-grayscale-800: dark gray */
+}
+/* Improve text selection highlight in dark mode */
+.dark ::selection {
+  background-color: #6d28d9; /* --color-offset-700: deeper purple for higher contrast */
+  color: #fafaf9; /* --color-grayscale-50: near-white */
+}
+
 /* Blog stuff */
 .blog-nav-highlight {
   @apply bg-primary-800 text-white dark:text-white hover:text-white dark:hover:text-white;

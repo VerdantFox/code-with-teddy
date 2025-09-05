@@ -318,7 +318,7 @@ function performKeyMapAction(textareaElement, event, historyManager) {
 }
 
 function getPressedKey(event) {
-  let pressedKey = event.key
+  let pressedKey = event.key.toLowerCase()
   if (event.ctrlKey) {
     if (event.shiftKey) {
       pressedKey = `ctrl+shift+${pressedKey}`
@@ -332,34 +332,44 @@ function getPressedKey(event) {
 function addPrefixToLine(textareaElement, event, prefix, trimIfSame = false) {
   event.preventDefault()
 
-  const cursorPosition = textareaElement.selectionStart
-  const beforeCursor = textareaElement.value.substring(0, cursorPosition)
-  const afterCursor = textareaElement.value.substring(cursorPosition)
+  const value = textareaElement.value
+  const selStart = textareaElement.selectionStart
+  const selEnd = textareaElement.selectionEnd
   let prefixValue = prefix
 
-  // Find the start of the line
-  const lineStart = beforeCursor.lastIndexOf("\n") + 1
-  const line = beforeCursor.substring(lineStart) + afterCursor
+  // Find the start of the first selected line and end of the last selected line
+  const firstLineStart = value.lastIndexOf("\n", selStart - 1) + 1
+  let lastLineEnd = value.indexOf("\n", selEnd)
+  if (lastLineEnd === -1) lastLineEnd = value.length
 
-  // Check if the first character of the line is the same as the first character of the prefix
-  if (trimIfSame && line[0] === prefixValue[0]) {
-    // Trim the whitespace from the prefix
-    prefixValue = prefixValue.trim()
-  }
+  // Get the selected block
+  const selectedBlock = value.substring(firstLineStart, lastLineEnd)
+  // Split into lines
+  const lines = selectedBlock.split("\n")
 
-  // Add the prefix to the start of the line
+  // Add prefix to each line
+  const newLines = lines.map((line) => {
+    let p = prefixValue
+    if (trimIfSame && line[0] === prefixValue[0]) {
+      p = prefixValue.trim()
+    }
+    return p + line
+  })
+  const newBlock = newLines.join("\n")
+
+  // Build the new value
   const newValue =
-    beforeCursor.substring(0, lineStart) +
-    prefixValue +
-    beforeCursor.substring(lineStart) +
-    afterCursor
+    value.substring(0, firstLineStart) + newBlock + value.substring(lastLineEnd)
 
-  // Update the textareaElement value
+  // Update the textarea value
   textareaElement.value = newValue
 
-  // Move the cursor to its original position
-  textareaElement.selectionStart = textareaElement.selectionEnd =
-    cursorPosition + prefixValue.length
+  // Calculate new selection range
+  // The selection should cover all the newly prefixed lines
+  const newSelStart = firstLineStart
+  const newSelEnd = firstLineStart + newBlock.length
+  textareaElement.selectionStart = newSelStart
+  textareaElement.selectionEnd = newSelEnd
 
   // Focus the textarea element
   textareaElement.focus()
@@ -415,25 +425,38 @@ function addLink(textareaElement, event) {
 function deleteLine(textareaElement, event) {
   event.preventDefault()
 
-  const cursorPosition = textareaElement.selectionStart
-  const beforeCursor = textareaElement.value.substring(0, cursorPosition)
-  const afterCursor = textareaElement.value.substring(cursorPosition)
+  const value = textareaElement.value
+  const selStart = textareaElement.selectionStart
+  const selEnd = textareaElement.selectionEnd
 
-  // Find the start and end of the line
-  const lineStart = beforeCursor.lastIndexOf("\n")
-  const lineEnd = afterCursor.indexOf("\n")
-  const afterLine = lineEnd === -1 ? "" : afterCursor.substring(lineEnd)
+  // If nothing is selected, treat as single line delete
+  if (selStart === selEnd) {
+    // Find the start and end of the line
+    const lineStart = value.lastIndexOf("\n", selStart - 1) + 1
+    let lineEnd = value.indexOf("\n", selStart)
+    if (lineEnd === -1) lineEnd = value.length
 
-  // Delete the line
-  const newValue = beforeCursor.substring(0, lineStart) + afterLine
+    const newValue =
+      value.substring(0, lineStart) + value.substring(lineEnd + 1)
+    textareaElement.value = newValue
+    // Move cursor to start of the next line (or end of text)
+    textareaElement.selectionStart = textareaElement.selectionEnd = lineStart
+    textareaElement.focus()
+    return
+  }
 
-  // Update the textareaElement value
+  // If there is a selection, delete all lines that intersect with the selection
+  // Expand selection to start of first line and end of last line
+  const firstLineStart = value.lastIndexOf("\n", selStart - 1) + 1
+  let lastLineEnd = value.indexOf("\n", selEnd)
+  if (lastLineEnd === -1) lastLineEnd = value.length
+  else lastLineEnd = lastLineEnd + 1 // include the newline
+
+  const newValue =
+    value.substring(0, firstLineStart) + value.substring(lastLineEnd)
   textareaElement.value = newValue
-
-  // Move the cursor to the start of the next line
-  textareaElement.selectionStart = textareaElement.selectionEnd = lineStart
-
-  // Focus the textarea element
+  // Place cursor at start of where the deleted block was
+  textareaElement.selectionStart = textareaElement.selectionEnd = firstLineStart
   textareaElement.focus()
 }
 
