@@ -9,10 +9,18 @@
 # For setting up python see: https://github.com/actions/setup-python
 # For setting up node see: https://github.com/actions/setup-node
 # For running pre-commit see: https://github.com/pre-commit/action
+# For setting up uv see: https://github.com/astral-sh/setup-uv
 # For setting up postgres service container see: https://docs.github.com/en/actions/using-containerized-services/creating-postgresql-service-containers
 
 name: Run full CI
 on: push
+
+permissions: read-all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Lint job: (Run on all branch pushes)
   # - Checks out our branch
@@ -21,24 +29,22 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version: "3.12"
-          cache: "pip"
-          cache-dependency-path: "requirements-dev.txt"
-      - uses: actions/setup-node@v4
+          python-version: "3.14"
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          node-version: 20
+          node-version: 22
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
       - name: Install python dependencies
-        run: |
-          pip install uv
-          uv venv venv
-          source venv/bin/activate
-          uv pip install -r requirements-dev.txt
+        run: uv pip install -r requirements-dev.txt --system
       - name: Install npm dependencies
         run: npm install
-      - uses: pre-commit/action@v3.0.1
+      - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
   # Test job: (Run on all branch pushes)
   # - Checks out our branch
@@ -48,17 +54,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Python 3.14
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: "requirements-dev.txt"
+          python-version: "3.14"
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
       - name: Install dependencies
-        run: |
-          pip install uv
-          uv pip install -r requirements-dev.txt --system
+        run: uv pip install -r requirements-dev.txt --system
       - name: Test with pytest
         run: pytest --tb=line
 
@@ -77,7 +83,7 @@ jobs:
       - test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: "release-branch"
       - name: Update Release Branch
