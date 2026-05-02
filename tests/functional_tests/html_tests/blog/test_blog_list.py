@@ -78,7 +78,9 @@ def test_get_blog_list_basic_user_succeeds(
         assert string not in response.text
 
     soup = str_to_soup(response.text)
-    total_results = int(soup.find(id="desktop-total-results").text)
+    total_el = soup.find(id="desktop-total-results")
+    assert total_el is not None
+    total_results = int(total_el.text)
     assert total_results == len(blog_posts)
 
 
@@ -105,7 +107,9 @@ def test_get_blog_list_admin_user_succeeds(
         assert string in response.text
 
     soup = str_to_soup(response.text)
-    total_results = int(soup.find(id="desktop-total-results").text)
+    total_el = soup.find(id="desktop-total-results")
+    assert total_el is not None
+    total_results = int(total_el.text)
     assert total_results == len(blog_posts)
 
 
@@ -213,7 +217,7 @@ SEARCH_TEST_CASES = [
         order_by="asdf",
         results_per_page="foo",
         expected_total_results=0,
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_text=["Invalid Choice: could not coerce.", "Not a valid choice."],
     ),
 ]
@@ -239,7 +243,9 @@ def test_search_blog_posts(
         return
 
     soup = str_to_soup(response.text)
-    total_results = int(soup.find(id="desktop-total-results").text)
+    total_el = soup.find(id="desktop-total-results")
+    assert total_el is not None
+    total_results = int(total_el.text)
     assert total_results == test_case.expected_total_results
 
     titles_from_html = [title.text for title in soup.find_all(class_="bp-title")]

@@ -129,21 +129,21 @@ MEDIA_UPLOAD_TEST_CASES = [
         data={"name": "BMP media"},
         files={"media": (BMP_FILE.name, BMP_FILE.read_bytes())},
         expected_strings=["BMP media"],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     MediaUploadTestCase(
         id="no_name",
         data={},
         files={"media": (PNG_FILE.name, PNG_FILE.read_bytes())},
         expected_strings=["This field is required"],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     MediaUploadTestCase(
         id="no_media",
         data={"name": "PNG media"},
         files={},
         expected_strings=["This field is required"],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     MediaUploadTestCase(
         id="bp_not_found",
@@ -259,7 +259,7 @@ MEDIA_REORDER_TEST_CASES = [
         id="bad_position",
         rel_media_id=1,
         position="foo",
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=["Invalid position"],
     ),
     MediaReorderTestCase(

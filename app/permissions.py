@@ -1,7 +1,7 @@
 """permissions: Permissions for the app."""
 
 from collections.abc import Callable
-from enum import Enum
+from enum import StrEnum
 from functools import wraps
 from typing import TYPE_CHECKING, Any
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from app.mixins import AuthUserMixin
 
 
-class Role(str, Enum):
+class Role(StrEnum):
     """User roles."""
 
     UNAUTHENTICATED = "unauthenticated"
@@ -20,7 +20,7 @@ class Role(str, Enum):
     ADMIN = "admin"
 
 
-class Action(str, Enum):
+class Action(StrEnum):
     """Actions that can be performed."""
 
     EDIT_BP = "edit_bp"

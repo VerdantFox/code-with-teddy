@@ -20,6 +20,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Annotated
 
+import anyio
 import faker
 import typer
 from sqlalchemy.exc import OperationalError
@@ -139,7 +140,7 @@ class PopulateDB:
 
     async def create_bp_from_path(self, blog_post_path: Path) -> db_models.BlogPost:
         """Generate a blog post from a Path."""
-        file_content = blog_post_path.read_text()
+        file_content = await anyio.Path(blog_post_path).read_text()
         title = blog_utils.get_bp_title(file_content)
         md_content = blog_utils.get_bp_content(file_content)
         md_description = blog_utils.get_bp_introduction(file_content)

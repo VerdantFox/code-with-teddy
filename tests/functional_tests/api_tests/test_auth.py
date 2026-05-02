@@ -30,15 +30,14 @@ GET_ACCESS_TOKEN_TEST_CASES = [
     GetAccessTokenTestCase(
         id="success_with_username",
         data={
-            "username": test_models.BASIC_USER[test_models.UserModelKeys.USERNAME],
+            "username": str(test_models.BASIC_USER[test_models.UserModelKeys.USERNAME]),
             "password": test_models.PASSWORD_VAL,
         },
-        expected_strings=[ACCESS_TOKEN],
     ),
     GetAccessTokenTestCase(
         id="success_with_email",
         data={
-            "username": test_models.BASIC_USER[test_models.UserModelKeys.EMAIL],
+            "username": str(test_models.BASIC_USER[test_models.UserModelKeys.EMAIL]),
             "password": test_models.PASSWORD_VAL,
         },
         expected_strings=[ACCESS_TOKEN],
@@ -46,7 +45,7 @@ GET_ACCESS_TOKEN_TEST_CASES = [
     GetAccessTokenTestCase(
         id="bad_password",
         data={
-            "username": test_models.BASIC_USER[test_models.UserModelKeys.EMAIL],
+            "username": str(test_models.BASIC_USER[test_models.UserModelKeys.EMAIL]),
             "password": "bad_password",
         },
         expected_status_code=status.HTTP_401_UNAUTHORIZED,

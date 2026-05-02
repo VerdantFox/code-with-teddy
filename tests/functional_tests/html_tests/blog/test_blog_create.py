@@ -208,7 +208,7 @@ def test_post_create_blog_post_with_form_errors_fails(test_client: TestClient):
         "content": "some content",
     }
     response = test_client.post(ENDPOINT, data=data)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     expected_strings = (
         "Create New Blog Post",
         "Field must be at least 1 character long.",
@@ -244,7 +244,7 @@ def test_post_create_blog_post_with_duplicate_post_title_fails(test_client: Test
         assert string in response.text
 
     response = test_client.post(ENDPOINT, data=data)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     expected_strings = (
         "Create New Blog Post",
         "Error saving blog post",

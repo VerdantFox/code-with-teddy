@@ -135,7 +135,7 @@ def test_get_bp_introduction() -> None:
 
 def test_get_bp_introduction_empty() -> None:
     """Test get_bp_introduction function with empty content."""
-    with pytest.raises(ValueError, match="No introduction found in the blog post content."):
+    with pytest.raises(ValueError, match=r"No introduction found in the blog post content\."):
         blog_utils.get_bp_introduction("")
 
 
@@ -146,7 +146,7 @@ def test_get_bp_tags() -> None:
 
 def test_get_bp_tags_empty() -> None:
     """Test get_bp_tags function with empty content."""
-    with pytest.raises(ValueError, match="No tags found in the blog post content."):
+    with pytest.raises(ValueError, match=r"No tags found in the blog post content\."):
         blog_utils.get_bp_tags("")
 
 
@@ -169,7 +169,7 @@ def test_get_bp_title() -> None:
 
 def test_get_bp_title_empty() -> None:
     """Test get_bp_title function with empty content."""
-    with pytest.raises(ValueError, match="No title found in the blog post content."):
+    with pytest.raises(ValueError, match=r"No title found in the blog post content\."):
         blog_utils.get_bp_title("")
 
 
@@ -181,5 +181,5 @@ def test_get_bp_content() -> None:
 
 def test_get_bp_content_empty() -> None:
     """Test get_bp_content function with empty content."""
-    with pytest.raises(ValueError, match="No content found in the blog post content."):
+    with pytest.raises(ValueError, match=r"No content found in the blog post content\."):
         blog_utils.get_bp_content("")

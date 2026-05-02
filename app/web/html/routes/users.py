@@ -61,6 +61,7 @@ async def login_get(
     if redirect_url:
         login_form.redirect_url.data = redirect_url
     return templates.TemplateResponse(
+        request,
         LOGIN_TEMPLATE,
         {constants.REQUEST: request, constants.LOGIN_FORM: login_form},
     )
@@ -76,13 +77,14 @@ async def login_post(
     login_form = LoginForm.load(form_data)
     if not login_form.validate():
         return templates.TemplateResponse(
+            request,
             "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
                 constants.MESSAGE: FormErrorMessage(),
                 constants.LOGIN_FORM: login_form,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     redirect_url = login_form.redirect_url.data or "/"
 
@@ -92,6 +94,7 @@ async def login_post(
     # HTML redirects don't pass through headers so HTMX
     # can't see the redirect.
     response = templates.TemplateResponse(
+        request,
         "users/partials/login_form.html",
         {
             constants.REQUEST: request,
@@ -108,6 +111,7 @@ async def login_post(
         )
     except errors.UserNotAuthenticatedError as e:
         return templates.TemplateResponse(
+            request,
             "users/partials/login_form.html",
             {
                 constants.REQUEST: request,
@@ -169,6 +173,7 @@ async def register_get(
     if redirect_url:
         register_form.redirect_url.data = redirect_url
     return templates.TemplateResponse(
+        request,
         REGISTER_TEMPLATE,
         {constants.REQUEST: request, constants.FORM: register_form},
     )
@@ -184,13 +189,14 @@ async def register_post(
     register_form = RegisterUserForm.load(form_data)
     if not register_form.validate():
         return templates.TemplateResponse(
+            request,
             REGISTER_TEMPLATE,
             {
                 constants.REQUEST: request,
                 constants.MESSAGE: FormErrorMessage(),
                 constants.FORM: register_form,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     register_response = await user_handler.register_user(
         db=db,
@@ -205,6 +211,7 @@ async def register_post(
         for error_field, error_msg in register_response.field_errors.items():
             register_form[error_field].errors.extend(error_msg)
         return templates.TemplateResponse(
+            request,
             REGISTER_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -312,6 +319,7 @@ async def user_settings_get(
     form.timezone.data = current_user.timezone
     form.avatar_url.data = current_user.avatar_location
     return templates.TemplateResponse(
+        request,
         "users/settings.html",
         {constants.REQUEST: request, constants.FORM: form, constants.CURRENT_USER: current_user},
     )
@@ -331,6 +339,7 @@ async def user_settings_post(
     if not form.validate():
         await db.refresh(current_user)
         return templates.TemplateResponse(
+            request,
             "users/settings.html",
             {
                 constants.REQUEST: request,
@@ -338,7 +347,7 @@ async def user_settings_post(
                 constants.FORM: form,
                 constants.CURRENT_USER: current_user,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
 
     update_user_response = await user_handler.update_user(
@@ -349,7 +358,7 @@ async def user_settings_post(
             username=form.username.data,
             full_name=form.name.data,
             password=form.password.data,
-            timezone=form.timezone.data,
+            timezone=str(form.timezone.data or ""),
             avatar_location=form.avatar_url.data,
             avatar_upload=form.avatar_upload.data,
         ),
@@ -358,6 +367,7 @@ async def user_settings_post(
         for error_field, error_msg in update_user_response.field_errors.items():
             form[error_field].errors.extend(error_msg)
         return templates.TemplateResponse(
+            request,
             "users/settings.html",
             {
                 constants.REQUEST: request,
@@ -392,6 +402,7 @@ async def get_request_password_reset(request: Request) -> _TemplateResponse:
     """Return the password reset form."""
     form = PasswordResetRequestForm()
     return templates.TemplateResponse(
+        request,
         "users/request_password_reset.html",
         {constants.REQUEST: request, constants.FORM: form},
     )
@@ -408,13 +419,14 @@ async def post_request_password_reset(
     form = PasswordResetRequestForm.load(form_data)
     if not form.validate():
         return templates.TemplateResponse(
+            request,
             "users/request_password_reset.html",
             {
                 constants.REQUEST: request,
                 constants.MESSAGE: FormErrorMessage(),
                 constants.FORM: form,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
 
     await user_handler.send_pw_reset_email(
@@ -457,6 +469,7 @@ async def get_password_reset(
     await user_handler.assert_token_is_valid(db=db, query=reset_token_query)
 
     return templates.TemplateResponse(
+        request,
         "users/password_reset.html",
         {constants.REQUEST: request, constants.FORM: form, "reset_token_query": reset_token_query},
     )
@@ -473,6 +486,7 @@ async def post_password_reset(
     form = PasswordResetForm.load(form_data)
     if not form.validate():
         return templates.TemplateResponse(
+            request,
             "users/password_reset.html",
             {
                 constants.REQUEST: request,
@@ -480,7 +494,7 @@ async def post_password_reset(
                 constants.FORM: form,
                 "reset_token_query": reset_token_query,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
 
     user = await user_handler.reset_password_from_token(

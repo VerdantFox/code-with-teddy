@@ -79,10 +79,10 @@ DEFAULT_DATA = {
     CONTENT: CONTENT_MD,
     THUMBNAIL_URL: BLANK,
 }
-OG_TITLE = test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.TITLE]
-OG_DESCRIPTION = test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.DESCRIPTION]
-OG_CONTENT = test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.CONTENT]
-OG_THUMBNAIL_URL = test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.THUMBNAIL_URL]
+OG_TITLE = str(test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.TITLE])
+OG_DESCRIPTION = str(test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.DESCRIPTION])
+OG_CONTENT = str(test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.CONTENT])
+OG_THUMBNAIL_URL = str(test_models.BASIC_BLOG_POST[test_models.BlogPostInputKeys.THUMBNAIL_URL])
 
 EDIT_POST_TEST_CASES = [
     EditPostTestCase(
@@ -111,7 +111,7 @@ EDIT_POST_TEST_CASES = [
             "Invalid form field(s). See errors on form.",
             "Field must be at least 1 character long.",
         ],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     EditPostTestCase(
         id="missing_bp",
@@ -150,6 +150,6 @@ def test_edit_blog_post_repeat_title_fails(
     advanced_bp = advanced_blog_post
     data = {**DEFAULT_DATA, TITLE: advanced_bp.title}
     response = test_client.post(f"/blog/{basic_bp.id}/edit", data=data)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert "Error saving blog post" in response.text
     assert "Title already exists" in response.text

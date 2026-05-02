@@ -48,7 +48,7 @@ BPSeriesFK = Annotated[
 ]
 
 
-class TSVector(sa.types.TypeDecorator):  # ty: ignore[unresolved-attribute]
+class TSVector(sa.types.TypeDecorator):
     """Vector type for PostgreSQL full-text search."""
 
     impl = TSVECTOR

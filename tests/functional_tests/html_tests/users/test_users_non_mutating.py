@@ -32,8 +32,8 @@ PASSWORD = "password"
 NEXT = "next"  # redirect_url is aliased to "next"
 
 # Form field values
-USERNAME_VAL: str = test_models.BASIC_USER[test_models.UserModelKeys.USERNAME]
-EMAIL_VAL: str = test_models.BASIC_USER[test_models.UserModelKeys.EMAIL]
+USERNAME_VAL: str = str(test_models.BASIC_USER[test_models.UserModelKeys.USERNAME])
+EMAIL_VAL: str = str(test_models.BASIC_USER[test_models.UserModelKeys.EMAIL])
 PASSWORD_VAL = test_models.PASSWORD_VAL
 REDIRECT_URL_VAL = "/foobar"
 BLANK = ""
@@ -110,7 +110,7 @@ LOGIN_POST_TEST_CASES = [
             "Invalid form field(s)",
             "Field must be between 3 and 100 characters long",
         ],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     LoginLogoutTestCase(
         id="missing_password",
@@ -119,7 +119,7 @@ LOGIN_POST_TEST_CASES = [
             "Invalid form field(s)",
             "Field must be between 8 and 100 characters long",
         ],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
 ]
 

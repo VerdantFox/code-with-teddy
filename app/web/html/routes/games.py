@@ -13,4 +13,6 @@ router = APIRouter(tags=["games"])
 @router.get("/connect-4", response_model=None)
 async def connect_4(request: Request) -> _TemplateResponse:
     """Return the connect 4 game page."""
-    return templates.TemplateResponse("projects/connect4.html", {constants.REQUEST: request})
+    return templates.TemplateResponse(
+        request, "projects/connect4.html", {constants.REQUEST: request}
+    )

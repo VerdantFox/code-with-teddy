@@ -97,16 +97,16 @@ async def _reset_user(db_session: AsyncSession, user_before: dict[str, Any]) -> 
     return user
 
 
-USER_IN_BASE = {
+USER_IN_BASE: dict[str, Any] = {
     USERNAME: "simple_user",
     EMAIL: "simple@email.com",
     FULL_NAME: "Simple User",
 }
-USER_IN_CREATE_BASIC = {
+USER_IN_CREATE_BASIC: dict[str, Any] = {
     **USER_IN_BASE,
     PASSWORD: "password",
 }
-USER_IN_CREATE_FULL = {
+USER_IN_CREATE_FULL: dict[str, Any] = {
     **USER_IN_CREATE_BASIC,
     AVATAR_LOCATION: "avatar",
     TIMEZONE: "PST",
@@ -163,20 +163,20 @@ CREATE_USER_TEST_CASES = [
     ),
     CreateUpdateUserTestCase(
         id="username_exists",
-        body={**USER_IN_CREATE_BASIC, USERNAME: test_models.ADMIN_USER[USERNAME]},
+        body={**USER_IN_CREATE_BASIC, USERNAME: str(test_models.ADMIN_USER[USERNAME])},
         expected_status_code=status.HTTP_409_CONFLICT,
         expected_response_body={"detail": "User with username 'admin_user' already exists."},
     ),
     CreateUpdateUserTestCase(
         id="email_exists",
-        body={**USER_IN_CREATE_BASIC, EMAIL: test_models.ADMIN_USER[EMAIL]},
+        body={**USER_IN_CREATE_BASIC, EMAIL: str(test_models.ADMIN_USER[EMAIL])},
         expected_status_code=status.HTTP_409_CONFLICT,
         expected_response_body={"detail": "User with email 'admin@email.com' already exists."},
     ),
     CreateUpdateUserTestCase(
         id="missing_fields",
         body={},
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_response_body={
             "detail": [
                 {
@@ -209,7 +209,7 @@ CREATE_USER_TEST_CASES = [
     CreateUpdateUserTestCase(
         id="invalid_fields",
         body={USERNAME: "a", EMAIL: "a", FULL_NAME: "a", PASSWORD: "a"},
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_response_body={
             "detail": [
                 {
@@ -287,7 +287,7 @@ def test_update_other_user_as_basic_user_returns_not_found(
     assert response.json() == {"detail": "User not found"}
 
 
-UPDATES_BASE = {
+UPDATES_BASE: dict[str, Any] = {
     USERNAME: "new_username",
     EMAIL: "new_email@email.com",
     FULL_NAME: "New Name",
@@ -335,7 +335,7 @@ PATCH_USER_TEST_CASES = [
     CreateUpdateUserTestCase(
         id="update_invalid_fields",
         body={USERNAME: "a", EMAIL: "a", FULL_NAME: "a", PASSWORD: "a"},
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_response_body={
             "detail": [
                 {

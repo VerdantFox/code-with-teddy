@@ -81,6 +81,7 @@ class DBBuilder:
             self.print("Populating database...")
             await populate_db.populate_database(connection_string=self.get_connection_string())
         self.announce_vars()
+        assert self.container is not None
         return self.container
 
     def print(self, *args: Any, **kwargs: Any) -> None:

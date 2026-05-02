@@ -103,7 +103,7 @@ REGISTER_TEST_CASES = [
             "Field must be between 3 and 100 characters long.",
             "Field must be between 8 and 100 characters long.",
         ],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     RegisterTestCase(
         id="invalid_email",
@@ -116,7 +116,7 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, INVALID_FORM_FIELDS, "Invalid email address."],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     RegisterTestCase(
         id="password_mismatch",
@@ -129,13 +129,13 @@ REGISTER_TEST_CASES = [
             REDIRECT_URL: REDIRECT_URL_VAL,
         },
         expected_strings=[REGISTER_PAGE, INVALID_FORM_FIELDS, "Passwords must match"],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     RegisterTestCase(
         id="repeat_username",
         data={
             EMAIL: EMAIL_VAL,
-            USERNAME: test_models.ADMIN_USER[test_models.UserModelKeys.USERNAME],
+            USERNAME: str(test_models.ADMIN_USER[test_models.UserModelKeys.USERNAME]),
             NAME: NAME_VAL,
             PASSWORD: PASSWORD_VAL,
             CONFIRM_PASSWORD: CONFIRM_PASSWORD_VAL,
@@ -147,7 +147,7 @@ REGISTER_TEST_CASES = [
     RegisterTestCase(
         id="repeat_email",
         data={
-            EMAIL: test_models.ADMIN_USER[test_models.UserModelKeys.EMAIL],
+            EMAIL: str(test_models.ADMIN_USER[test_models.UserModelKeys.EMAIL]),
             USERNAME: USERNAME_VAL,
             NAME: NAME_VAL,
             PASSWORD: PASSWORD_VAL,
@@ -289,7 +289,7 @@ USER_SETTINGS_TEST_CASES = [
             TIMEZONE: TIMEZONE_VAL,
         },
         files={AVATAR_UPLOAD: (GIF_FILE.name, GIF_FILE.read_bytes())},
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=[INVALID_FILE_EXT, USERNAME_VAL],
     ),
     UserSettingsTestCase(
@@ -301,7 +301,7 @@ USER_SETTINGS_TEST_CASES = [
             TIMEZONE: TIMEZONE_VAL,
         },
         files={AVATAR_UPLOAD: (MP4_FILE.name, MP4_FILE.read_bytes())},
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=[INVALID_FILE_EXT, USERNAME_VAL],
     ),
     UserSettingsTestCase(
@@ -317,7 +317,7 @@ USER_SETTINGS_TEST_CASES = [
             "Field must be between 1 and 100 characters long.",
             "Field must be between 3 and 100 characters long.",
         ],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     UserSettingsTestCase(
         id="invalid_email",
@@ -328,7 +328,7 @@ USER_SETTINGS_TEST_CASES = [
             TIMEZONE: TIMEZONE_VAL,
         },
         expected_strings=["Invalid email address."],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     UserSettingsTestCase(
         id="passwords_mismatch",
@@ -341,13 +341,13 @@ USER_SETTINGS_TEST_CASES = [
             CONFIRM_PASSWORD: "password2",
         },
         expected_strings=["Passwords must match"],
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
     ),
     UserSettingsTestCase(
         id="repeat_username",
         data={
             EMAIL: EMAIL_VAL,
-            USERNAME: test_models.ADMIN_USER[test_models.UserModelKeys.USERNAME],
+            USERNAME: str(test_models.ADMIN_USER[test_models.UserModelKeys.USERNAME]),
             NAME: NAME_VAL,
             TIMEZONE: TIMEZONE_VAL,
         },
@@ -357,7 +357,7 @@ USER_SETTINGS_TEST_CASES = [
     UserSettingsTestCase(
         id="repeat_email",
         data={
-            EMAIL: test_models.ADMIN_USER[test_models.UserModelKeys.EMAIL],
+            EMAIL: str(test_models.ADMIN_USER[test_models.UserModelKeys.EMAIL]),
             USERNAME: USERNAME_VAL,
             NAME: NAME_VAL,
             TIMEZONE: TIMEZONE_VAL,
@@ -492,6 +492,7 @@ async def test_password_reset_flow_success(
     assert response.status_code == status.HTTP_200_OK
     assert response.headers.get("hx-redirect") == "/"
     assert "access_token" in response.cookies
+    test_client.cookies.clear()
 
 
 def test_send_pw_reset_email_not_found(test_client: TestClient, mocker: MockerFixture) -> None:
@@ -509,7 +510,7 @@ def test_send_pw_reset_email_not_found(test_client: TestClient, mocker: MockerFi
 def test_post_request_password_reset_invalid_email(test_client: TestClient) -> None:
     """Test resetting the password with an invalid email."""
     response = test_client.post("/request-password-reset", data={EMAIL: "invalid_email"})
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert "Invalid email address." in response.text
 
 
@@ -536,7 +537,7 @@ def test_post_reset_password_invalid_form(test_client: TestClient) -> None:
         "/reset-password/invalid_query",
         data={PASSWORD: "new_password", CONFIRM_PASSWORD: "differnt_password"},
     )
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert "Passwords must match" in response.text
 
 

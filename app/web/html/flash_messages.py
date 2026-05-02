@@ -1,6 +1,6 @@
 """flash_messages: Flash messages for the HTML web package."""
 
-from enum import Enum
+from enum import StrEnum
 from typing import cast
 
 from fastapi import Request
@@ -10,7 +10,7 @@ MESSAGES = "_messages"
 DEFAULT_FORM_ERROR_MESSAGE = "Invalid form field(s). See errors on form."
 
 
-class FlashCategory(str, Enum):
+class FlashCategory(StrEnum):
     """Categories for flash messages.
 
     Categories are used to style the flash message.

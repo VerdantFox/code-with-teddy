@@ -68,7 +68,7 @@ python -m scripts.start_local_postgres
 To run the app locally, you can use the following command:
 
 ```bash
-./run-dev.sh
+./scripts/run-dev.sh
 ```
 
 This will start an instance of `tailwind` that will build the CSS and watch for changes. It will also update the Python requirements, start up the Postgres database docker container if it is not already running, and start the FastAPI server.

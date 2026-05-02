@@ -1,6 +1,6 @@
 """test_series_non_mutating: Test the blog post series non-mutating endpoints."""
 
-from enum import Enum
+from enum import StrEnum
 
 import pytest
 from fastapi import status
@@ -90,7 +90,7 @@ def test_get_blog_post_in_series(
     assert "Up next in blog series:" not in response.text
 
 
-class SeriesEnum(str, Enum):
+class SeriesEnum(StrEnum):
     """Enum for the series form."""
 
     EMPTY = "empty"

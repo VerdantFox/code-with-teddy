@@ -1,6 +1,6 @@
 """models: models for use in tests."""
 
-import enum
+from enum import StrEnum
 from typing import Any
 
 from app.datastore import db_models
@@ -9,7 +9,7 @@ from app.services.blog import blog_handler
 from app.services.general import auth_helpers
 
 
-class UserModelKeys(str, enum.Enum):
+class UserModelKeys(StrEnum):
     """User model keys."""
 
     ID = "id"
@@ -64,7 +64,7 @@ def admin_user() -> db_models.User:
     return db_models.User(**user_dict)
 
 
-class BlogPostKeys(str, enum.Enum):
+class BlogPostKeys(StrEnum):
     """Blog post keys."""
 
     ID = "id"
@@ -90,7 +90,7 @@ class BlogPostKeys(str, enum.Enum):
     TS_VECTOR = "ts_vector"
 
 
-class BlogPostInputKeys(str, enum.Enum):
+class BlogPostInputKeys(StrEnum):
     """Blog post input keys."""
 
     TITLE = "title"

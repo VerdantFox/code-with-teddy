@@ -74,7 +74,7 @@ def update_html(html: str, *, update_headers: bool = True) -> str:
 def _update_html_links(html_soup: BeautifulSoup) -> None:
     """Make all links open in new tab."""
     for a_tag in html_soup.find_all("a"):
-        if a_tag.get("href", "").startswith("#"):
+        if a_tag.get("href", "").startswith("#"):  # ty: ignore[unresolved-attribute]
             continue
         a_tag["target"] = "_blank"
         a_tag["rel"] = "noopener noreferrer"
@@ -84,9 +84,9 @@ def _update_html_headers(html_soup: BeautifulSoup) -> None:
     """Fix header IDs that don't start alpha to work with scrollspy."""
     for h_tag in html_soup.find_all(re.compile(r"^h[1-6]$")):
         id_ = h_tag.get("id")
-        if h_tag.get("id") and not id_[0].isalpha():
+        if h_tag.get("id") and not id_[0].isalpha():  # ty: ignore[not-subscriptable]
             h_tag["id"] = f"blog-{id_}"
-        h_tag["x-intersect"] = f"highlightTocElement('{_update_intersect_id(id_)}')"
+        h_tag["x-intersect"] = f"highlightTocElement('{_update_intersect_id(id_)}')"  # ty: ignore[invalid-argument-type]
 
 
 def _update_html_pre_tags(html_soup: BeautifulSoup) -> None:
@@ -98,7 +98,7 @@ def _update_html_pre_tags(html_soup: BeautifulSoup) -> None:
 def _update_html_code_highlights(html_soup: BeautifulSoup) -> None:
     """Add "not-prose" class to all "highlight" code blocks."""
     for code_tag in html_soup.find_all("div", {"class": "highlight"}):
-        code_tag["class"].append("not-prose")
+        code_tag["class"].append("not-prose")  # ty: ignore[unresolved-attribute]
 
 
 def _update_html_media(html_soup: BeautifulSoup) -> None:
@@ -112,27 +112,27 @@ def _update_html_media(html_soup: BeautifulSoup) -> None:
     for img in html_soup.find_all("img"):
         _update_img(img)
     for picture in html_soup.find_all("picture"):
-        picture.parent["class"] = [*picture.parent.get("class", []), "text-center"]
+        picture.parent["class"] = [*picture.parent.get("class", []), "text-center"]  # ty: ignore[invalid-assignment, not-iterable, unresolved-attribute, invalid-argument-type]
     for media in html_soup.find_all(class_="media-element"):
-        media.parent["class"] = [*media.parent.get("class", []), "text-center"]
+        media.parent["class"] = [*media.parent.get("class", []), "text-center"]  # ty: ignore[invalid-assignment, not-iterable, unresolved-attribute, invalid-argument-type]
     for video in html_soup.find_all("video"):
         _update_video(video)
 
 
 def _update_img(img: Tag) -> None:
     """Update the image tag."""
-    img["class"] = [*img.get("class", []), "rounded-lg", "mx-auto"]  # ty: ignore[not-iterable]
+    img["class"] = [*img.get("class", []), "rounded-lg", "mx-auto"]  # ty: ignore[invalid-assignment, invalid-argument-type, not-iterable]
     img["loading"] = "lazy"
-    if img.attrs.get("src", "").endswith(".svg"):
-        img["class"].extend(["w-4/5", "max-sm:w-full"])
-    if img.parent.name != "p":  # ty: ignore[possibly-unbound-attribute]
+    if img.attrs.get("src", "").endswith(".svg"):  # ty: ignore[unresolved-attribute]
+        img["class"].extend(["w-4/5", "max-sm:w-full"])  # ty: ignore[unresolved-attribute]
+    if img.parent.name != "p":  # ty: ignore[unresolved-attribute]
         return
-    img.parent["class"] = [*img.parent.get("class", []), "text-center"]  # ty: ignore[not-iterable, possibly-unbound-attribute, possibly-unbound-implicit-call]
+    img.parent["class"] = [*img.parent.get("class", []), "text-center"]  # ty: ignore[invalid-assignment, not-iterable, unresolved-attribute, invalid-argument-type]
 
 
 def _update_video(video: Tag) -> None:
     """Update the video tag."""
-    video["class"] = [*video.get("class", []), "lazy"]  # ty: ignore[not-iterable]
+    video["class"] = [*video.get("class", []), "lazy"]  # ty: ignore[invalid-assignment, invalid-argument-type, not-iterable]
     for source in video.find_all("source"):
         if source.get("src"):
             source["data-src"] = source["src"]
@@ -145,6 +145,7 @@ def update_toc(toc: str) -> str:
     toc_element = toc_soup.find("div", {"class": "toc"})
     if not toc_element:  # Something went wrong...
         return ""
+    assert isinstance(toc_element, Tag)  # noqa: S101
     update_element(
         element=toc_element,
         name="nav",
@@ -152,6 +153,7 @@ def update_toc(toc: str) -> str:
         class_="not-prose",
     )
     toc_list_outer = toc_element.find("ul")
+    assert isinstance(toc_list_outer, Tag)  # noqa: S101
     update_element(
         element=toc_list_outer,
         class_="flex flex-col gap-3",
@@ -162,6 +164,7 @@ def update_toc(toc: str) -> str:
             class_="flex flex-col gap-3",
         )
         a_tag = li_tag.find("a")
+        assert isinstance(a_tag, Tag)  # noqa: S101
         update_element(
             element=a_tag,
             class_="link px-2 py-1 rounded-lg",
@@ -210,7 +213,7 @@ def update_toc(toc: str) -> str:
 
 def update_element(
     *,
-    element: BeautifulSoup,
+    element: Tag,
     name: str | None = None,
     id_: str | None = None,
     class_: str | None = None,
@@ -231,8 +234,9 @@ def update_a_tag_alpha_href(a_tag: Tag) -> None:
     Fix by adding a prefix to the ID of the element and the TOC link
     if the ID does not begin with a letter.
     """
-    if a_tag["href"].startswith("#") and not a_tag["href"][1].isalpha():
-        a_tag["href"] = f"#blog-{a_tag['href'][1:]}"
+    href = str(a_tag["href"])
+    if href.startswith("#") and not href[1].isalpha():
+        a_tag["href"] = f"#blog-{href[1:]}"
 
 
 def _update_intersect_id(id_: str) -> str:

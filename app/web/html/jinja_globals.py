@@ -22,16 +22,16 @@ def shorten(
 ) -> str:
     """Shorten the text to the given length."""
     if stop_at_newline:
-        text = text.split("\n")[0]
+        text = text.split("\n", maxsplit=1)[0]
     text = textwrap.shorten(text, width=width, placeholder=placeholder)
     if urlencode:
         text = quote(text)
     return text
 
 
-templates.env.globals["abs"] = abs
-templates.env.globals["hasattr"] = hasattr
-templates.env.globals["shorten"] = shorten
-templates.env.globals["strip_markdown"] = strip_markdown
-templates.env.globals["get_flashed_messages"] = flash_messages.get_flashed_messages
-templates.env.globals["sentry_cdn"] = settings.sentry_cdn
+templates.env.globals["abs"] = abs  # ty: ignore[invalid-assignment]
+templates.env.globals["hasattr"] = hasattr  # ty: ignore[invalid-assignment]
+templates.env.globals["shorten"] = shorten  # ty: ignore[invalid-assignment]
+templates.env.globals["strip_markdown"] = strip_markdown  # ty: ignore[invalid-assignment]
+templates.env.globals["get_flashed_messages"] = flash_messages.get_flashed_messages  # ty: ignore[invalid-assignment]
+templates.env.globals["sentry_cdn"] = settings.sentry_cdn  # ty: ignore[invalid-assignment]

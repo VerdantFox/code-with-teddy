@@ -85,7 +85,7 @@ async def get_current_user_required_by_token(
         raise errors.UserNotAuthenticatedError
 
     payload = await parse_access_token(access_token=access_token)
-    user_id = int(payload.get("user_id", 0))
+    user_id = int(payload.get("user_id", 0))  # ty: ignore[invalid-argument-type]
     return await get_user_by_id(user_id, db)
 
 
@@ -100,7 +100,7 @@ async def refresh_token(
     payload = await parse_access_token(access_token=access_token)
 
     if remaining_time is not None:
-        current_expires_at_float = float(payload["exp"])
+        current_expires_at_float = float(payload["exp"])  # ty: ignore[invalid-argument-type]
         current_expires_at = datetime.fromtimestamp(
             current_expires_at_float,
             tz=UTC,

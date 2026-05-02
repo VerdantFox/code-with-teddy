@@ -16,6 +16,7 @@ async def twisted_towers(
 ) -> _TemplateResponse:
     """Return the Twisted Towers project page."""
     return templates.TemplateResponse(
+        request,
         "projects/twisted_towers.html",
         {constants.REQUEST: request},
     )
@@ -27,6 +28,7 @@ async def moth_hunt(
 ) -> _TemplateResponse:
     """Return the Moth Hunt project page."""
     return templates.TemplateResponse(
+        request,
         "projects/moth_hunt.html",
         {constants.REQUEST: request},
     )
@@ -38,6 +40,7 @@ async def file_renamer(
 ) -> _TemplateResponse:
     """Return the File Renamer project page."""
     return templates.TemplateResponse(
+        request,
         "projects/file_renamer.html",
         {constants.REQUEST: request},
     )

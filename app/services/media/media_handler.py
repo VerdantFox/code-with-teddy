@@ -1,7 +1,7 @@
 """media_handler: service for handling media files."""
 
 from collections.abc import Iterable
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -26,7 +26,7 @@ SUFFIX_MAP = {
 }
 
 
-class MediaType(str, Enum):
+class MediaType(StrEnum):
     """Media type."""
 
     IMAGE = "image"
@@ -164,7 +164,7 @@ def pil_save(
 
 def pil_thumbnail(pic: MediaFileProtocol, max_width: int, max_height: int) -> Image:  # ty: ignore[invalid-type-form]
     """Thumbnail with pillow."""
-    image = Image.open(pic)
+    image = Image.open(pic)  # ty: ignore[invalid-argument-type]
     output_size = (max_width, max_height)
     image.thumbnail(output_size)
     return image

@@ -113,7 +113,7 @@ POST_SERIES_CASES = [
     PostSeriesTestCase(
         id="no_name",
         name="",
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=["Error creating series", "Field must be at least 1 character long."],
         expected_missing_strings=["Series Created!"],
     ),
@@ -164,7 +164,7 @@ PUT_SERIES_CASES = [
     PutSeriesTestCase(
         id="no_name",
         name="",
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=["Error updating series", "Field must be at least 1 character long."],
         expected_missing_strings=["Series Updated!"],
     ),

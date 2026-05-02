@@ -18,6 +18,7 @@ async def about(
 ) -> _TemplateResponse:
     """Return the portfolio landing (about) page."""
     return templates.TemplateResponse(
+        request,
         "main/about/about.html",
         {constants.REQUEST: request},
     )
@@ -29,6 +30,7 @@ async def projects(
 ) -> _TemplateResponse:
     """Return the portfolio projects page."""
     return templates.TemplateResponse(
+        request,
         "main/projects/projects.html",
         {constants.REQUEST: request},
     )
@@ -40,6 +42,7 @@ async def experience(
 ) -> _TemplateResponse:
     """Return the portfolio experience page."""
     return templates.TemplateResponse(
+        request,
         "main/experience/experience.html",
         {constants.REQUEST: request},
     )

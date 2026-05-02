@@ -5,15 +5,12 @@ import enum
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Environment(str, enum.Enum):
+class Environment(enum.StrEnum):
     """Enum for environment types."""
 
     LOCAL = "local"
     DOCKER = "docker"
     PROD = "prod"
-
-    def __str__(self) -> str:
-        return self.value
 
 
 class Settings(BaseSettings):

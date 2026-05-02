@@ -119,17 +119,17 @@ async def list_blog_posts(
             text="See errors in form",
             category=FlashCategory.ERROR,
         ).flash(request)
-        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
     try:
         paginator: blog_handler.Paginator | None = await blog_handler.get_blog_posts(
             db=db,
             can_see_unpublished=current_user.has_permission(Action.READ_UNPUBLISHED_BP),
             search=form.search.data,
             tags=form.tags.data,
-            order_by_field=form.order_by.data,
+            order_by_field=str(form.order_by.data or "created_timestamp"),
             asc=form.asc.data,
-            results_per_page=form.results_per_page.data,
-            page=form.page.data,
+            results_per_page=int(form.results_per_page.data or 20),
+            page=int(form.page.data or 1),
         )
     except AttributeError:
         FlashMessage(
@@ -137,13 +137,14 @@ async def list_blog_posts(
             category=FlashCategory.ERROR,
         ).flash(request)
         paginator = None
-        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
 
     if paginator:
         form.page.data = paginator.current_page
     template = LISTED_POSTS_TEMPLATE if is_form_request else LIST_POSTS_FULL_TEMPLATE
 
     return templates.TemplateResponse(
+        request,
         template,
         {
             constants.REQUEST: request,
@@ -201,6 +202,7 @@ class BlogPostForm(Form):
 async def create_bp_get(request: Request, current_user: LoggedInUser) -> _TemplateResponse:
     """Return page to create a blog post."""
     return templates.TemplateResponse(
+        request,
         EDIT_BP_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -220,6 +222,7 @@ async def create_bp_post(
     form = BlogPostForm.load(form_data)
     if not form.validate():
         return templates.TemplateResponse(
+            request,
             EDIT_BP_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -227,7 +230,7 @@ async def create_bp_post(
                 constants.FORM: form,
                 constants.MESSAGE: FormErrorMessage(),
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     input_data = blog_handler.SaveBlogInput(**form.data)
     response = await blog_handler.save_blog_post(db, input_data)
@@ -238,6 +241,7 @@ async def create_bp_post(
         # If there is a database error, `current_user` goes stale and needs refreshing.
         await db.refresh(current_user)
         return templates.TemplateResponse(
+            request,
             EDIT_BP_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -245,7 +249,7 @@ async def create_bp_post(
                 constants.FORM: form,
                 constants.MESSAGE: FormErrorMessage(text=response.err_msg),
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     FlashMessage(
         title="Blog Post Saved!",
@@ -288,6 +292,7 @@ async def get_manage_series(
     search_form = SeriesSearchForm.load(params)
     series_list = await blog_handler.get_all_series(db=db, search=search_form.search.data)
     return templates.TemplateResponse(
+        request,
         template,
         {
             constants.REQUEST: request,
@@ -317,18 +322,19 @@ async def create_series(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             ADD_SERIES_FORM_TEMPLATE,
             {
                 constants.REQUEST: request,
                 "form": form,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     try:
         series = await blog_handler.create_series(
             db=db, name=form.name.data, description=form.description.data
         )
-    except sqlalchemy.exc.IntegrityError:  # ty: ignore[unresolved-attribute]
+    except sqlalchemy.exc.IntegrityError:
         logger.exception(err_msg_title)
         FlashMessage(
             title=err_msg_title,
@@ -337,6 +343,7 @@ async def create_series(
             timeout=20,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             ADD_SERIES_FORM_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -350,6 +357,7 @@ async def create_series(
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return templates.TemplateResponse(
+        request,
         SINGLE_SERIES_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -380,6 +388,7 @@ async def update_series(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             SINGLE_SERIES_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -387,13 +396,13 @@ async def update_series(
                 "series": series,
                 "series_update_form": SeriesUpdateForm,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     try:
         series = await blog_handler.update_series(
             db=db, series=series, name=form.name.data, description=form.description.data
         )
-    except sqlalchemy.exc.IntegrityError:  # ty: ignore[unresolved-attribute]
+    except sqlalchemy.exc.IntegrityError:
         await db.rollback()
         await db.refresh(series, attribute_names=["id", "name", "description", "posts"])
         await db.refresh(current_user)
@@ -405,6 +414,7 @@ async def update_series(
             timeout=20,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             SINGLE_SERIES_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -419,6 +429,7 @@ async def update_series(
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return templates.TemplateResponse(
+        request,
         SINGLE_SERIES_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -446,6 +457,7 @@ async def delete_series(
     message = "Series deleted."
     status_code = status.HTTP_200_OK
     return templates.TemplateResponse(
+        request,
         DELETED_SERIES_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -482,6 +494,7 @@ async def read_blog_post(
         LoggedInCommentForm if current_user.is_authenticated else NotLoggedInCommentForm
     )
     response = templates.TemplateResponse(
+        request,
         "blog/read_post.html",
         {
             constants.REQUEST: request,
@@ -530,6 +543,7 @@ async def like_blog_post(request: Request, db: DBSession, bp_id: int) -> _Templa
     await db.refresh(bp)
 
     response = templates.TemplateResponse(
+        request,
         "blog/partials/like_button.html",
         {
             constants.REQUEST: request,
@@ -593,6 +607,7 @@ async def get_comment(
     comment = await blog_handler.get_comment_from_id(db=db, comment_id=comment_id)
     await db.refresh(comment)
     return templates.TemplateResponse(
+        request,
         COMMENT_TEMPLATE,
         {constants.REQUEST: request, constants.CURRENT_USER: current_user, "comment": comment},
     )
@@ -607,6 +622,7 @@ async def comment_edit_get(
     if not blog_handler.can_edit_comment(current_user=current_user, comment=comment):
         await db.refresh(comment)
         return templates.TemplateResponse(
+            request,
             COMMENT_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -620,6 +636,7 @@ async def comment_edit_get(
     form = NotLoggedInCommentForm.load({"name": name, "content": comment.md_content})
     await db.refresh(comment)
     return templates.TemplateResponse(
+        request,
         COMMENT_FORM_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -651,16 +668,19 @@ async def comment_post_preview(
         return HTMLResponse()
     if current_user.is_authenticated:
         assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used for type checker)
-        form_data_dict["name"] = current_user.full_name or current_user.username
+        form_data_dict["name"] = str(current_user.full_name or current_user.username)
     user_id = current_user.id if current_user.is_authenticated else None
     try:
         input_data = blog_handler.CommentInputPreview(
-            **form_data_dict, user_id=user_id, bp_id=bp_id
+            **form_data_dict,  # ty: ignore[invalid-argument-type]
+            user_id=user_id,
+            bp_id=bp_id,
         )
     except ValidationError:  # pragma: no cover (not sure this is reachable)
         return HTMLResponse()
     comment = blog_handler.generate_comment(input_data)
     return templates.TemplateResponse(
+        request,
         COMMENT_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -698,6 +718,7 @@ async def comment_blog_post(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             COMMENTS_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -708,15 +729,18 @@ async def comment_blog_post(
                 LIKED: liked,
                 BLOG_POST_URL: request.url_for("html:read_blog_post", slug=bp.slug),
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     if current_user.is_authenticated:
         assert hasattr(current_user, "full_name")  # noqa: S101 (assert-used type checker)
-        form_data_dict["name"] = current_user.full_name or current_user.username
+        form_data_dict["name"] = str(current_user.full_name or current_user.username)
     user_id = current_user.id if current_user.is_authenticated else None
     try:
         input_data = blog_handler.SaveCommentInput(
-            **form_data_dict, guest_id=current_user.guest_id, user_id=user_id, bp_id=bp_id
+            **form_data_dict,  # ty: ignore[invalid-argument-type]
+            guest_id=current_user.guest_id,
+            user_id=user_id,
+            bp_id=bp_id,
         )
     except ValidationError:
         FlashMessage(
@@ -724,6 +748,7 @@ async def comment_blog_post(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             COMMENTS_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -734,12 +759,14 @@ async def comment_blog_post(
                 LIKED: liked,
                 BLOG_POST_URL: request.url_for("html:read_blog_post", slug=bp.slug),
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     comment = blog_handler.generate_comment(input_data)
     if not form.validate():
         form_error_msg = (
-            "No robots allowed!" if form.check_me.errors else DEFAULT_FORM_ERROR_MESSAGE
+            "No robots allowed!"
+            if isinstance(form, NotLoggedInCommentForm) and form.check_me.errors
+            else DEFAULT_FORM_ERROR_MESSAGE
         )
         FlashMessage(
             title=ERROR_SAVING_COMMENT,
@@ -747,6 +774,7 @@ async def comment_blog_post(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             COMMENTS_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -758,7 +786,7 @@ async def comment_blog_post(
                 LIKED: liked,
                 BLOG_POST_URL: request.url_for("html:read_blog_post", slug=bp.slug),
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     await blog_handler.save_new_comment(db, input_data)
     await db.refresh(bp)
@@ -774,6 +802,7 @@ async def comment_blog_post(
     )
 
     response = templates.TemplateResponse(
+        request,
         COMMENTS_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -804,6 +833,7 @@ async def comment_edit_patch(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             COMMENT_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -822,13 +852,14 @@ async def comment_edit_patch(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             COMMENT_TEMPLATE,
             {
                 constants.REQUEST: request,
                 constants.CURRENT_USER: current_user,
                 "comment": comment,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     try:
         comment = await blog_handler.update_existing_comment(
@@ -841,6 +872,7 @@ async def comment_edit_patch(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             COMMENT_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -855,6 +887,7 @@ async def comment_edit_patch(
     ).flash(request)
     await db.refresh(comment)
     return templates.TemplateResponse(
+        request,
         COMMENT_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -882,6 +915,7 @@ async def delete_comment(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             COMMENT_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -896,7 +930,7 @@ async def delete_comment(
         category=FlashCategory.SUCCESS,
     ).flash(request)
     return templates.TemplateResponse(
-        "blog/partials/comment_deleted.html", {constants.REQUEST: request}
+        request, "blog/partials/comment_deleted.html", {constants.REQUEST: request}
     )
 
 
@@ -940,6 +974,7 @@ async def edit_bp_get(
     )
 
     return templates.TemplateResponse(
+        request,
         EDIT_BP_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -961,6 +996,7 @@ async def edit_bp_post(
     form = BlogPostForm.load(form_data)
     if not form.validate():
         return templates.TemplateResponse(
+            request,
             EDIT_BP_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -968,7 +1004,7 @@ async def edit_bp_post(
                 constants.FORM: form,
                 constants.MESSAGE: FormErrorMessage(),
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     input_data = blog_handler.SaveBlogInput(**form.data, existing_bp=bp)
@@ -978,6 +1014,7 @@ async def edit_bp_post(
             form[error_field].errors.extend(error_msg)
         await db.refresh(current_user)
         return templates.TemplateResponse(
+            request,
             EDIT_BP_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -985,7 +1022,7 @@ async def edit_bp_post(
                 constants.FORM: form,
                 constants.MESSAGE: FormErrorMessage(text=response.err_msg),
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     FlashMessage(
         title="Blog Post Updated!",
@@ -1010,6 +1047,7 @@ async def edit_bp_live_update(
     input_data = blog_handler.SaveBlogInput(**form.data)
     bp = await blog_handler.set_new_bp_fields(data=input_data)
     return templates.TemplateResponse(
+        request,
         "blog/partials/edit_preview.html",
         {
             constants.REQUEST: request,
@@ -1038,6 +1076,7 @@ async def upload_blog_post_media(
     bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
     if not form.validate():
         return templates.TemplateResponse(
+            request,
             UPLOAD_MEDIA_TEMPLATE,
             {
                 constants.REQUEST: request,
@@ -1045,7 +1084,7 @@ async def upload_blog_post_media(
                 constants.FORM: form,
                 BLOG_POST: bp,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
 
     bp = await blog_handler.save_media_for_blog_post(
@@ -1055,6 +1094,7 @@ async def upload_blog_post_media(
         media=form.media.data,
     )
     return templates.TemplateResponse(
+        request,
         UPLOAD_MEDIA_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -1088,9 +1128,10 @@ async def reorder_bp_media(
             category=FlashCategory.ERROR,
         ).flash(request)
         return templates.TemplateResponse(
+            request,
             FLASH_ERRORS_TEMPLATE,
             {constants.REQUEST: request},
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
     bp = await blog_handler.reorder_media_for_blog_post(
         db=db,
@@ -1099,6 +1140,7 @@ async def reorder_bp_media(
         position=position,
     )
     return templates.TemplateResponse(
+        request,
         LIST_MEDIA_TEMPLATE,
         {
             constants.REQUEST: request,
@@ -1124,6 +1166,7 @@ async def delete_blog_post_media(
         bp_id=bp_id,
     )
     return templates.TemplateResponse(
+        request,
         UPLOAD_MEDIA_TEMPLATE,
         {
             constants.REQUEST: request,

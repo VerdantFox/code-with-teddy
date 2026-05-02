@@ -27,6 +27,7 @@ async def general_error(
     """Return an error page for any web error."""
     html_error = WebAppError(detail=detail, status_code=status_code)
     return templates.TemplateResponse(
+        request,
         "errors/general_error.html",
         {constants.REQUEST: request, "error": html_error},
         status_code=html_error.status_code,

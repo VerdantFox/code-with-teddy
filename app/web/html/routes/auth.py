@@ -54,6 +54,7 @@ async def refresh_access_token(
 
     if not access_token:
         return templates.TemplateResponse(
+            request,
             REFRESH_ACCESS_PARTIAL,
             {"request": request, "no_content": True},
         )
@@ -65,13 +66,14 @@ async def refresh_access_token(
         )
     except errors.UserNotValidatedError:
         response = templates.TemplateResponse(
+            request,
             REFRESH_ACCESS_PARTIAL,
             {"request": request, "no_content": True},
         )
         response.delete_cookie(key=ACCESS_TOKEN_KEY)
         return response
     response = templates.TemplateResponse(
-        REFRESH_ACCESS_PARTIAL, {"request": request, "refresh": True}
+        request, REFRESH_ACCESS_PARTIAL, {"request": request, "refresh": True}
     )
     response.set_cookie(
         key=ACCESS_TOKEN_KEY, value=token.access_token, httponly=True, secure=True, samesite="lax"

@@ -296,7 +296,7 @@ GUEST_COMMENT_PREVIEW_TEST_CASES = [
             EMAIL: PERRIN_EMAIL,
             CONTENT: BASIC_CONTENT_MD,
         },
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=["Something went wrong with the form submission."],
     ),
     GuestCommentPreviewTestCase(

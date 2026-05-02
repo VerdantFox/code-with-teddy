@@ -38,3 +38,4 @@ webroot/
 node_modules/
 certs/
 .vscode/
+ai_workspace/

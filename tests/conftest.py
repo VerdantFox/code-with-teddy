@@ -5,12 +5,14 @@ from os import getenv
 from pathlib import Path
 
 import pytest
+import sqlalchemy as sa
 from dotenv import load_dotenv
 from pytest_mock import MockerFixture
 from sqlalchemy import Table, delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from sqlalchemy_utils.functions import database_exists, drop_database
+from sqlalchemy_utils.functions import database_exists
 
+from app.datastore import database as db_module
 from app.datastore.database import get_engine
 from app.services.general.transforms import to_bool
 from scripts.start_local_postgres import DBBuilder
@@ -101,7 +103,15 @@ async def generate_postgres_container() -> AsyncGenerator[DBBuilder, None]:
     yield db_builder
     if CONTAINER_NO_TEARDOWN:  # pragma: no cover
         return
-    drop_database(db_url)
+    # Dispose the async engine pool to release all connections before dropping the DB
+    if db_module.ENGINE is not None:
+        await db_module.ENGINE.dispose()
+    # Use WITH (FORCE) to terminate remaining sessions and drop (PostgreSQL 13+)
+    admin_url = db_url.rsplit("/", 1)[0] + "/postgres"
+    sync_engine = sa.create_engine(admin_url, isolation_level="AUTOCOMMIT")
+    with sync_engine.connect() as conn:
+        conn.execute(sa.text(f'DROP DATABASE IF EXISTS "{TEST_DB_NAME}" WITH (FORCE)'))
+    sync_engine.dispose()
     assert not database_exists(db_url)
     pg_container.stop()
     pg_container.remove()

@@ -71,7 +71,7 @@ NEW_COMMENT_TEST_CASES = [
             EMAIL: "not-an-email",
             CONTENT: BASIC_CONTENT_MD,
         },
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=["Invalid email address.", PERRIN, BASIC_CONTENT_MD],
     ),
     PostCommentTestCase(
@@ -94,7 +94,7 @@ NEW_COMMENT_TEST_CASES = [
             EMAIL: PERRIN_EMAIL,
             CONTENT: BASIC_CONTENT_MD,
         },
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=["No robots allowed!", PERRIN, BASIC_CONTENT_MD],
     ),
     PostCommentTestCase(
@@ -106,7 +106,7 @@ NEW_COMMENT_TEST_CASES = [
             EMAIL: PERRIN_EMAIL,
             CONTENT: BASIC_CONTENT_MD,
         },
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=["No robots allowed!", PERRIN, BASIC_CONTENT_MD],
     ),
     PostCommentTestCase(
@@ -118,7 +118,7 @@ NEW_COMMENT_TEST_CASES = [
             EMAIL: PERRIN_EMAIL,
             CONTENT: BASIC_CONTENT_MD,
         },
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=[INVALID_FORM, BASIC_CONTENT_MD],
     ),
     PostCommentTestCase(
@@ -130,7 +130,7 @@ NEW_COMMENT_TEST_CASES = [
             EMAIL: PERRIN_EMAIL,
             CONTENT: BLANK,
         },
-        expected_status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        expected_status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         expected_strings=["This field is required.", INVALID_FORM],
     ),
     # Advanced MD test cases covered by `test_comment_post_preview_as_guest`
@@ -180,7 +180,7 @@ def test_comment_as_basic_user_with_bp_cannot_comment_fails(
     data = {CONTENT: BASIC_CONTENT_MD}
 
     response = test_client.post(f"/blog/{bp_id}/comment", data=data)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert "Commenting has been disabled for this blog post..." in response.text
 
 
@@ -280,7 +280,7 @@ def test_edit_comment_with_no_content_fails(
     bp_comment_id = bp.comments[1].id
     data = {CONTENT: BLANK}
     response = test_client.patch(f"/blog/comment/{bp_comment_id}", data=data)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert "Error editing comment" in response.text
     assert "No content provided" in response.text
 
