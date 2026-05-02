@@ -17,7 +17,7 @@ TOKEN_URL = "api/v1/auth/token"
 async def logged_in_basic_user_module(
     test_client: TestClient,
     basic_user_module: db_models.User,
-) -> AsyncGenerator[db_models.User, None]:
+) -> AsyncGenerator[db_models.User]:
     """Log in and return the module-scoped basic user."""
     login_headers = get_login_headers(test_client, basic_user_module)
     test_client.headers.update(login_headers)
@@ -29,7 +29,7 @@ async def logged_in_basic_user_module(
 async def logged_in_admin_user_module(
     test_client: TestClient,
     admin_user_module: db_models.User,
-) -> AsyncGenerator[db_models.User, None]:
+) -> AsyncGenerator[db_models.User]:
     """Log in and return the module-scoped admin user."""
     login_headers = get_login_headers(test_client, admin_user_module)
     test_client.headers.update(login_headers)

@@ -47,7 +47,7 @@ def requires_permission(permission: Action) -> Callable:
 
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args: Any, current_user: "AuthUserMixin", **kwargs: Any) -> Any:
+        async def wrapper(*args: Any, current_user: AuthUserMixin, **kwargs: Any) -> Any:
             if not current_user.has_permission(permission):
                 raise errors.UserPermissionsError
             return await func(*args, current_user=current_user, **kwargs)

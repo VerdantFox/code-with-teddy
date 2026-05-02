@@ -83,7 +83,7 @@ def anyio_backend() -> str:
 
 
 @pytest.fixture(name="db_builder", scope="session")
-async def generate_postgres_container() -> AsyncGenerator[DBBuilder, None]:
+async def generate_postgres_container() -> AsyncGenerator[DBBuilder]:
     """Generate a fresh test postgres container for the duration of the test session."""
     db_builder = DBBuilder(
         container_name=TEST_DB_CONTAINER_NAME,
@@ -119,7 +119,7 @@ async def generate_postgres_container() -> AsyncGenerator[DBBuilder, None]:
 
 # ------------------ Session fixtures -------------------
 @pytest.fixture(name="db_session")
-async def get_db_session(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession, None]:
+async def get_db_session(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession]:
     """Return the test db session."""
     async_session = _make_session(db_builder)
     async with async_session() as session:
@@ -127,7 +127,7 @@ async def get_db_session(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession, 
 
 
 @pytest.fixture(name="db_session_module", scope="module")
-async def get_db_session_module(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession, None]:
+async def get_db_session_module(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession]:
     """Return the test db session."""
     async_session = _make_session(db_builder)
     async with async_session() as session:
@@ -146,7 +146,7 @@ def _mock_mailersend(session_mocker: MockerFixture) -> None:
 @pytest.fixture(name="clean_db")
 async def _clean_db_function(
     db_session: AsyncSession, db_builder: DBBuilder
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """Delete all data from the database after the function."""
     yield
     await delete_all_data(db_session, db_builder)
@@ -156,7 +156,7 @@ async def _clean_db_function(
 @pytest.fixture(name="clean_db_except_users")
 async def _clean_db_except_users(
     db_session: AsyncSession, db_builder: DBBuilder
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """Delete all data from the database except users after the function."""
     yield
     await delete_all_data(db_session, db_builder, skip_tables={"users"})
@@ -165,7 +165,7 @@ async def _clean_db_except_users(
 @pytest.fixture(name="clean_db_module", scope="module")
 async def _clean_db_module(
     db_session_module: AsyncSession, db_builder: DBBuilder
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """Delete all data from the database after the module."""
     yield
     await delete_all_data(db_session_module, db_builder)

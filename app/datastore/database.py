@@ -42,7 +42,7 @@ def get_engine(
     return ENGINE
 
 
-async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_db_session() -> AsyncGenerator[AsyncSession]:
     """Start a SessionLocal transaction and yield it."""
     engine = get_engine()
     async_session = async_sessionmaker(engine, expire_on_commit=False)

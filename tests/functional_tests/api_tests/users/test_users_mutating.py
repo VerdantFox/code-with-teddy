@@ -56,7 +56,7 @@ async def _reset_basic_user_fixture_function(
     anyio_backend: str,  # noqa: ARG001 (unused-arg)
     db_session: AsyncSession,
     basic_user_module: db_models.User,
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """Reset the basic user."""
     user_before = _get_user_before(basic_user_module)
     yield

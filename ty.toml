@@ -1,0 +1,22 @@
+# ty.toml: ty type checker configuration
+# Reference: https://docs.astral.sh/ty/reference/configuration/
+[environment]
+python = "./venv"
+python-version = "3.14"
+
+
+# Rules references: https://docs.astral.sh/ty/reference/rules/
+# Most rules have a default value already ("error", "warn", "ignore")
+# This overwrites some of those rules
+[rules]
+invalid-ignore-comment = "error"
+possibly-missing-attribute = "error"
+possibly-missing-import = "error"
+redundant-cast = "error"
+undefined-reveal = "error"
+# unknown-rule is no longer a valid rule name in current ty versions
+unresolved-global = "error"
+unsupported-base = "error"
+division-by-zero = "error"
+possibly-unresolved-reference = "error"
+unused-ignore-comment = "error"

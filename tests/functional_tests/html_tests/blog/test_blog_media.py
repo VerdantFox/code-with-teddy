@@ -25,7 +25,7 @@ async def _clean_db_fixture_module(clean_db_module: None, anyio_backend: str) ->
 @pytest.fixture(name="clean_db_except_users_or_bps")
 async def _clean_db_except_users_or_bps(
     db_session: AsyncSession, db_builder: DBBuilder
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """Delete all data from the database except users after the function."""
     yield
     await delete_all_data(db_session, db_builder, skip_tables={"users", "blog_posts"})

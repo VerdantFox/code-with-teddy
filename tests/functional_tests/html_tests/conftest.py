@@ -33,7 +33,7 @@ def str_to_soup() -> StrToSoup:  # pragma: no cover
 async def logged_in_basic_user(
     test_client: TestClient,
     basic_user: db_models.User,
-) -> AsyncGenerator[db_models.User, None]:
+) -> AsyncGenerator[db_models.User]:
     """Log in and return the basic user."""
     yield await set_basic_user_login_cookie(test_client, basic_user)
     test_client.cookies.clear()
@@ -43,7 +43,7 @@ async def logged_in_basic_user(
 async def logged_in_basic_user_module(
     test_client: TestClient,
     basic_user_module: db_models.User,
-) -> AsyncGenerator[db_models.User, None]:
+) -> AsyncGenerator[db_models.User]:
     """Log in and return the module-scoped basic user."""
     yield await set_basic_user_login_cookie(test_client, basic_user_module)
     test_client.cookies.clear()
@@ -66,7 +66,7 @@ async def set_basic_user_login_cookie(
 async def logged_in_basic_user_2_module(
     test_client: TestClient,
     basic_user_2_module: db_models.User,
-) -> AsyncGenerator[db_models.User, None]:
+) -> AsyncGenerator[db_models.User]:
     """Log in and return the module-scoped basic user."""
     yield await set_basic_user_2_login_cookie(test_client, basic_user_2_module)
     test_client.cookies.clear()
@@ -85,7 +85,7 @@ async def set_basic_user_2_login_cookie(
 async def logged_in_admin_user(
     test_client: TestClient,
     admin_user: db_models.User,
-) -> AsyncGenerator[db_models.User, None]:
+) -> AsyncGenerator[db_models.User]:
     """Log in and return the admin user."""
     yield await set_admin_user_login_cookie(test_client, admin_user)
     test_client.cookies.clear()
@@ -95,7 +95,7 @@ async def logged_in_admin_user(
 async def logged_in_admin_user_module(
     test_client: TestClient,
     admin_user_module: db_models.User,
-) -> AsyncGenerator[db_models.User, None]:
+) -> AsyncGenerator[db_models.User]:
     """Log in and return the module-scoped admin user."""
     yield await set_admin_user_login_cookie(test_client, admin_user_module)
     test_client.cookies.clear()

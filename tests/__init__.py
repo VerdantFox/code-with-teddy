@@ -23,7 +23,7 @@ class TestCase(BaseModel, arbitrary_types_allowed=True):
 
     @staticmethod
     def parametrize(
-        test_cases: Sequence["TestCase"], *, arg_name: str = "test_case"
+        test_cases: Sequence[TestCase], *, arg_name: str = "test_case"
     ) -> pytest.MarkDecorator:
         """Parametrize the test cases."""
         return pytest.mark.parametrize(

@@ -114,8 +114,8 @@ class BlogPost(Base):
     id: Mapped[IntPK]
     title: Mapped[StrIndexedUnique]
     slug: Mapped[StrIndexedUnique]
-    old_slugs: Mapped[list["OldBlogPostSlug"]] = relationship(back_populates="blog_post")
-    tags: Mapped[list["BlogPostTag"]] = relationship(
+    old_slugs: Mapped[list[OldBlogPostSlug]] = relationship(back_populates="blog_post")
+    tags: Mapped[list[BlogPostTag]] = relationship(
         secondary="blog_tags_associations",
         back_populates="blog_posts",
         order_by="asc(BlogPostTag.tag)",
@@ -131,7 +131,7 @@ class BlogPost(Base):
     html_content: Mapped[str]
     html_toc: Mapped[str]
 
-    media: Mapped[list["BlogPostMedia"]] = relationship(
+    media: Mapped[list[BlogPostMedia]] = relationship(
         back_populates="blog_post",
         order_by="asc(BlogPostMedia.position), asc(BlogPostMedia.created_timestamp)",
     )
@@ -139,12 +139,12 @@ class BlogPost(Base):
     updated_timestamp: Mapped[DateTimeIndexed]
     likes: Mapped[IntIndexed]
     views: Mapped[IntIndexed]
-    comments: Mapped[list["BlogPostComment"]] = relationship(
+    comments: Mapped[list[BlogPostComment]] = relationship(
         back_populates="blog_post", order_by="asc(BlogPostComment.created_timestamp)"
     )
     series_id: Mapped[BPSeriesFK | None]
     series_position: Mapped[IntNullable]
-    series: Mapped["BlogPostSeries"] = relationship(back_populates="posts")
+    series: Mapped[BlogPostSeries] = relationship(back_populates="posts")
 
     ts_vector: Mapped[TSVector] = mapped_column(
         TSVector(),
@@ -160,7 +160,7 @@ class OldBlogPostSlug(Base):
 
     slug: Mapped[StrPK]
     blog_post_id: Mapped[BlogPostFK]
-    blog_post: Mapped["BlogPost"] = relationship(back_populates="old_slugs")
+    blog_post: Mapped[BlogPost] = relationship(back_populates="old_slugs")
 
 
 class BlogPostTag(Base):
@@ -169,7 +169,7 @@ class BlogPostTag(Base):
     __tablename__ = "blog_post_tags"
 
     tag: Mapped[StrPK]
-    blog_posts: Mapped[list["BlogPost"]] = relationship(
+    blog_posts: Mapped[list[BlogPost]] = relationship(
         secondary="blog_tags_associations", back_populates="tags"
     )
 
@@ -191,7 +191,7 @@ class BlogPostMedia(Base):
 
     id: Mapped[IntPK]
     blog_post_id: Mapped[BlogPostFK | None]
-    blog_post: Mapped["BlogPost"] = relationship(back_populates="media")
+    blog_post: Mapped[BlogPost] = relationship(back_populates="media")
     name: Mapped[str]
     locations: Mapped[str]
     media_type: Mapped[str]
@@ -210,12 +210,12 @@ class BlogPostComment(Base):
 
     id: Mapped[IntPK]
     blog_post_id: Mapped[BlogPostFK | None]
-    blog_post: Mapped["BlogPost"] = relationship(back_populates="comments")
+    blog_post: Mapped[BlogPost] = relationship(back_populates="comments")
     name: Mapped[StrNullable]  # Name of the commenter
     email: Mapped[StrNullable]  # Email of the commenter
     guest_id: Mapped[StrNullable]  # Guest ID of the commenter
     user_id: Mapped[UsersFk | None]
-    user: Mapped["User"] = relationship()
+    user: Mapped[User] = relationship()
     md_content: Mapped[str]
     html_content: Mapped[str]
     created_timestamp: Mapped[DateTimeIndexed]
@@ -262,4 +262,4 @@ class PasswordResetToken(Base):
     encrypted_query: Mapped[StrIndexedUnique]
     created_timestamp: Mapped[DateTimeIndexed]
     expires_timestamp: Mapped[DateTimeIndexed]
-    user: Mapped["User"] = relationship()
+    user: Mapped[User] = relationship()

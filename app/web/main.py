@@ -56,7 +56,7 @@ def create_app() -> FastAPI:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001 (unused-argument)
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: ARG001 (unused-argument)
     """Code to run before taking any requests and just before shutdown."""
     engine = get_engine()
     try:
