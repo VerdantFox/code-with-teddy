@@ -12,11 +12,11 @@ name = "code-with-teddy"
 version = "1.0"
 description = "Teddy's portfolio website."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 classifiers = [
     "Framework :: FastAPI",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
 ]
 maintainers = [
     { name = "Theodore Williams", email = "theodore.f.williams@gmail.com" },
@@ -82,8 +82,6 @@ dependencies = [
     "sqlalchemy[asyncio]",
     # Typer: CLI toolkit (needed in prod for Alembic migrations)
     "typer[all]",
-    # Uv: Python package manager
-    "uv",
     # Uvicorn: ASGI server
     "uvicorn[standard]",
     # werkzeug: WSGI utility library (also useful utilities for our ASGI app)
@@ -197,7 +195,7 @@ skip_covered = true # Don't show fully covered files in the report
 # Reference: https://docs.astral.sh/ty/reference/configuration/
 [tool.ty.environment]
 python = "./venv"
-python-version = "3.12"
+python-version = "3.14"
 
 
 # Rules references: https://docs.astral.sh/ty/reference/rules/
@@ -221,7 +219,7 @@ unused-ignore-comment = "error"
 # Reference: https://docs.astral.sh/ruff/configuration/
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py314"
 
 
 [tool.ruff.format]

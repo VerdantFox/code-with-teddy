@@ -61,7 +61,7 @@ echo_usage() {
     echo 'OPTIONS:'
     echo '  --help            Display this help message and exit.'
     echo '  --debug           Announce global variables.'
-    echo '  --dev/--prod      Deploy in development or production mode (default=dev).'
+    echo '  --dev/--prod      Deploy in development or production mode (REQUIRED).'
     echo '  --down            Tear down containers/network without (re-)starting.'
     echo '  --restart         Restart containers even if not re-built.'
     echo '  --skip-build      Skip the build step.'
@@ -193,9 +193,11 @@ stop_containers() {
 restart_containers() {
     if [ "${STOP:-}" == "1" ] && [ "${START:-}" == "1" ]
     then
-        log INFO "Restarting containers..."
+        log INFO "Restarting containers (down then up)..."
         # shellcheck disable=SC2068
-        docker compose ${COMPOSE_EXTRAS[@]:-} --profile $PROFILE restart --timeout 120
+        docker compose ${COMPOSE_EXTRAS[@]:-} --profile $PROFILE down --timeout 120
+        # shellcheck disable=SC2068
+        docker compose ${COMPOSE_EXTRAS[@]:-} --profile $PROFILE up --detach --timeout 120
         log_containers
         remove_dangling
     fi

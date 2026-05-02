@@ -1,7 +1,7 @@
 # codewithteddy web app Dockerfile
 
 # Temp 'build' stage to install dependencies
-FROM python:3.12-slim AS build
+FROM python:3.14-slim AS build
 WORKDIR /app
 
 # Set environment variables
@@ -40,7 +40,7 @@ RUN --mount=type=cache,target=/root/.cache \
     uv pip install -r requirements-prod.txt
 
 # Final production stage
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 # Update package lists and install curl (for healthcheck)
 # DL3008: Pin versions in apt get install
