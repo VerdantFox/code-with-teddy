@@ -1,48 +1,40 @@
 # Spec 0001: Update Ruff and Ty Rules for Maximum Strictness
 
+**Status:** Complete
+
+---
+
 ## Overview
 
-This spec describes planned changes to `ruff.toml` and `ty.toml` to increase linting and
-type-checking strictness as much as practical. Rules that conflict with existing rules, are
-purely for .pyi stub files, are domain-irrelevant (e.g., Airflow, Django, numpy/pandas), or
-would produce excessive false positives are excluded or noted.
+Increase linting and type-checking strictness by enabling additional stable rule groups in `ruff.toml` and upgrading warn-level rules to errors in `ty.toml`, excluding rules that are domain-irrelevant, conflict with existing configuration, or produce excessive false positives.
+
+### Acceptance Criteria
+
+- `ruff.toml` enables `FAST`, `FA`, `FURB`, `LOG`, `SLOT`, `TD`, and `RUF029`.
+- `ty.toml` upgrades all targeted `warn`-level rules to `error` and enables `unsupported-dynamic-base`, `unused-awaitable`, and `call-abstract-method`.
+- `pre-commit run --all-files` passes with no violations.
+- Full test suite passes with no regressions.
 
 ---
 
-## Ruff Changes
+## Research
 
-### Currently Commented-Out Rule Groups Now Stable
+### Current ruff.toml State
 
-Two rule groups were previously disabled because they were "In preview." Both now have large
-sets of stable rules:
+Two rule groups (`FURB`, `LOG`) were previously commented out because they were in preview. Both now have large sets of stable rules ready to enable.
 
-| Group          | Code   | Reason to Enable                                                                                               |
-| -------------- | ------ | -------------------------------------------------------------------------------------------------------------- |
-| refurb         | `FURB` | Many modernization rules are now stable (e.g., `FURB105`, `FURB136`, `FURB157`, `FURB161`, `FURB163`, etc.)    |
-| flake8-logging | `LOG`  | Several rules are now stable: `LOG001`, `LOG002`, `LOG007`, `LOG009`. Prevents misuse of the `logging` module. |
+The following stable groups are not yet selected but are potentially relevant to this FastAPI project:
 
-**Action:** Uncomment `"FURB"` and `"LOG"` in `ruff.toml` `[lint] select`.
+| Group                     | Code   | Notes                                                                      |
+| ------------------------- | ------ | -------------------------------------------------------------------------- |
+| FastAPI                   | `FAST` | Catches FastAPI anti-patterns (e.g., non-annotated route dependencies).    |
+| flake8-future-annotations | `FA`   | `FA100`/`FA102` enforce `from __future__ import annotations` where needed. |
+| flake8-slots              | `SLOT` | `SLOT000`–`SLOT002` enforce `__slots__` on subclasses of slotted builtins. |
+| flake8-type-checking      | `TC`   | `TC001`–`TC003` move type-only imports into `TYPE_CHECKING` blocks.        |
+| flake8-todos              | `TD`   | `TD001`–`TD007` enforce a consistent TODO format.                          |
+| flake8-fixme              | `FIX`  | `FIX001`–`FIX004` flag FIXME/HACK/TODO/XXX comments.                       |
 
----
-
-### New Rule Groups to Add
-
-These groups are not currently selected and are stable and relevant to this FastAPI project:
-
-| Group                                                    | Code   | Why Add                                                                                                  | Caveats                                                                                                                                               |
-| -------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FastAPI                                                  | `FAST` | Project is built on FastAPI. Rules catch FastAPI anti-patterns (e.g., non-annotated route dependencies). | Verify no false positives on existing routes.                                                                                                         |
-| flake8-future-annotations                                | `FA`   | `FA100` / `FA102` enforce `from __future__ import annotations` where needed for forward references.      | Python 3.14 may make this less critical; verify impact.                                                                                               |
-| flake8-slots                                             | `SLOT` | `SLOT000`–`SLOT002` enforce `__slots__` on subclasses of slotted base classes (`str`, `tuple`, etc.).    | Only flags issues when subclassing builtin slotted types; low noise.                                                                                  |
-| flake8-type-checking COMMENT: let's not include this one | `TC`   | `TC001`–`TC003` move type-only imports into `TYPE_CHECKING` blocks, reducing runtime overhead.           | Must verify against SQLAlchemy/Pydantic patterns that need runtime imports; may require per-file ignores.                                             |
-| flake8-todos                                             | `TD`   | `TD001`–`TD007` enforce a consistent TODO format.                                                        | Very strict; review existing TODO comments and pick which rules to keep. Consider ignoring `TD002` (author) and `TD003` (issue link) if not required. |
-| flake8-fixme COMMENT: Let's not include this one         | `FIX`  | `FIX001`–`FIX004` flag FIXME/HACK/TODO/XXX comments so they're tracked.                                  | Potentially noisy. `FIX002` (line-contains-todo) overlaps heavily with `TD` rules. May omit.                                                          |
-
-**Action:** Add `"FAST"`, `"FA"`, `"SLOT"`, `"TC"`, `"TD"` to `[lint] select`. Evaluate `"FIX"` separately.
-
----
-
-### Rule Groups Intentionally Excluded
+The following groups are intentionally out of scope (domain-irrelevant or preview-only):
 
 | Group            | Code  | Reason Excluded                                                  |
 | ---------------- | ----- | ---------------------------------------------------------------- |
@@ -54,30 +46,7 @@ These groups are not currently selected and are stable and relevant to this Fast
 | pandas-vet       | `PD`  | No pandas usage.                                                 |
 | NumPy            | `NPY` | No numpy usage.                                                  |
 
----
-
-### New Ignored Rules to Review
-
-Some rules in newly added groups will likely need to be ignored:
-
-| Rule     | Name                             | Reason to Ignore                                                      |
-| -------- | -------------------------------- | --------------------------------------------------------------------- |
-| `TD002`  | `missing-todo-author`            | Author in TODOs is not a project requirement.                         |
-| `TD003`  | `missing-todo-link`              | Issue links are not required for all TODOs.                           |
-| `FIX002` | `line-contains-todo`             | Redundant with `TD` rules if both are enabled.                        |
-| `TC001`  | `typing-only-first-party-import` | SQLAlchemy mapped columns require runtime access; evaluate carefully. |
-
----
-
-### Unfixable Rules to Review
-
-The current `unfixable` list should remain as-is. No new entries needed for newly added groups.
-
----
-
-### Preview Mode Consideration
-
-The project currently uses only stable rules. Several useful rules remain in preview:
+The project currently uses only stable rules. Several useful rules remain in preview and can be added explicitly to `select` without enabling global preview mode:
 
 | Rule                 | Group | Description                                                          |
 | -------------------- | ----- | -------------------------------------------------------------------- |
@@ -87,97 +56,58 @@ The project currently uses only stable rules. Several useful rules remain in pre
 | `PLR0904`            | PLR   | `too-many-public-methods`                                            |
 | `RUF029`             | RUF   | `unused-async` — flags async functions that don't use async features |
 
-**Decision:** Do not enable preview mode globally. Individual preview rules can be enabled by
-adding them explicitly to `select` using their specific codes (e.g., `"RUF029"`, `"LOG004"`).
+### Current ty.toml State
 
-**Action:** Consider adding `"RUF029"` (unused-async) explicitly — it's a good fit for an async
-FastAPI codebase to prevent accidentally non-async route handlers.
-COMMENT: Let's try RUF029
+The following rules currently default to `warn` and are candidates for upgrade to `error`: `ambiguous-protocol-member`, `deprecated`, `ignore-comment-unknown-rule`, `ineffective-final`, `invalid-enum-member-annotation`, `invalid-legacy-positional-parameter`, `mismatched-type-name`, `possibly-missing-submodule`, `unused-type-ignore-comment`, `useless-overload-body`.
+
+The `unsupported-dynamic-base` rule defaults to `ignore` but is worth enabling at `warn` since `type()` is rarely used in this codebase.
+
+Two high-value preview rules are available: `unused-awaitable` (critical for async correctness; preview since 0.0.21) and `call-abstract-method` (preview since 0.0.16).
+
+A stale comment referencing `unknown-rule` (a rule removed from ty) exists in `ty.toml` and should be removed.
 
 ---
 
-### Summary of `ruff.toml` Changes
+## Plan
+
+### Approach
+
+Apply changes in phases — ty first (foundational), then ruff stable groups, then ruff todo/preview rules. Run `pre-commit run --all-files` and the full test suite after each phase before proceeding. This staged approach makes it easy to attribute any new violations to the specific rule group that introduced them.
+
+`TC` (flake8-type-checking) is excluded because SQLAlchemy mapped columns require runtime imports — moving them into `TYPE_CHECKING` blocks would break the ORM. `FIX` (flake8-fixme) is excluded because `FIX002` (`line-contains-todo`) is redundant with the `TD` rules.
+
+### Files to Modify
+
+| File                           | Change                                                                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `ty.toml`                      | Upgrade warn-level rules to error, enable `unsupported-dynamic-base` and preview rules, remove stale comment.              |
+| `ruff.toml`                    | Uncomment `FURB` and `LOG`, add `FAST`/`FA`/`SLOT`/`TD` to select, add `TD002`/`TD003` to ignore, add `RUF029` explicitly. |
+| `app/**/*.py`, `tests/**/*.py` | Fix any violations introduced by the new rules.                                                                            |
+
+### Implementation Details
+
+#### ruff.toml changes
 
 ```toml
 # In [lint] select, uncomment/add these:
-"FAST",  # FastAPI-specific rules
-"FA",    # flake8-future-annotations
-"FURB",  # Refurb (was "In preview", now has stable rules)
-"LOG",   # flake8-logging (was "In preview", now has stable rules)
-"SLOT",  # flake8-slots
-"TC",    # flake8-type-checking
-"TD",    # flake8-todos
+"FAST",   # FastAPI-specific rules
+"FA",     # flake8-future-annotations
+"FURB",   # Refurb (was "In preview", now has stable rules)
+"LOG",    # flake8-logging (was "In preview", now has stable rules)
+"SLOT",   # flake8-slots
+"TD",     # flake8-todos
 "RUF029", # unused-async (preview, added explicitly)
 
 # In [lint] ignore, add:
-"TD002", # Missing author in TODO
-"TD003", # Missing issue link for TODO
+"TD002",  # Missing author in TODO — not a project requirement
+"TD003",  # Missing issue link for TODO — not required
 ```
 
----
-
-## Ty Changes
-
-### Rules Currently "warn" → Upgrade to "error"
-
-The following rules default to `warn`. Setting them to `"error"` increases strictness:
-
-| Rule                                  | Default | Proposed | Description                                                                              |
-| ------------------------------------- | ------- | -------- | ---------------------------------------------------------------------------------------- |
-| `ambiguous-protocol-member`           | warn    | error    | Protocol with undeclared members leads to ambiguous interfaces.                          |
-| `deprecated`                          | warn    | error    | Uses of items marked `@deprecated` should be treated as errors.                          |
-| `ignore-comment-unknown-rule`         | warn    | error    | Unknown rule codes in `ty: ignore[...]` comments are likely typos.                       |
-| `ineffective-final`                   | warn    | error    | Calling `final()` directly (not as decorator) has no type-checker effect.                |
-| `invalid-enum-member-annotation`      | warn    | error    | Explicit type annotations on enum members are misleading per the typing spec.            |
-| `invalid-legacy-positional-parameter` | warn    | error    | Incorrect use of the legacy positional-only parameter convention.                        |
-| `mismatched-type-name`                | warn    | error    | TypeVar/NewType/TypedDict variable name doesn't match the name argument (likely a typo). |
-| `possibly-missing-submodule`          | warn    | error    | Accessing submodules that may not have been imported.                                    |
-| `unused-type-ignore-comment`          | warn    | error    | `type: ignore` comments that suppress no errors should be removed.                       |
-| `useless-overload-body`               | warn    | error    | `@overload`-decorated functions should have stub-like bodies only.                       |
-
-### Rules Currently "ignore" → Enable
-
-| Rule                       | Default | Proposed | Description                                          | Risk                                            |
-| -------------------------- | ------- | -------- | ---------------------------------------------------- | ----------------------------------------------- |
-| `unsupported-dynamic-base` | ignore  | warn     | Classes created via `type()` with unsupported bases. | Low — `type()` is rarely used in this codebase. |
-
-### Preview Rules to Enable
-
-These rules are in preview but are high-value for this async FastAPI codebase:
-
-| Rule                   | Level        | Description                                                                | Notes                                                 |
-| ---------------------- | ------------ | -------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `unused-awaitable`     | warn → error | Coroutines/awaitables used as expression statements without being awaited. | Critical for async correctness. Preview since 0.0.21. |
-| `call-abstract-method` | error        | Calls to abstract `@classmethod`/`@staticmethod` with trivial bodies.      | Preview since 0.0.16.                                 |
-
-### Rules to Remove the Stale Comment About
-
-The current `ty.toml` has a comment:
-
-```toml
-# unknown-rule is no longer a valid rule name in current ty versions
-```
-
-This comment refers to a rule that was removed. The comment itself should be removed since
-it no longer serves a purpose.
-
-### Summary of `ty.toml` Changes
+#### ty.toml changes
 
 ```toml
 [rules]
-# Existing rules (keep as-is):
-invalid-ignore-comment = "error"
-possibly-missing-attribute = "error"
-possibly-missing-import = "error"
-redundant-cast = "error"
-undefined-reveal = "error"
-unresolved-global = "error"
-unsupported-base = "error"
-division-by-zero = "error"
-possibly-unresolved-reference = "error"
-unused-ignore-comment = "error"
-
-# New rules (upgrade warn → error):
+# Upgrade warn → error:
 ambiguous-protocol-member = "error"
 deprecated = "error"
 ignore-comment-unknown-rule = "error"
@@ -189,7 +119,7 @@ possibly-missing-submodule = "error"
 unused-type-ignore-comment = "error"
 useless-overload-body = "error"
 
-# New rules (enable from ignore):
+# Enable from ignore:
 unsupported-dynamic-base = "warn"
 
 # Preview rules (explicitly enabled):
@@ -197,30 +127,27 @@ unused-awaitable = "error"
 call-abstract-method = "error"
 ```
 
----
+### Testing Approach
 
-## Implementation Order
+No new test files are needed. The full test suite (`pytest`) should be run after each phase to confirm no regressions. `pre-commit run --all-files` acts as the primary per-phase validation (it runs ruff, ty, and other validators).
 
-1. **ty changes first** — type-checking errors are foundational. Run `pre-commit run --all-files` and fix all
-   new violations before moving to linting.
-2. **Ruff stable group additions** — add `FURB`, `LOG`, `FAST`, `FA`, `SLOT` first (lower
-   churn expected).
-3. **Ruff TD and preview** — requires cleaning up TODO comments and adding `RUF029`. Apply last.
-4. **Run full test suite** after each stage to catch regressions.
+### Trade-offs and Considerations
 
----
-
-## Notes
-
-- All rule additions are for stable rules unless explicitly marked as preview.
-- Conflicts with existing ignore rules: none identified — the new groups don't overlap with
-  currently ignored rules (`A003`, `ANN401`, `COM812`, `D105`, `D107`, `D203`, `D213`,
-  `ISC001`).
+- `TC` is excluded: SQLAlchemy/Pydantic runtime import patterns conflict with moving imports into `TYPE_CHECKING` blocks.
+- `FIX` is excluded: `FIX002` is redundant with `TD` rules.
+- Preview mode is not enabled globally — individual preview rules are added explicitly to avoid pulling in unstable rules.
+- Conflicts with existing ignore rules: none identified. The new groups don't overlap with currently ignored rules (`A003`, `ANN401`, `COM812`, `D105`, `D107`, `D203`, `D213`, `ISC001`).
 - The `tests/*` per-file ignores are unlikely to need changes for any of these new rule groups.
 
 ---
 
-## Todo List
+## Open Questions
+
+[No open questions.]
+
+---
+
+## Tasks
 
 ### Phase 1 — ty Strictness
 
@@ -272,4 +199,12 @@ call-abstract-method = "error"
 
 - [x] Run `pre-commit run --all-files` (full clean pass with all new rules)
 - [x] Run full test suite (`pytest`)
-- [ ] Commit all changes
+- [x] Commit all changes
+
+---
+
+## Implementation
+
+### Implementation Log
+
+No significant deviations from the plan. All phases completed in order. `TC` and `FIX` were excluded as decided during planning. `RUF029` required converting or annotating several non-async `async def` functions.
