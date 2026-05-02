@@ -68,12 +68,10 @@ async def get_blog_urls_xml(*, request: Request, db: DBSession) -> str:
         results_per_page=1_000_000,
         page=1,
     )
-    return "".join(
-        [
-            produce_blog_url_xml(request=request, blog_post=blog_post)
-            for blog_post in paginator.blog_posts
-        ]
-    )
+    return "".join([
+        produce_blog_url_xml(request=request, blog_post=blog_post)
+        for blog_post in paginator.blog_posts
+    ])
 
 
 def produce_blog_url_xml(*, request: Request, blog_post: db_models.BlogPost) -> str:

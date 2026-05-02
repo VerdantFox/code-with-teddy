@@ -8,6 +8,7 @@ from logging import getLogger
 from typing import Self
 
 import sqlalchemy
+import sqlalchemy.exc
 from fastapi import UploadFile
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import Select, delete, select
@@ -277,7 +278,7 @@ async def get_bp_from_slug(db: AsyncSession, slug: str) -> db_models.BlogPost:
         result = await db.execute(stmt)
         return result.scalars().one()
     except sqlalchemy.exc.NoResultFound:
-        # FIXME: This maybe should raise an error that redirects to the new slug
+        # TODO: This maybe should raise an error that redirects to the new slug
         return await _get_bp_from_slug_history(db=db, slug=slug)
 
 
@@ -471,7 +472,7 @@ async def _create_bp_save_sqlalchemy_error_response(
     - Rollback the database session
     - Update the field_errors dict
     """
-    logger.exception(ERROR_SAVING_BP)
+    logger.exception(ERROR_SAVING_BP)  # noqa: LOG004 (called from exception handlers)
     await db.rollback()
     err = repr(e)
     msg = ERROR_SAVING_BP

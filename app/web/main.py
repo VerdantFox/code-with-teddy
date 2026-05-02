@@ -6,7 +6,7 @@ This is the main entrypoint for the web app. It mounts the API and HTML apps.
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-import sqlalchemy
+import sqlalchemy.exc
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse

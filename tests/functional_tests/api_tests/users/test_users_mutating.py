@@ -43,9 +43,10 @@ async def _clean_db_users_fixture_function(anyio_backend: str, db_session: Async
     """Clean users from the db except the basic and admin user."""
     await db_session.execute(
         delete(db_models.User).where(
-            ~db_models.User.username.in_(
-                [test_models.BASIC_USER[USERNAME], test_models.ADMIN_USER[USERNAME]]
-            )
+            ~db_models.User.username.in_([
+                test_models.BASIC_USER[USERNAME],
+                test_models.ADMIN_USER[USERNAME],
+            ])
         )
     )
     await db_session.commit()

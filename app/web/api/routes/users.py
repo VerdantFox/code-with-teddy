@@ -2,7 +2,7 @@
 
 from typing import cast
 
-import sqlalchemy
+import sqlalchemy.exc
 from fastapi import APIRouter, status
 from sqlalchemy import select
 

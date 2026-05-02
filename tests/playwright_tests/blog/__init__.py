@@ -19,4 +19,4 @@ def _update_articles_cache(*args: str) -> None:
 
 def get_article_from_cache() -> str:
     """Get an article from the cache at random."""
-    return sorted(BLOG_ARTICLES)[0] if BLOG_ARTICLES else ""
+    return min(BLOG_ARTICLES) if BLOG_ARTICLES else ""

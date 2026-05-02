@@ -197,7 +197,7 @@ def _update_template_content(base_template: Path, new_versions: dict[str, str]) 
 
     """
     # Read the current template
-    with base_template.open("r") as f:
+    with base_template.open("r", encoding="utf-8") as f:
         content = f.read()
 
     # Update the version lines
@@ -219,7 +219,7 @@ def _update_template_content(base_template: Path, new_versions: dict[str, str]) 
     lines.append("")  # Ensure file ends with a newline
 
     # Write the updated content
-    with base_template.open("w") as f:
+    with base_template.open("w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 

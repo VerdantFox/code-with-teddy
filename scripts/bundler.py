@@ -143,7 +143,7 @@ DEPENDENCIES = {
     "HTMX--response targets extension": Dependency(
         name="HTMX--response targets extension",
         # api_name="htmx-ext-response-targets",  # HTMX-V2 name  # noqa: ERA001
-        # url="https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@{version}",  # HTMX-V2 url  # noqa: ERA001,E501
+        # url="https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@{version}",  # HTMX-V2 url  # noqa: ERA001
         api_name="htmx.org",
         url="https://unpkg.com/htmx.org@{version}/dist/ext/response-targets.js",
         bundle_path=JS_BUNDLED_NON_DEFERRED,
@@ -159,7 +159,7 @@ DEPENDENCIES = {
     "HTMX--alpine morph extension": Dependency(
         name="HTMX--alpine morph extension",
         # api_name="htmx-ext-alpine-morph",  # HTMX-V2 name  # noqa: ERA001
-        # url="https://unpkg.com/htmx-ext-alpine-morph@{version}/alpine-morph.js",  # HTMX-V2 url  # noqa: ERA001,E501
+        # url="https://unpkg.com/htmx-ext-alpine-morph@{version}/alpine-morph.js",  # HTMX-V2 url  # noqa: ERA001
         api_name="htmx.org",
         url="https://unpkg.com/htmx.org@{version}/dist/ext/alpine-morph.js",
         bundle_path=JS_BUNDLED_NON_DEFERRED,

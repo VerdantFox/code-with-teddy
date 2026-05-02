@@ -181,9 +181,12 @@ def fixture_get_integration_environment(request: pytest.FixtureRequest) -> UIDet
     admin_username = lower_env.get(admin_username_key, "")
     admin_password = lower_env.get(admin_password_key, "")
 
-    if not all(
-        [basic_username, basic_password, admin_username, admin_password]
-    ):  # pragma: no cover
+    if not all([
+        basic_username,
+        basic_password,
+        admin_username,
+        admin_password,
+    ]):  # pragma: no cover
         err_msg = (
             f"{basic_username_key}, {basic_password_key}, {admin_username_key},"
             f" and {admin_password} must be set in the environment."

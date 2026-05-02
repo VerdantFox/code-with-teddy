@@ -6,7 +6,8 @@ from http import HTTPStatus
 from logging import getLogger
 from uuid import uuid4
 
-import sqlalchemy
+import sqlalchemy.exc
+import sqlalchemy.orm.exc
 from fastapi import BackgroundTasks, UploadFile
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import delete, select

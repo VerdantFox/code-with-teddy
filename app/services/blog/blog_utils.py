@@ -9,7 +9,7 @@ def get_slug(title: str) -> str:
 
     Remove problematic characters.
     """
-    title = re.sub("[!@#$%^&*()+=`~<>/:;.,]", "", title)
+    title = re.sub(r"[!@#$%^&*()+=`~<>/:;.,]", "", title)
     return re.sub(r"[^\w]+", "-", title.lower()).strip(" -")
 
 

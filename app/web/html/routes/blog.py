@@ -2,7 +2,7 @@
 
 from logging import getLogger
 
-import sqlalchemy
+import sqlalchemy.exc
 from fastapi import APIRouter, BackgroundTasks, Request, UploadFile, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
@@ -944,9 +944,16 @@ class BlogPostMediaForm(Form):
         "Upload media file",
         validators=[
             validators.DataRequired(),
-            custom_validators.is_allowed_extension(
-                ["jpg", "jpeg", "png", "gif", "webp", "svg", "mp4", "webm"]
-            ),
+            custom_validators.is_allowed_extension([
+                "jpg",
+                "jpeg",
+                "png",
+                "gif",
+                "webp",
+                "svg",
+                "mp4",
+                "webm",
+            ]),
         ],
     )
 
@@ -958,20 +965,18 @@ async def edit_bp_get(
 ) -> _TemplateResponse:
     """Return page to edit a blog post."""
     bp = await blog_handler.get_bp_from_id(db=db, bp_id=bp_id)
-    form = BlogPostForm.load(
-        {
-            "is_new": False,
-            "title": bp.title,
-            "tags": ", ".join([tag.tag for tag in bp.tags]),
-            "can_comment": bp.can_comment,
-            "is_published": bp.is_published,
-            "description": bp.markdown_description,
-            "content": bp.markdown_content,
-            "thumbnail_url": bp.thumbnail_location or "",
-            "series_id": bp.series_id or "",
-            "series_position": bp.series_position or "",
-        }
-    )
+    form = BlogPostForm.load({
+        "is_new": False,
+        "title": bp.title,
+        "tags": ", ".join([tag.tag for tag in bp.tags]),
+        "can_comment": bp.can_comment,
+        "is_published": bp.is_published,
+        "description": bp.markdown_description,
+        "content": bp.markdown_content,
+        "thumbnail_url": bp.thumbnail_location or "",
+        "series_id": bp.series_id or "",
+        "series_position": bp.series_position or "",
+    })
 
     return templates.TemplateResponse(
         request,

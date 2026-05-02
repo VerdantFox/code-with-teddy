@@ -10,7 +10,7 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 from alembic import op
 
-import app
+import app.datastore.db_models
 
 # revision identifiers, used by Alembic.
 revision: str = "de229330a488"

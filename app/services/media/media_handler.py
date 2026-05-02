@@ -105,7 +105,7 @@ def save_image(name: str, image_file: MediaFileProtocol) -> str:
 
     # GIF and SVG don't save properly with pillow
     # Webp is already compressed
-    if og_image_path.suffix.casefold() in (".gif", ".svg", ".webp"):
+    if og_image_path.suffix.casefold() in {".gif", ".svg", ".webp"}:
         og_image_path.write_bytes(image_file.read())
         return get_path_str_from_static(og_image_path)
 

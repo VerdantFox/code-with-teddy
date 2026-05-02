@@ -9,14 +9,33 @@ python-version = "3.14"
 # Most rules have a default value already ("error", "warn", "ignore")
 # This overwrites some of those rules
 [rules]
+# Existing rules
 invalid-ignore-comment = "error"
 possibly-missing-attribute = "error"
 possibly-missing-import = "error"
 redundant-cast = "error"
 undefined-reveal = "error"
-# unknown-rule is no longer a valid rule name in current ty versions
 unresolved-global = "error"
 unsupported-base = "error"
 division-by-zero = "error"
 possibly-unresolved-reference = "error"
 unused-ignore-comment = "error"
+
+# Upgraded from warn → error
+ambiguous-protocol-member = "error"
+deprecated = "error"
+ignore-comment-unknown-rule = "error"
+ineffective-final = "error"
+invalid-enum-member-annotation = "error"
+invalid-legacy-positional-parameter = "error"
+mismatched-type-name = "error"
+possibly-missing-submodule = "error"
+unused-type-ignore-comment = "error"
+useless-overload-body = "error"
+
+# Enabled from ignore
+unsupported-dynamic-base = "warn"
+
+# Preview rules explicitly enabled
+unused-awaitable = "error"
+call-abstract-method = "error"
