@@ -11,7 +11,7 @@ import sqlalchemy
 import sqlalchemy.exc
 from fastapi import UploadFile
 from pydantic import BaseModel, Field, model_validator
-from sqlalchemy import Select, delete, select
+from sqlalchemy import Select, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -143,7 +143,7 @@ class Paginator(BaseModel, arbitrary_types_allowed=True):
     is_only_page: bool = False
 
 
-async def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
+async def get_blog_posts(  # noqa: PLR0913,PLR0914 (too-many-arguments, too-many-locals)
     *,
     db: AsyncSession,
     can_see_unpublished: bool,
@@ -154,42 +154,81 @@ async def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
     results_per_page: int = 20,
     page: int = 1,
 ) -> Paginator:
-    """Get blog posts."""
+    """Get blog posts.
+
+    Uses a window-function `COUNT(*) OVER()` to retrieve the total number of
+    matching rows in the same round-trip as the paginated data.  The fallback
+    path (separate COUNT query + re-fetch) is only taken when the requested
+    page is beyond the last page — an uncommon edge case.
+    """
     stmt = _get_bp_list_statement()
+    # Build a parallel count statement for the out-of-range-page fallback.
     count_stmt = select(sqlalchemy.func.count()).select_from(db_models.BlogPost)
     if not can_see_unpublished:
-        stmt = stmt.filter(db_models.BlogPost.is_published.is_(True))
-        count_stmt = count_stmt.where(db_models.BlogPost.is_published.is_(True))
+        filter_expr = db_models.BlogPost.is_published.is_(True)
+        stmt = stmt.filter(filter_expr)
+        count_stmt = count_stmt.where(filter_expr)
     if tags:
         tags_list = transforms.to_list(tags, lowercase=True)
-        stmt = stmt.filter(db_models.BlogPost.tags.any(db_models.BlogPostTag.tag.in_(tags_list)))
-        count_stmt = count_stmt.where(
-            db_models.BlogPost.tags.any(db_models.BlogPostTag.tag.in_(tags_list))
-        )
+        filter_expr = db_models.BlogPost.tags.any(db_models.BlogPostTag.tag.in_(tags_list))
+        stmt = stmt.filter(filter_expr)
+        count_stmt = count_stmt.where(filter_expr)
     if search:
-        stmt = stmt.filter(db_models.BlogPost.ts_vector.match(search))
-        count_stmt = count_stmt.where(db_models.BlogPost.ts_vector.match(search))
-
-    # Get total blog posts matching results here
-    count_result = await db.execute(count_stmt)
-    total_results = count_result.scalar() or 0
-    total_pages = _calculate_total_pages(
-        total_results=total_results, results_per_page=results_per_page
-    )
-    actual_page = min(page, total_pages)
-    actual_page = max(actual_page, 1)
+        filter_expr = db_models.BlogPost.ts_vector.match(search)
+        stmt = stmt.filter(filter_expr)
+        count_stmt = count_stmt.where(filter_expr)
 
     order_by = getattr(db_models.BlogPost, order_by_field)
     if not asc:
         order_by = order_by.desc()
-    limit, offset = _calculate_limit_offset(results_per_page=results_per_page, page=actual_page)
-    stmt = stmt.order_by(order_by).limit(limit).offset(offset)
-    result = await db.execute(stmt)
-    blog_posts = list(result.scalars().all())
+
+    page = max(page, 1)
+    limit, offset = _calculate_limit_offset(results_per_page=results_per_page, page=page)
+
+    # Single query: annotate each row with COUNT(*) OVER() so we learn the
+    # total matching rows without a separate round-trip.
+    windowed_stmt = (
+        stmt
+        .add_columns(func.count().over().label("total"))
+        .order_by(order_by)
+        .limit(limit)
+        .offset(offset)
+    )
+    result = await db.execute(windowed_stmt)
+    rows = result.all()
+
+    if rows:
+        # Happy path: window function gives us the total for free.
+        total_results: int = rows[0][1]
+        blog_posts = [row[0] for row in rows]
+        actual_page = page
+    elif page == 1:
+        # Page 1 returned nothing — there are simply zero matching posts.
+        total_results = 0
+        blog_posts = []
+        actual_page = 1
+    else:
+        # Page is beyond the last page.  Fall back to a COUNT query and
+        # re-fetch the correct (clamped) page.  This path is rarely hit.
+        count_result = await db.execute(count_stmt)
+        total_results = count_result.scalar() or 0
+        total_pages_inner = _calculate_total_pages(
+            total_results=total_results, results_per_page=results_per_page
+        )
+        actual_page = min(page, max(total_pages_inner, 1))
+        limit, offset = _calculate_limit_offset(results_per_page=results_per_page, page=actual_page)
+        refetch_result = await db.execute(stmt.order_by(order_by).limit(limit).offset(offset))
+        blog_posts = list(refetch_result.scalars().all())
+
+    total_pages = _calculate_total_pages(
+        total_results=total_results, results_per_page=results_per_page
+    )
+    actual_page = min(max(actual_page, 1), max(total_pages, 1))
+    _, final_offset = _calculate_limit_offset(results_per_page=results_per_page, page=actual_page)
     return Paginator(
         blog_posts=blog_posts,
-        min_result=offset + 1,
-        max_result=offset + len(blog_posts),
+        min_result=final_offset + 1,
+        max_result=final_offset + len(blog_posts),
         total_results=total_results,
         total_pages=total_pages,
         current_page=actual_page,
