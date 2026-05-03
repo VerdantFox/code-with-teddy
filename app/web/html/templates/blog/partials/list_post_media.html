@@ -57,7 +57,7 @@
         </p>
       </span>
       <hr class="mb-6" />
-      {% set locations = media_item.locations_to_list() %}
+      {% set locations = media_item.locations %}
       {% if media_item.media_type == "image" and locations.__len__() == 1 %}
         <span
           id="media-html-{{ loop.index }}"

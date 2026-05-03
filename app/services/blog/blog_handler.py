@@ -554,14 +554,12 @@ async def save_media_for_blog_post(
     name: str,
 ) -> db_models.BlogPost:
     """Save media for a blog post."""
-    locations_str, media_type = _save_bp_media(
-        name=name, blog_post_slug=blog_post.slug, media=media
-    )
+    locations, media_type = _save_bp_media(name=name, blog_post_slug=blog_post.slug, media=media)
     return await commit_media_to_db(
         db=db,
         blog_post=blog_post,
         name=name,
-        locations_str=locations_str,
+        locations=locations,
         media_type=media_type,
     )
 
@@ -597,7 +595,7 @@ async def delete_media_from_blog_post(
         media = result.scalars().one()
     except sqlalchemy.exc.NoResultFound as e:
         raise errors.BlogPostMediaNotFoundError from e
-    media_locations = media.locations_to_list()
+    media_locations = media.locations
     for location in media_locations:
         media_handler.del_media_from_path_str(location)
     await db.delete(media)
@@ -606,7 +604,7 @@ async def delete_media_from_blog_post(
     return blog_post
 
 
-def _save_bp_media(name: str, blog_post_slug: str, media: UploadFile) -> tuple[str, str]:
+def _save_bp_media(name: str, blog_post_slug: str, media: UploadFile) -> tuple[list[str], str]:
     file_name = f"{blog_utils.get_slug(name)}--{blog_post_slug}"
     return media_handler.upload_blog_media(
         media=media,
@@ -619,7 +617,7 @@ async def commit_media_to_db(  # noqa: PLR0913 (too-many-arguments)
     *,
     blog_post: db_models.BlogPost,
     name: str,
-    locations_str: str,
+    locations: list[str],
     media_type: str,
     position: int | None = None,
 ) -> db_models.BlogPost:
@@ -627,7 +625,7 @@ async def commit_media_to_db(  # noqa: PLR0913 (too-many-arguments)
     bp_media_object = db_models.BlogPostMedia(
         blog_post_id=blog_post.id,
         name=name,
-        locations=locations_str,
+        locations=locations,
         media_type=media_type,
         created_timestamp=datetime.now(UTC),
         position=position,

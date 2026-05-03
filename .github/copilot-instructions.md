@@ -27,9 +27,9 @@ HTML routes auto-discover and register all modules in `app/web/html/routes/` via
 
 ### Local development
 
-```bash
+```shell
 # Start DB (Docker Postgres) + seed dummy data
-python -m scripts.start_local_postgres
+python -m scripts.start_local_postgres --migrate head
 
 # Start app (requires tmux): runs Tailwind watcher + uvicorn with hot-reload
 ./scripts/run-dev.sh
@@ -37,7 +37,7 @@ python -m scripts.start_local_postgres
 
 ### Running tests
 
-```bash
+```shell
 # Unit + functional tests only (default, fast)
 pytest
 
@@ -55,15 +55,22 @@ Tests use a **separate Postgres container** (`postgres_test`, port 5433). The ro
 
 ### Linting & formatting
 
-```bash
+```shell
 pre-commit run --all-files
 ```
 
 ### DB migrations
 
-```bash
-python -m scripts.alembic revision --autogenerate -m "description"
-python -m scripts.alembic upgrade head
+Database migrations use alembic to generate and run migrations. When a database migration is needed, use the following to generate a new migration file:
+
+```shell
+python -m scripts.alembic migrate -m "description of migration"
+```
+
+Note: You'll need a local Postgres instance running to generate the migration against. You can use the same local Postgres instance used for development:
+
+```shell
+python -m scripts.start_local_postgres --migrate head
 ```
 
 ## Key Conventions

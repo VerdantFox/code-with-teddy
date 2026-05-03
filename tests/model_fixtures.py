@@ -132,21 +132,21 @@ async def add_blog_post_with_media(db_session: AsyncSession) -> db_models.BlogPo
         db=db_session,
         blog_post=bp,
         name="Some media 1",
-        locations_str="some_location1.png",
+        locations=["some_location1.png"],
         media_type="image/png",
     )
     await blog_handler.commit_media_to_db(
         db=db_session,
         blog_post=bp,
         name="Some media 2",
-        locations_str="some_location2.png",
+        locations=["some_location2.png"],
         media_type="image/png",
     )
     await blog_handler.commit_media_to_db(
         db=db_session,
         blog_post=bp,
         name="Some media 3",
-        locations_str="some_location3.png",
+        locations=["some_location3.png"],
         media_type="image/png",
         position=2,
     )

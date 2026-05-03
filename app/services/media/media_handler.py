@@ -63,12 +63,12 @@ async def upload_avatar(pic: UploadFile, name: str) -> str:
     return get_path_str_from_static(path)
 
 
-def upload_blog_media(media: UploadFile, name: str) -> tuple[str, str]:
+def upload_blog_media(media: UploadFile, name: str) -> tuple[list[str], str]:
     """Upload a blog media file.
 
     Returns
     -------
-        A tuple of the path string and the media type.
+        A tuple of the list of path strings and the media type.
 
     See `save_media` for more details.
 
@@ -77,17 +77,15 @@ def upload_blog_media(media: UploadFile, name: str) -> tuple[str, str]:
     return save_media(media, name)
 
 
-def save_media(media: UploadFile, name: str) -> tuple[str, str]:
+def save_media(media: UploadFile, name: str) -> tuple[list[str], str]:
     """Save a media file.
 
     Returns
     -------
-        A tuple of the path string and the media type.
+        A tuple of the list of path strings and the media type.
 
-    The path string is a comma-separated list of paths.
-
-    Images save a webp version as well as the original,
-    if the webp version is smaller.
+        Images save a webp version as well as the original,
+        if the webp version is smaller.
 
     """
     media_type = get_media_type_from_file(media)
@@ -99,7 +97,7 @@ def save_media(media: UploadFile, name: str) -> tuple[str, str]:
     raise ValueError(msg)
 
 
-def save_image(name: str, image_file: MediaFileProtocol) -> str:
+def save_image(name: str, image_file: MediaFileProtocol) -> list[str]:
     """Save an image, and its webp version."""
     og_image_path = BLOG_UPLOAD_FOLDER / _fix_name_suffix(name)
 
@@ -107,7 +105,7 @@ def save_image(name: str, image_file: MediaFileProtocol) -> str:
     # Webp is already compressed
     if og_image_path.suffix.casefold() in {".gif", ".svg", ".webp"}:
         og_image_path.write_bytes(image_file.read())
-        return get_path_str_from_static(og_image_path)
+        return [get_path_str_from_static(og_image_path)]
 
     try:
         pil_save(
@@ -126,7 +124,7 @@ def save_image(name: str, image_file: MediaFileProtocol) -> str:
         if compare_image_sizes(og_image_path, webp_image_path):
             webp_image_path.unlink()
         images = (path for path in (webp_image_path, og_image_path) if path.exists())
-    return ",".join(get_path_str_from_static(image) for image in images)
+    return [get_path_str_from_static(image) for image in images]
 
 
 def _fix_name_suffix(name: str) -> str:
@@ -139,11 +137,11 @@ def _fix_name_suffix(name: str) -> str:
     return f"{start}.{mapped_suffix}" if mapped_suffix else name
 
 
-def save_video(name: str, video: MediaFileProtocol) -> str:
+def save_video(name: str, video: MediaFileProtocol) -> list[str]:
     """Save a video."""
     video_path = BLOG_UPLOAD_FOLDER / name
     video_path.write_bytes(video.read())
-    return get_path_str_from_static(video_path)
+    return [get_path_str_from_static(video_path)]
 
 
 def pil_save(

@@ -51,7 +51,7 @@ Once you approve the research, ask the AI to write the implementation plan into 
 
 Useful prompt to get started:
 
-> "I want to build [feature/fix]. Write a detailed plan in the Plan section of the spec. Read source files before suggesting changes — base the plan on the actual codebase. Do not implement yet."
+> I want to build the feature/bug outlined in the spec overview. Write a detailed plan in the Plan section of the spec. Read source files before suggesting changes — base the plan on the actual codebase. Do not implement yet.
 
 **If you have a reference implementation** (e.g., a pattern already used elsewhere in the codebase, or a well-designed open-source example), share it with the AI. Reference implementations dramatically improve plan quality.
 
@@ -69,7 +69,7 @@ Annotations can:
 
 Then send the AI back to the document:
 
-> "I added `COMMENT:` notes to the plan and `ANSWER:` responses to any open questions. Address all notes and update the plan accordingly. Do not implement yet."
+> I added `COMMENT:` notes to the plan and `ANSWER:` responses to any open questions. Address all notes and update the plan accordingly. Do not implement yet.
 
 Repeat this cycle until the plan is exactly right. **Always include "do not implement yet."** Without it, the AI will start writing code the moment it thinks the plan is good enough.
 
@@ -79,7 +79,7 @@ Once the plan is approved, ask the AI to populate the Tasks section with a granu
 
 When the plan and tasks are finalized, issue the implementation command:
 
-> "Implement all tasks. Mark each task as completed in the spec as you finish it. Run `pre-commit run --all-files` after each logical change. Do not stop until all tasks are marked complete. Do not add unnecessary comments or docstrings to code you did not change."
+> Implement all tasks. Mark each task as completed in the spec as you finish it. Run `pre-commit run --all-files` after each logical change. Do not stop until all tasks are marked complete. Do not add unnecessary comments or docstrings to code you did not change.
 
 The key phrases encoded in this prompt:
 
@@ -93,7 +93,7 @@ During implementation, your prompts should be short and terse — the AI has the
 
 **If something goes badly wrong,** revert with `git checkout` and narrow scope rather than trying to patch a bad approach:
 
-> "I reverted everything. Now I only want [narrow change] — nothing else."
+> I reverted everything. Now I only want [narrow change] — nothing else.
 
 ---
 

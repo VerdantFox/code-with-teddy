@@ -4,13 +4,13 @@
 
 To run you'll need to first install the playwright browsers:
 
-```bash
+```shell
 playwright install
 ```
 
 You'll also need to set the environment variables:
 
-```bash
+```shell
 export BASIC_USER_USERNAME="some_username"
 export BASIC_USER_PASSWORD="some_password"
 export ADMIN_USER_USERNAME="some_admin_username"
@@ -21,13 +21,13 @@ export ADMIN_USER_PASSWORD="some_admin_password"
 
 To run the tests:
 
-```bash
+```shell
 pytest --playwright ENVIRONMENT
 ```
 
 Where `ENVIRONMENT` is one of `local` or `prod`. Or you can run:
 
-```bash
+```shell
 pytest --all
 ```
 
@@ -42,7 +42,7 @@ You can also add the following options:
 
 To use codegen to generate playwright code use the following command:
 
-```bash
+```shell
 playwright codegen http://localhost:8000
 ```
 

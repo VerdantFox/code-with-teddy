@@ -8,7 +8,7 @@ Let's discuss how to perform database migrations with [Alembic](https://alembic.
 
 Alembic can be used on its own with the command `alembic`. However, I made a convenience script `python -m scripts.alembic` that can be used for easier use with this package.
 
-```bash
+```shell
 python -m scripts.alembic --help              # Show all the alembic commands
 python -m scripts.alembic migrate -m MESSAGE  # Auto-generate a migration file
 python -m scripts.alembic upgrade             # Upgrade to a later version
@@ -60,13 +60,13 @@ This project does not have automatic migrations (yet), so at this point, you'll 
 
 We can create a new local postgres container with `scripts/start-local-postgres.sh`. By default, this script creates a new postgres container and creates tables as specified by the SQLAlchemy models in `db_models`. To create a new local Postgres container and migrate that Postgres database to the latest migration version (which will be different from the SQLAlchemy models in `db_models` if you have altered them), run:
 
-```bash
+```shell
 ./dev_tools/start-local-postgres.sh --migrate head
 ```
 
 In this way, you can migrate a local database to the latest migration version, then run `python -m scripts.alembic migrate -m MESSAGE` to generate a migration script with the differences between the latest migration script and your `db_models` changes. If you need to migrate to a specific version that is not the latest migration version, run:
 
-```bash
+```shell
 ./dev_tools/start-local-postgres.sh --migrate VERSION
 ```
 
@@ -74,13 +74,13 @@ In this way, you can migrate a local database to the latest migration version, t
 
 All database migration scripts include an `upgrade` function and a `downgrade` function. If we need to perform a rollback, we run the `downgrade` function:
 
-```bash
+```shell
 python -m scripts.alembic downgrade
 ```
 
 The above command will perform a downgrade of one level. It will run the `downgrade` function for the current migration version hash file. To downgrade to a specific migration hash version, specify the version after `downgrade`:
 
-```bash
+```shell
 python -m scripts.alembic downgrade VERSION
 ```
 
@@ -92,13 +92,13 @@ You might want to generate an SQL file migration script for a DB administrator t
 
 To get a migration SQL script from database creation to the latest migration version:
 
-```bash
+```shell
 python -m scripts.alembic upgrade --sql > my_migration.sql
 ```
 
 To get a migration SQL script from one migration to another:
 
-```bash
+```shell
 python -m scripts.alembic upgrade --sql START_HASH:END_HASH > my_migration.sql
 # example:
 # python -m scripts.alembic upgrade 1975ea83b712:ae1027a6acf --sql > my_migration.sql

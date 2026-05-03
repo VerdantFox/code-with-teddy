@@ -5,7 +5,7 @@ from typing import Annotated, ClassVar
 
 import sqlalchemy as sa
 from sqlalchemy import Column, Computed, ForeignKey, Index, String, Table, asc
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -182,8 +182,9 @@ class BlogPostMedia(Base):
     Attributes
     ----------
         name: The name of the media, given as the title of the HTML tag.
-        locations: The location of the file on the filesystem. If multiple versions
-            of the file are included, they are comma-separated.
+        locations: The locations of the file on the filesystem. If multiple
+            versions of the file are included (e.g. webp + original), each
+            path is a separate element in the list.
 
     """
 
@@ -193,14 +194,10 @@ class BlogPostMedia(Base):
     blog_post_id: Mapped[BlogPostFK | None]
     blog_post: Mapped[BlogPost] = relationship(back_populates="media")
     name: Mapped[str]
-    locations: Mapped[str]
+    locations: Mapped[list[str]] = mapped_column(ARRAY(String))
     media_type: Mapped[str]
     position: Mapped[int | None]
     created_timestamp: Mapped[DateTimeIndexed]
-
-    def locations_to_list(self) -> list[str]:
-        """Get the media locations as a list."""
-        return self.locations.split(",")
 
 
 class BlogPostComment(Base):
