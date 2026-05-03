@@ -118,19 +118,27 @@ async def generate_postgres_container() -> AsyncGenerator[DBBuilder]:
 
 
 # ------------------ Session fixtures -------------------
+@pytest.fixture(name="session_maker", scope="session")
+def get_session_maker(db_builder: DBBuilder) -> async_sessionmaker[AsyncSession]:
+    """Return a single session-scoped async session maker (one engine for the whole run)."""
+    return _make_session(db_builder)
+
+
 @pytest.fixture(name="db_session")
-async def get_db_session(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession]:
+async def get_db_session(
+    session_maker: async_sessionmaker[AsyncSession],
+) -> AsyncGenerator[AsyncSession]:
     """Return the test db session."""
-    async_session = _make_session(db_builder)
-    async with async_session() as session:
+    async with session_maker() as session:
         yield session
 
 
 @pytest.fixture(name="db_session_module", scope="module")
-async def get_db_session_module(db_builder: DBBuilder) -> AsyncGenerator[AsyncSession]:
+async def get_db_session_module(
+    session_maker: async_sessionmaker[AsyncSession],
+) -> AsyncGenerator[AsyncSession]:
     """Return the test db session."""
-    async_session = _make_session(db_builder)
-    async with async_session() as session:
+    async with session_maker() as session:
         yield session
 
 
@@ -176,13 +184,9 @@ async def _clean_db_module(
 # Helper functions
 # -------------------------------------------------------
 def _make_session(db_builder: DBBuilder) -> async_sessionmaker[AsyncSession]:
-    """Create a new async session."""
+    """Create a new async session maker backed by a single engine."""
     connection_string = db_builder.get_connection_string()
-    db_echo: bool = False
-    db_pool_size: int = 5
-    engine = get_engine(
-        new=True, connection_string=connection_string, echo=db_echo, pool_size=db_pool_size
-    )
+    engine = get_engine(new=True, connection_string=connection_string, echo=False, pool_size=5)
     return async_sessionmaker(engine, expire_on_commit=False)
 
 

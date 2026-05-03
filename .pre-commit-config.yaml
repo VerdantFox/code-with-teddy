@@ -37,10 +37,9 @@ repos:
     hooks:
       - id: ty-check
         name: ty-check
-        language: python
+        language: system
         entry: ty check
         pass_filenames: false
-        additional_dependencies: [ty==0.0.34]
 
   - repo: https://github.com/asottile/blacken-docs
     rev: 1.20.0

@@ -1,7 +1,6 @@
 # ty.toml: ty type checker configuration
 # Reference: https://docs.astral.sh/ty/reference/configuration/
 [environment]
-python = "./venv"
 python-version = "3.14"
 
 
