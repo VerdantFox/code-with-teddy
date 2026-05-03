@@ -14,7 +14,7 @@ router = APIRouter(tags=["sitemap"])
 
 
 @router.get("/sitemap.xml", response_model=None)
-@aiocache.cached(key="constant")
+@aiocache.cached(key="sitemap", ttl=3600)
 async def sitemap(request: Request, db: DBSession) -> HTMLResponse:
     """Return the sitemap page."""
     return HTMLResponse(

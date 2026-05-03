@@ -42,7 +42,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.add_middleware(SessionMiddleware, secret_key=settings.session_secret)
+    app.add_middleware(SessionMiddleware, secret_key=settings.session_secret, max_age=86400)
 
     @app.get("/api")
     async def api_home(request: Request) -> RedirectResponse:
@@ -63,8 +63,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: ARG001 (unuse
         async with engine.begin() as conn:
             if settings.db_create_tables:
                 await conn.run_sync(db_models.Base.metadata.create_all)
-            else:
-                yield
     except sqlalchemy.exc.OperationalError as e:  # pragma: no cover
         err_msg = (
             "Could not connect to the database. Check the connection string."

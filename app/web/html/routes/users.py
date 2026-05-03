@@ -31,6 +31,13 @@ LOGIN_TEMPLATE = "users/login.html"
 REGISTER_TEMPLATE = "users/register.html"
 
 
+def _safe_redirect(url: str | None) -> str:
+    """Return a safe same-origin redirect path, defaulting to '/'."""
+    if url and url.startswith("/") and not url.startswith("//"):
+        return url
+    return "/"
+
+
 class LoginForm(Form):
     """Form for user login page."""
 
@@ -86,7 +93,7 @@ async def login_post(
             },
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
-    redirect_url = login_form.redirect_url.data or "/"
+    redirect_url = _safe_redirect(login_form.redirect_url.data)
 
     # Why not a RedirectResponse?
     # Because we need to set the HX-Redirect header to perform
@@ -240,7 +247,7 @@ async def register_post(
 async def logout(request: Request) -> RedirectResponse:
     """Log the user out and redirect to the home page."""
     form_data = await request.form()
-    redirect_url = str(form_data.get("next", "/"))
+    redirect_url = _safe_redirect(str(form_data.get("next", "/")))
     response = RedirectResponse(
         redirect_url,
         status_code=status.HTTP_303_SEE_OTHER,

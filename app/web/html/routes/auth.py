@@ -34,6 +34,7 @@ async def login_for_access_token(
         value=token.access_token,
         httponly=True,
         secure=True,
+        samesite="lax",
     )
     return token
 

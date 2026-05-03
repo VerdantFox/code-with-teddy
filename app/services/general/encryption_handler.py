@@ -9,8 +9,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from app.settings import settings
 
-ENCRYPTION_KEY = settings.encryption_key
-
 
 def derive_iv(plaintext: str) -> bytes:
     """Derive a consistent IV from the plaintext using a hash function.
@@ -39,7 +37,7 @@ def encrypt(data: str) -> str:
         str: The Base64 encoded encrypted data including the IV.
 
     """
-    key_bytes = bytes.fromhex(ENCRYPTION_KEY)
+    key_bytes = bytes.fromhex(settings.encryption_key)
     data_bytes = data.encode("utf-8")
     iv = derive_iv(data)
     cipher = Cipher(algorithms.AES(key_bytes), modes.CBC(iv), backend=default_backend())
@@ -68,7 +66,7 @@ def decrypt(encoded_data: str) -> str:
         str: The decrypted data as a string.
 
     """
-    key_bytes = bytes.fromhex(ENCRYPTION_KEY)
+    key_bytes = bytes.fromhex(settings.encryption_key)
     encrypted_data_with_iv = base64.b64decode(encoded_data)
 
     iv = encrypted_data_with_iv[:16]
@@ -89,7 +87,7 @@ def decrypt(encoded_data: str) -> str:
 if __name__ == "__main__":  # pragma: no cover
     # Encryption key as a 64-character hex string (256 bits / 32 bytes)
     # key = os.urandom(32).hex()  # noqa: ERA001 (commented-out code)
-    print(f"Key (hex): {ENCRYPTION_KEY}")  # noqa: T201 (print used for example)
+    print(f"Key (hex): {settings.encryption_key}")  # noqa: T201 (print used for example)
 
     import uuid
 

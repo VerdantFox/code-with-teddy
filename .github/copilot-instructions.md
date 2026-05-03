@@ -112,3 +112,8 @@ python -m scripts.alembic upgrade head
 - The `logged_in_basic_user` / `logged_in_admin_user` fixtures call `test_client.cookies.clear()` on teardown. If a test logs in **manually** (e.g., `POST /login` or `POST /auth/token`) without using these fixtures, it **must** call `test_client.cookies.clear()` at the end to avoid leaking cookie state into subsequent tests.
 - `BASIC_COOKIE` and `ADMIN_COOKIE` in `tests/__init__.py` are module-level dicts shared across the session. They are cleared between test modules by `_clear_tokens()` called from the `clean_db` fixture teardown.
 - Flash messages are stored in the **session cookie**. A stale session cookie from a previous test (e.g., one that logged in) can cause flash messages from a subsequent test to be lost or doubled.
+
+## DO these things
+
+- Run `pre-commit run --all-files` frequently to apply all linters and formatters locally. The `pre-commit` config is in `.pre-commit-config.yaml`
+- `ai_workspace/` at the project root is in `.gitignore` and safe for writing debug scripts and output files. Use this instead of writing to `/tmp/` or other shared locations.

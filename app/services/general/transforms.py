@@ -18,12 +18,12 @@ def to_bool(value: Any) -> bool:
     return False
 
 
-def too_bool_validator(v: Any, _: ValidationInfo) -> bool:
-    """Cooerce any value to a bool."""
+def to_bool_validator(v: Any, _: ValidationInfo) -> bool:
+    """Coerce any value to a bool."""
     return to_bool(v)
 
 
-CoercedBool = Annotated[bool, BeforeValidator(too_bool_validator)]
+CoercedBool = Annotated[bool, BeforeValidator(to_bool_validator)]
 
 
 def to_list(obj: Any, *, lowercase: bool = False) -> list[str]:

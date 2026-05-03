@@ -56,6 +56,9 @@ class SaveBlogResponse(BaseModel, arbitrary_types_allowed=True):
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
 
 
+SaveBlogResponse.model_rebuild()
+
+
 class CommentInputPreview(BaseModel, arbitrary_types_allowed=True):
     """Input for comment preview."""
 
@@ -87,6 +90,9 @@ class SaveCommentResponse(BaseModel, arbitrary_types_allowed=True):
     err_msg: str = "Error saving comment"
     status_code: HTTPStatus = HTTPStatus.OK
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
+
+
+SaveCommentResponse.model_rebuild()
 
 
 def _get_bp_statement() -> Select:
@@ -286,29 +292,21 @@ async def _get_bp_from_slug_history(db: AsyncSession, slug: str) -> db_models.Bl
     """Get a blog post from its slug history."""
     try:
         stmt = (
-            select(db_models.OldBlogPostSlug)
-            .options(
-                selectinload(db_models.OldBlogPostSlug.blog_post)
-                .selectinload(db_models.BlogPost.comments)
-                .selectinload(db_models.BlogPostComment.user),
-                selectinload(db_models.OldBlogPostSlug.blog_post).selectinload(
-                    db_models.BlogPost.tags
-                ),
+            _get_bp_statement()
+            .join(
+                db_models.OldBlogPostSlug,
+                db_models.OldBlogPostSlug.blog_post_id == db_models.BlogPost.id,
             )
             .filter(db_models.OldBlogPostSlug.slug == slug)
         )
         result = await db.execute(stmt)
-        slug_object = result.scalars().one()
+        return result.scalars().one()
     except sqlalchemy.exc.NoResultFound as e:
         raise errors.BlogPostNotFoundError from e
-    else:
-        return slug_object.blog_post
 
 
 async def save_blog_post(db: AsyncSession, data: SaveBlogInput) -> SaveBlogResponse:
     """Save a blog post."""
-    SaveBlogResponse.model_rebuild()
-
     field_errors: defaultdict[str, list[str]] = defaultdict(list)
     try:
         blog_post = await _save_bp_to_db(data=data, db=db)
@@ -389,7 +387,7 @@ async def update_existing_bp_fields(  # noqa: C901 (complexity)
         blog_post.series_id = data.series_id
     if blog_post.series_position != data.series_position:
         blog_post.series_position = data.series_position
-    blog_post.updated_timestamp = datetime.now().astimezone(UTC)
+    blog_post.updated_timestamp = datetime.now(UTC)
     return blog_post
 
 
@@ -414,7 +412,7 @@ async def set_new_bp_fields(
     html_description = markdown_parser.markdown_to_html(data.description)
     html_content = markdown_parser.markdown_to_html(data.content)
     tags = await _get_bp_tags(db=db, tags=data.tags)
-    now = datetime.now().astimezone(UTC)
+    now = datetime.now(UTC)
     return db_models.BlogPost(
         title=data.title,
         slug=blog_utils.get_slug(data.title),
@@ -575,7 +573,7 @@ async def commit_media_to_db(  # noqa: PLR0913 (too-many-arguments)
         name=name,
         locations=locations_str,
         media_type=media_type,
-        created_timestamp=datetime.now().astimezone(UTC),
+        created_timestamp=datetime.now(UTC),
         position=position,
     )
     db.add(bp_media_object)
@@ -623,7 +621,7 @@ async def update_existing_comment(
     html_content = generate_comment_html(md_content)
     comment.md_content = md_content
     comment.html_content = html_content
-    comment.updated_timestamp = datetime.now().astimezone(UTC)
+    comment.updated_timestamp = datetime.now(UTC)
     if current_user.is_authenticated:
         comment.user_id = current_user.id
     await db.commit()
@@ -634,7 +632,7 @@ async def update_existing_comment(
 def generate_comment(data: CommentInputPreview) -> db_models.BlogPostComment:
     """Generate a blog post comment."""
     html_content = generate_comment_html(data.content)
-    now = datetime.now().astimezone(UTC)
+    now = datetime.now(UTC)
     return db_models.BlogPostComment(
         blog_post_id=data.bp_id,
         name=data.name,
@@ -680,18 +678,20 @@ def can_edit_comment(
     comment: db_models.BlogPostComment, current_user: db_models.User | UnauthenticatedUser
 ) -> bool:
     """Check if a user can edit this comment."""
-    return comment.user_id == current_user.id or comment.guest_id == current_user.guest_id
+    if current_user.is_authenticated:
+        return comment.user_id == current_user.id
+    return bool(comment.guest_id and comment.guest_id == current_user.guest_id)
 
 
 def can_delete_comment(
     comment: db_models.BlogPostComment, current_user: db_models.User | UnauthenticatedUser
 ) -> bool:
     """Check if a user can delete this comment. Allows admin to delete any comment."""
-    return (
-        comment.user_id == current_user.id
-        or comment.guest_id == current_user.guest_id
-        or current_user.is_admin
-    )
+    if current_user.is_admin:
+        return True
+    if current_user.is_authenticated:
+        return comment.user_id == current_user.id
+    return bool(comment.guest_id and comment.guest_id == current_user.guest_id)
 
 
 async def get_comment_from_id(db: AsyncSession, comment_id: int) -> db_models.BlogPostComment:
