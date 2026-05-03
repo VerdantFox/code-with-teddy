@@ -178,7 +178,7 @@ async def create_pw_reset_token(
     query = str(uuid4())
     pw_reset_token = db_models.PasswordResetToken(
         user_id=user.id,
-        encrypted_query=encryption_handler.encrypt(query),
+        encrypted_query=encryption_handler.hash_token(query),
         created_timestamp=datetime.now(UTC),
         expires_timestamp=datetime.now(UTC) + timedelta(minutes=PW_RESET_TOKEN_EXPIRATION_MINUTES),
     )
@@ -190,7 +190,7 @@ async def create_pw_reset_token(
 
 async def assert_token_is_valid(db: AsyncSession, query: str) -> db_models.PasswordResetToken:
     """Get a password reset token by query."""
-    encrypted_query = encryption_handler.encrypt(query)
+    encrypted_query = encryption_handler.hash_token(query)
 
     stmt = select(db_models.PasswordResetToken).where(
         db_models.PasswordResetToken.encrypted_query == encrypted_query
