@@ -15,11 +15,12 @@ from sqlalchemy import Select, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app import errors
 from app.datastore import db_models
 from app.services.blog import blog_utils, markdown_parser
 from app.services.general import transforms
 from app.services.media import media_handler
-from app.web import errors, web_models
+from app.web import web_models
 from app.web.web_models import UnauthenticatedUser
 
 logger = getLogger(__name__)
@@ -96,6 +97,7 @@ SaveCommentResponse.model_rebuild()
 
 
 def _get_bp_statement() -> Select:
+    """Return a fully-loaded blog post statement (for detail views)."""
     return select(db_models.BlogPost).options(
         selectinload(db_models.BlogPost.tags),
         selectinload(db_models.BlogPost.media),
@@ -109,6 +111,21 @@ def _get_bp_statement() -> Select:
             db_models.BlogPost.slug,
             db_models.BlogPost.is_published,
         ),
+    )
+
+
+def _get_bp_list_statement() -> Select:
+    """Return a lightweight blog post statement for list/paginated views.
+
+    Loads `tags` (needed for display and tag filtering) and `comments`
+    (needed for the comment count) but omits the heavy `media`,
+    `old_slugs`, and `series` collections that are not rendered on the
+    list page.  `comments` is loaded without its nested `user` relationship
+    since only the count is displayed.
+    """
+    return select(db_models.BlogPost).options(
+        selectinload(db_models.BlogPost.tags),
+        selectinload(db_models.BlogPost.comments),
     )
 
 
@@ -138,7 +155,7 @@ async def get_blog_posts(  # noqa: PLR0913 (too-many-arguments)
     page: int = 1,
 ) -> Paginator:
     """Get blog posts."""
-    stmt = _get_bp_statement()
+    stmt = _get_bp_list_statement()
     count_stmt = select(sqlalchemy.func.count()).select_from(db_models.BlogPost)
     if not can_see_unpublished:
         stmt = stmt.filter(db_models.BlogPost.is_published.is_(True))

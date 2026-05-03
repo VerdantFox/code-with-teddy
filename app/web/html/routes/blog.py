@@ -18,12 +18,11 @@ from wtforms import (
     validators,
 )
 
-from app import constants
+from app import constants, errors
 from app.datastore.database import DBSession
 from app.permissions import Action, requires_permission
 from app.services.blog import blog_handler
 from app.services.general import email_handler
-from app.web import errors
 from app.web.auth import LoggedInUser, LoggedInUserOptional
 from app.web.html import web_user_handlers
 from app.web.html.const import templates

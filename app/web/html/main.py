@@ -48,11 +48,10 @@ class CSPMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # Build comprehensive CSP policy with nonce
-        # HTMX and some inline scripts require 'unsafe-inline' as fallback
         csp_policy = [
             f"default-src {SELF}",
             (
-                f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL} {UNSAFE_INLINE} "
+                f"script-src {SELF} 'nonce-{nonce}' {UNSAFE_EVAL} "
                 f"{SENTRY_JS_CDN} {SENTRY_BROWSER_CDN}"
             ),
             f"style-src {SELF} {FONTS_BUNNY} {UNSAFE_INLINE}",

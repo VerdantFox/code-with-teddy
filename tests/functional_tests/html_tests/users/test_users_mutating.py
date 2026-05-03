@@ -10,10 +10,10 @@ from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import errors
 from app.datastore import db_models
 from app.services.media import media_handler
 from app.services.users import user_handler
-from app.web import errors
 from tests import TEST_MEDIA_DATA_PATH, TestCase
 from tests.data import models as test_models
 from tests.functional_tests import BASE_URL

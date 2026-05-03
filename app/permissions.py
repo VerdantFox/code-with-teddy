@@ -1,11 +1,12 @@
 """permissions: Permissions for the app."""
 
+import inspect
 from collections.abc import Callable
 from enum import StrEnum
 from functools import wraps
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
-from app.web import errors
+from app import errors
 
 if TYPE_CHECKING:
     from app.mixins import AuthUserMixin
@@ -52,6 +53,9 @@ def requires_permission(permission: Action) -> Callable:
                 raise errors.UserPermissionsError
             return await func(*args, current_user=current_user, **kwargs)
 
+        # Expose the original function's signature so FastAPI's dependency
+        # injection and OpenAPI schema generation see the correct parameters.
+        cast(Any, wrapper).__signature__ = inspect.signature(func)
         return wrapper
 
     return decorator

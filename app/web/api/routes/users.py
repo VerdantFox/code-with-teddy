@@ -6,11 +6,12 @@ import sqlalchemy.exc
 from fastapi import APIRouter, status
 from sqlalchemy import select
 
+from app import errors
 from app.datastore import db_models
 from app.datastore.database import AsyncSession, DBSession
 from app.permissions import Role
 from app.services.general import auth_helpers
-from app.web import auth, errors
+from app.web import auth
 from app.web import field_types as ft
 from app.web.api import api_models
 from app.web.web_models import UnauthenticatedUser

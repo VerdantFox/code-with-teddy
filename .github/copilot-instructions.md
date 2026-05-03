@@ -56,9 +56,7 @@ Tests use a **separate Postgres container** (`postgres_test`, port 5433). The ro
 ### Linting & formatting
 
 ```bash
-ruff check .       # lint
-ruff format .      # format
-ty check           # type-check (Astral ty, not mypy)
+pre-commit run --all-files
 ```
 
 ### DB migrations
@@ -84,6 +82,10 @@ python -m scripts.alembic upgrade head
 
 **Ruff** is the linter+formatter (100-char line length, extensive rule set). Docstrings required everywhere except `__init__` and magic methods. No `print` statements in app/tests.
 
+**ty** is the type checker (Astral ty, not mypy). All functions/methods must have return type annotations. Variable annotations required when the type cannot be inferred.
+
+**Pre-commit hooks** run Ruff and ty and some other lint hooks. Run `pre-commit run --all-files` to apply all hooks locally.
+
 ## Key Files
 
 | File                                                                   | Purpose                                      |
@@ -102,18 +104,12 @@ python -m scripts.alembic upgrade head
 
 ### pytest config gotchas
 
-- `pyproject.toml` sets `addopts = "--reruns 2"` — this retries every failed test twice, which hides ordering issues and slows debugging. Override it when investigating failures: `pytest --override-ini="addopts=" ...`
+- `pyproject.toml` sets `addopts = "--reruns 1"` — this retries every failed test once, which hides ordering issues and slows debugging. Override it when investigating failures: `pytest --override-ini="addopts=" ...`
 - `filterwarnings = ["error:::app", "error:::tests", "error:::scripts"]` — `DeprecationWarning`s from app/test code are **errors**. Any deprecated API usage in `app/` or `tests/` will cause test failures.
 - `ai_workspace/` at the project root is in `.gitignore` and safe for writing debug scripts and output files.
-
-### Test client and cookie state
-
-- The `test_client` fixture is **session-scoped** — cookies persist across tests within a session.
-- The `logged_in_basic_user` / `logged_in_admin_user` fixtures call `test_client.cookies.clear()` on teardown. If a test logs in **manually** (e.g., `POST /login` or `POST /auth/token`) without using these fixtures, it **must** call `test_client.cookies.clear()` at the end to avoid leaking cookie state into subsequent tests.
-- `BASIC_COOKIE` and `ADMIN_COOKIE` in `tests/__init__.py` are module-level dicts shared across the session. They are cleared between test modules by `_clear_tokens()` called from the `clean_db` fixture teardown.
-- Flash messages are stored in the **session cookie**. A stale session cookie from a previous test (e.g., one that logged in) can cause flash messages from a subsequent test to be lost or doubled.
 
 ## DO these things
 
 - Run `pre-commit run --all-files` frequently to apply all linters and formatters locally. The `pre-commit` config is in `.pre-commit-config.yaml`
-- `ai_workspace/` at the project root is in `.gitignore` and safe for writing debug scripts and output files. Use this instead of writing to `/tmp/` or other shared locations.
+- Use single backticks for docstrings and comments rather than double backticks.
+- `ai_workspace/` at the project root is in `.gitignore` and is safe for writing debug scripts and output files. Use this directory instead of writing to `/tmp/` or other shared locations.

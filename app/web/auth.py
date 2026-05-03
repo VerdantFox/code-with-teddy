@@ -9,12 +9,13 @@ from fastapi import Cookie, Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 
+from app import errors
 from app.datastore import db_models
 from app.datastore.database import DBSession
 from app.services.general import auth_helpers
 from app.settings import settings
-from app.web import errors, web_models
 from app.web import field_types as ft
+from app.web import web_models
 
 # ----------- Constants -----------
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")

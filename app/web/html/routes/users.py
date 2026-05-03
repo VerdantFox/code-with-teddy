@@ -1,6 +1,7 @@
 """users: HTML routes for users."""
 
 from typing import Annotated
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, BackgroundTasks, Query, Request, UploadFile, status
 from fastapi.responses import RedirectResponse
@@ -15,10 +16,10 @@ from wtforms import (
     validators,
 )
 
-from app import constants
+from app import constants, errors
 from app.datastore.database import DBSession
 from app.services.users import user_handler
-from app.web import auth, errors
+from app.web import auth
 from app.web.html.const import templates
 from app.web.html.flash_messages import FlashCategory, FlashMessage, FormErrorMessage
 from app.web.html.routes.auth import login_for_access_token
@@ -32,8 +33,24 @@ REGISTER_TEMPLATE = "users/register.html"
 
 
 def _safe_redirect(url: str | None) -> str:
-    """Return a safe same-origin redirect path, defaulting to '/'."""
-    if url and url.startswith("/") and not url.startswith("//"):
+    """Return a safe same-origin redirect path, defaulting to '/'.
+
+    Accepts both relative paths (`/blog`) and absolute same-origin URLs
+    (`http://localhost:8000/blog`).  Absolute URLs are stripped down to
+    path+query so the client is never redirected off-site.  Protocol-relative
+    URLs (`//evil.com`) are rejected.
+    """
+    if not url:
+        return "/"
+    parsed = urlparse(url)
+    if parsed.netloc:
+        # Absolute URL — keep only path + query (strips scheme and host)
+        path = parsed.path or "/"
+        if parsed.query:
+            path += f"?{parsed.query}"
+        return path
+    # Relative URL — must start with / but not //
+    if parsed.path.startswith("/") and not parsed.path.startswith("//"):
         return url
     return "/"
 

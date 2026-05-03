@@ -4,8 +4,9 @@ import sentry_sdk
 from fastapi import APIRouter, Request, Response
 from starlette.templating import _TemplateResponse
 
+from app import errors
 from app.datastore.database import DBSession
-from app.web import auth, errors
+from app.web import auth
 from app.web import field_types as ft
 from app.web.auth import OptionalCookieDependency
 from app.web.html.const import templates

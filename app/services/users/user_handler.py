@@ -13,11 +13,11 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import errors
 from app.datastore import db_models
 from app.permissions import Role
 from app.services.general import auth_helpers, email_handler, encryption_handler
 from app.services.media import media_handler
-from app.web import errors
 
 logger = getLogger(__name__)
 PW_RESET_TOKEN_EXPIRATION_MINUTES = 15
