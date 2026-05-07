@@ -341,9 +341,7 @@ the above test `SKIPPED (No way of testing this properly)`). If you only want
 to `skip` a test under certain conditions, mark with `skipif` like so:
 
 ```python
-@pytest.mark.skipif(
-    os.environ.get("SKIP") != "1", reason="It only works if SKIP is set to '1'"
-)
+@pytest.mark.skipif(os.environ.get("SKIP") != "1", reason="It only works if SKIP is set to '1'")
 def test_skipped_if():
     """Mark a test to be skipped under certain conditions with a reason"""
     assert True
@@ -553,9 +551,7 @@ def test_update_file_pathlib(tmp_path):
     test_file = tmp_path.joinpath("testfile.txt")
 
     # Get the file contents of a file in our test_data directory
-    with importlib.resources.path(
-        "pytest_examples.test_data", "infile.txt"
-    ) as test_path_og:
+    with importlib.resources.path("pytest_examples.test_data", "infile.txt") as test_path_og:
         # Write data from our test_data directory file to the temporary file
         test_file.write_text(test_path_og.read_text())
 
@@ -572,9 +568,7 @@ object for that temporary directory. With `test_file = tmp_path.joinpath("testfi
 we point to a temporary file in the temporary directory. Next
 
 ```python
-with importlib.resources.path(
-    "pytest_examples.test_data", "infile.txt"
-) as test_path_og:
+with importlib.resources.path("pytest_examples.test_data", "infile.txt") as test_path_og:
     test_file.write_text(test_path_og.read_text())
 ```
 

@@ -72,9 +72,7 @@ So `save_image` returns a string that is either a single path or exactly two com
 **`save_media_for_blog_post(db, blog_post, media, name)`** calls `_save_bp_media` to get `locations_str, media_type`, then calls `commit_media_to_db()`:
 
 ```python
-locations_str, media_type = _save_bp_media(
-    name=name, blog_post_slug=blog_post.slug, media=media
-)
+locations_str, media_type = _save_bp_media(name=name, blog_post_slug=blog_post.slug, media=media)
 return await commit_media_to_db(
     db=db,
     blog_post=blog_post,
@@ -119,7 +117,7 @@ After the change, if `locations` is already a `list[str]` on the model, the temp
 The initial migration (`de229330a488_initial_migration.py`) defines the column as:
 
 ```python
-sa.Column("locations", sa.String(), nullable=False),
+(sa.Column("locations", sa.String(), nullable=False),)
 ```
 
 A new migration will need to:
@@ -323,9 +321,7 @@ def upload_blog_media(media: UploadFile, name: str) -> tuple[list[str], str]:
 **`_save_bp_media`** — update return type annotation only (the call to `upload_blog_media` already returns the right shape after step 2):
 
 ```python
-def _save_bp_media(
-    name: str, blog_post_slug: str, media: UploadFile
-) -> tuple[list[str], str]:
+def _save_bp_media(name: str, blog_post_slug: str, media: UploadFile) -> tuple[list[str], str]:
     file_name = f"{blog_utils.get_slug(name)}--{blog_post_slug}"
     return media_handler.upload_blog_media(
         media=media,
@@ -343,9 +339,7 @@ async def save_media_for_blog_post(
     name: str,
 ) -> db_models.BlogPost:
     """Save media for a blog post."""
-    locations, media_type = _save_bp_media(
-        name=name, blog_post_slug=blog_post.slug, media=media
-    )
+    locations, media_type = _save_bp_media(name=name, blog_post_slug=blog_post.slug, media=media)
     return await commit_media_to_db(
         db=db,
         blog_post=blog_post,
@@ -456,9 +450,7 @@ def upgrade() -> None:
         sa.Column("locations_array", postgresql.ARRAY(sa.String()), nullable=True),
     )
     # Populate it from the existing comma-separated string column
-    op.execute(
-        "UPDATE blog_post_media SET locations_array = string_to_array(locations, ',')"
-    )
+    op.execute("UPDATE blog_post_media SET locations_array = string_to_array(locations, ',')")
     # Drop the old column and rename the new one
     op.drop_column("blog_post_media", "locations")
     op.alter_column(
@@ -476,14 +468,10 @@ def downgrade() -> None:
         sa.Column("locations_str", sa.String(), nullable=True),
     )
     # Convert the array back to a comma-separated string
-    op.execute(
-        "UPDATE blog_post_media SET locations_str = array_to_string(locations, ',')"
-    )
+    op.execute("UPDATE blog_post_media SET locations_str = array_to_string(locations, ',')")
     # Drop the array column and rename the text column back
     op.drop_column("blog_post_media", "locations")
-    op.alter_column(
-        "blog_post_media", "locations_str", new_column_name="locations", nullable=False
-    )
+    op.alter_column("blog_post_media", "locations_str", new_column_name="locations", nullable=False)
 ```
 
 ### Testing Approach

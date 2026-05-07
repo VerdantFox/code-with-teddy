@@ -123,9 +123,7 @@ from app.web.auth import LoggedInUser
 
 @router.get("/blog/create", response_model=None)
 @requires_permission(Action.EDIT_BP)
-async def create_bp_get(
-    request: Request, current_user: LoggedInUser
-) -> _TemplateResponse: ...
+async def create_bp_get(request: Request, current_user: LoggedInUser) -> _TemplateResponse: ...
 ```
 
 API routes use JWT bearer tokens instead of cookies.
